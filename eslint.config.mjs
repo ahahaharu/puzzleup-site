@@ -66,7 +66,8 @@ export default defineConfig([
         {
           patterns: [
             {
-              regex: '^@/content/(?!index$).+',
+              // Модули src/content, сгенерированный модуль и файлы content/ напрямую.
+              regex: '^(?:@/content/(?!index$).+|content-collections$|(?:\\.\\./)+content(?:/|$))',
               message: 'Import content from @/content only (src/content/index.ts).',
             },
           ],
