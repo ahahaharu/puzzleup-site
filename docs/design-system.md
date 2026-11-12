@@ -171,9 +171,9 @@ background-size: 32px 32px;   /* 24px на телефоне */
 
 | Компонент | Варианты и правила | Артборд |
 |---|---|---|
-| `Button` | `primary` (ink / paper, наведение – ink-2), `secondary` (прозрачная, рамка 1,5 px ink), `accent` (accent-strong, белый текст – только отправка формы), `onDark`. Размеры `lg` 56 px (первый экран, форма), `md` 48 px. Состояния: наведение, фокус, нажатие `scale(.98)`, неактивная 40%, загрузка со спиннером и «Отправляем…». Ссылка или кнопка – по смыслу (`href` → `<a>`/`next/link`) | Button, DS-States |
-| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись, `aria-label` «Написать Андрею в Telegram» | D-5-tutors, T-1-profile |
-| `Chip` | `solid`, `dashed`, `outline` – метки и плашки | Chip |
+| `Button` | `primary` (ink / paper, наведение – ink-2), `secondary` (прозрачная, рамка 1,5 px ink), `accent` (accent-strong, белый текст – только отправка формы), `onDark`, `secondaryOnDark` (контур paper 60 % на тёмной детали, X-thanks). Размеры `lg` 56 px (первый экран, форма), `md` 48 px. Состояния: наведение, фокус, нажатие `scale(.98)`, неактивная 40%, загрузка со спиннером и «Отправляем…» (`aria-disabled`, ADR-030). Ссылка или кнопка – по смыслу (`href` → `<a>`/`next/link`) | Button, DS-States |
+| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись. Подпись `short` / `action` / `personal`: на узкой паре видно «Telegram», на широкой – «Написать в Telegram» / «Написать Андрею в Telegram». Доступное имя всегда «Написать Андрею в Telegram» – через скрытый текст, не `aria-label` (ADR-029). Тон `light` / `dark` | D-5-tutors, T-1-profile, X-thanks |
+| `Chip` | `solid`, `dashed`, `outline`, `kraft` (предметы с классами в профиле) – метки и плашки | Chip, T-1-profile |
 | `ChoiceChip` | 44 px, рамка 1,5 px ink 25%. Выбранный – заливка ink, текст paper, галочка слева. На тёмной форме – инверсия. Нативные `radio`/`checkbox` внутри `<label>` | DS-States, T-6-form |
 | `Badge` (статус занятости) | Высота от 32, кружок 8 px + текст Golos 500 14 px, `nowrap` | T-S-statuses |
 | `Field` | Высота 52, рамка 1,5 px ink 30%, подпись всегда над полем, подсказка и ошибка под полем. Ошибка: рамка error / error-light, иконка, текст, `aria-describedby`, `aria-invalid` | DS-States, X-form-errors |
@@ -186,6 +186,8 @@ background-size: 32px 32px;   /* 24px на телефоне */
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |
 | `Margins` («пометки на полях») | Формулы Spectral Italic, ink 35–45%, поворот ±3–4°, `aria-hidden`, на телефоне скрываются при наложении на текст | D-1-hero |
 | `PhotoTape` | Фото «вклеено в тетрадь»: белая рамка 8 / 12 px, поворот ±1,5°, полоска «скотча», без фото – инициалы на kraft | D-5-tutors, T-1-profile |
+
+Все компоненты во всех состояниях – на витрине `/dev/ui` (только `pnpm dev`).
 
 Иконки линейные, толщина 1,6–1,7, 24 px (`viewBox 0 0 24 24`, `stroke="currentColor"`). Эмодзи не используются.
 
