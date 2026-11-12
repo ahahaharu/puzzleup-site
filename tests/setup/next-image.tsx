@@ -1,3 +1,4 @@
+// Путь внутренний, без semver-гарантий: при обновлении Next проверить, что он на месте (ADR-031).
 import { getImageProps, type ImageProps } from 'next/dist/shared/lib/image-external';
 
 // next/image – CommonJS-модуль: в Vite default-импорт приходит объектом экспортов, а не компонентом.

@@ -105,4 +105,22 @@ describe('Button', () => {
     expect(link.firstElementChild?.tagName.toLowerCase()).toBe('svg');
     expect(link.firstElementChild?.getAttribute('aria-hidden')).toBe('true');
   });
+
+  it('stays in the Tab order while loading and ignores Enter and Space', async () => {
+    const onSubmit = vi.fn((event: SubmitEvent) => event.preventDefault());
+    const screen = await render(
+      <form onSubmit={(event) => onSubmit(event.nativeEvent)}>
+        <Button type="submit" loading>
+          Записаться
+        </Button>
+      </form>,
+    );
+
+    await userEvent.tab();
+    await expect.element(screen.getByRole('button', { name: LOADING_LABEL })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.keyboard(' ');
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
 });
