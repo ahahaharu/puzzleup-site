@@ -180,7 +180,7 @@ background-size: 32px 32px;   /* 24px на телефоне */
 | `Checkbox` | Квадрат 24 px, зона клика от 44×44 вместе с текстом | DS-States |
 | `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `slanted` / `staff` / `margin` / `plain` (все бумаги раздела 4), `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
 | `PuzzlePiece` | Форма из логотипа (SVG ниже), `currentColor` | Logo |
-| `PuzzleStep` | Деталь-шаг, цепочка только горизонтальная (на телефоне – лента с прокруткой), соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
+| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
 | `Doodle` | Каракули на полях: `circle`, `sine`, `lever`, `cube`, `triangle`; не больше 6 на экран, на телефоне часть скрыта, `aria-hidden` | Doodle |
 | `SectionHead` | H2 + лид | SectionHead |
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |
