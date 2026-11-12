@@ -12,7 +12,7 @@ const VARIANTS: Record<ChipVariant, string> = {
   dashed: 'border-[1.5px] border-dashed border-ink/45 text-ink-2',
   outline: 'border border-ink/25 bg-paper text-ink',
   // Предметы с классами в профиле репетитора: «Математика · 5–9 класс».
-  kraft: 'bg-kraft text-ink',
+  kraft: 'bg-kraft py-1.5 text-small text-ink',
 };
 
 type ChipProps = {

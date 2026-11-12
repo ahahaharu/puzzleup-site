@@ -30,6 +30,9 @@ const TAPE = {
   lg: '-top-2 -left-4.5 h-5.5 w-[70px]',
 } as const;
 
+// Инициал – доля ширины фото (cqw), как на холсте: 52 px при 170 px в карточке, 105 px при 420 px в профиле.
+const INITIAL = { sm: 'text-[34cqw]', lg: 'text-[27cqw]' } as const;
+
 export function PhotoTape({
   name,
   photo,
@@ -61,10 +64,13 @@ export function PhotoTape({
             className="object-cover"
           />
         ) : (
-          // Инициал – декор: имя рядом всегда написано текстом. Размер – треть ширины, как на холсте.
+          // Инициал – декор: имя рядом всегда написано текстом.
           <span
             aria-hidden="true"
-            className="absolute inset-0 flex items-center justify-center font-display text-[31cqw] leading-none font-bold text-ink/40"
+            className={cn(
+              'absolute inset-0 flex items-center justify-center font-display leading-none font-bold text-ink/40',
+              INITIAL[frame],
+            )}
           >
             {name.trim().charAt(0).toUpperCase()}
           </span>

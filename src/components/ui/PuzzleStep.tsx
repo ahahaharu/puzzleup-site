@@ -87,11 +87,14 @@ export function PuzzleStep({
         {/* Номер – декор: порядок шагов задаёт список <ol> вокруг деталей. */}
         <span
           aria-hidden="true"
-          className={cn('font-hand text-hand-lg leading-none italic', colors.number)}
+          className={cn('font-hand text-hand-md leading-none italic', colors.number)}
         >
           {n}
         </span>
-        <Heading className="font-display text-h3 leading-[1.15]">{title}</Heading>
+        {/* Межстрочный 1,15 и трекинг −0,01em – из макета ds/PuzzleStep: заголовок в узкой детали. */}
+        <Heading className="font-display text-h3 leading-[1.15] tracking-[-0.01em]">
+          {title}
+        </Heading>
         {children && <p className="text-small">{children}</p>}
       </div>
     </div>
