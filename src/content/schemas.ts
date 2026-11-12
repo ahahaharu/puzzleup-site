@@ -32,7 +32,7 @@ const TELEGRAM_NICK = '[A-Za-z][A-Za-z0-9_]{4,31}';
 const telegram = z
   .string()
   .regex(
-    new RegExp(`^(?:@?${TELEGRAM_NICK}|https://t\\.me/${TELEGRAM_NICK})$`),
+    new RegExp(`^(?:${TELEGRAM_NICK}|https://t\\.me/${TELEGRAM_NICK})$`),
     'Telegram nick without @ or a https://t.me/ link',
   );
 // Номер с кодом страны в любом написании: «+375 29 000-00-00».
@@ -52,7 +52,11 @@ export const tutorSchema = z.strictObject({
   nameDative: text,
   namePrepositional: text,
   fullName: orPlaceholder(text),
-  unp: orPlaceholder(z.string().regex(/^\d{9}$/, '9 digits')),
+  // Без кавычек YAML прочитает УНП числом – просим строку, а не молча приводим.
+  unp: orPlaceholder(
+    z.string().regex(/^\d{9}$/),
+    "UNP must be a quoted string of 9 digits: '123456789'",
+  ),
   photo: z
     .string()
     .regex(/^[\w-]+\.(?:jpe?g|png|webp|avif)$/i, 'File name in public/tutors/')
@@ -171,7 +175,9 @@ export const siteSchema = z.strictObject({
     copyright: text,
   }),
   /** Часы ответа на заявки, время – по Минску. */
-  responseHours: z.strictObject({ from: time, to: time, tz: z.literal('Europe/Minsk') }),
+  responseHours: z
+    .strictObject({ from: time, to: time, tz: z.literal('Europe/Minsk') })
+    .refine((hours) => hours.from < hours.to, '`from` must be earlier than `to`'),
   /** Условия оплаты и переноса для репетитора без своего поля `terms`. */
   defaultTerms: text,
   /** Платформы занятий для репетитора без своего поля `platforms`. */

@@ -148,10 +148,60 @@ describe('validateContent', () => {
     ]);
   });
 
-  it('requires id to be t-<slug>', () => {
-    expect(messages(raw({ tutors: [tutor('maria', { id: 't-anna' })] }))).toContain(
-      'content/tutors/maria.mdx › id: id must be «t-maria»',
-    );
+  // id постоянный, а slug можно сменить (с редиректом) – после этого они расходятся.
+  it('keeps id independent of slug', () => {
+    const renamed = { ...raw(), tutors: [tutor('maria-m', { id: 't-maria' })] };
+    expect(messages(renamed)).toEqual([]);
+  });
+
+  it('requires an existing site operator', () => {
+    const site = raw().site;
+    const data = { ...Object(site.data), siteOperatorTutorId: 't-anna' };
+    expect(messages(raw({ site: { ...site, data } }))).toEqual([
+      'content/site.json › siteOperatorTutorId: tutor «t-anna» does not exist',
+    ]);
+  });
+
+  it('rejects response hours that end before they start', () => {
+    const site = raw().site;
+    const data = {
+      ...Object(site.data),
+      responseHours: { from: '22:00', to: '09:00', tz: 'Europe/Minsk' },
+    };
+    expect(messages(raw({ site: { ...site, data } }))).toEqual([
+      'content/site.json › responseHours: `from` must be earlier than `to`',
+    ]);
+  });
+
+  it('rejects a subject whose grades are reversed', () => {
+    const subjects = raw().subjects;
+    const [math] = Object(subjects.data);
+    const data = [{ ...math, gradeFrom: 11, gradeTo: 5 }];
+    expect(messages(raw({ subjects: { ...subjects, data } }))).toEqual([
+      'content/subjects.json › 0: `gradeFrom` must not exceed `gradeTo`',
+    ]);
+  });
+
+  it('asks to quote the UNP so that YAML keeps it a string', () => {
+    expect(messages(raw({ tutors: [tutor('maria', { unp: 123456789 })] }))).toEqual([
+      "content/tutors/maria.mdx › unp: UNP must be a quoted string of 9 digits: '123456789'",
+    ]);
+  });
+
+  it('accepts a Telegram nick only without @', () => {
+    expect(
+      messages(raw({ tutors: [tutor('maria', { telegram: '@maria_example' })] }))[0],
+    ).toContain('telegram');
+    expect(
+      messages(raw({ tutors: [tutor('maria', { telegram: 'https://t.me/maria_example' })] })),
+    ).toEqual([]);
+  });
+
+  it('rejects placeholders in JSON files in strict mode', () => {
+    const faq = [{ id: 'q', question: 'Вопрос?', answer: 'Ответ [черновик].' }];
+    expect(messages(raw({ faq: { file: 'content/faq.json', data: faq } }), true)).toEqual([
+      'content/faq.json › 0.answer: placeholder [черновик] must be replaced before release',
+    ]);
   });
 
   it('rejects a subject that is not in subjects.json', () => {

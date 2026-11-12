@@ -213,9 +213,6 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
     if (baseName(tutor.file) !== tutor.slug) {
       report(tutor.file, 'slug', `slug «${tutor.slug}» must match the file name`);
     }
-    if (tutor.id !== `t-${tutor.slug}`) {
-      report(tutor.file, 'id', `id must be «t-${tutor.slug}»`);
-    }
     const sameId = seenIds.get(tutor.id);
     if (sameId) {
       report(tutor.file, 'id', `id «${tutor.id}» is already used in ${sameId}`);

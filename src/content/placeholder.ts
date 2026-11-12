@@ -13,8 +13,8 @@ const PLACEHOLDER_ONLY = /^\[[^[\]\n]+\]$/;
 export const placeholderSchema = z.string().regex(PLACEHOLDER_ONLY);
 
 /** Поле, которое до релиза может быть заглушкой: значение по схеме или `[…]`. */
-export function orPlaceholder<T extends z.ZodType>(schema: T) {
-  return z.union([placeholderSchema, schema]);
+export function orPlaceholder<T extends z.ZodType>(schema: T, error?: string) {
+  return z.union([placeholderSchema, schema], error === undefined ? undefined : { error });
 }
 
 export function isPlaceholder(value: unknown): value is string {
