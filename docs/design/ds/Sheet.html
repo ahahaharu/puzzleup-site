@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PuzzleUp – лист из тетради</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Golos+Text:wght@400;500;600&amp;family=Spectral:ital,wght@1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D2340}a:hover{color:#B23A17}
+</style>
+</helmet>
+<div style="{{wrapStyle}}">
+<div style="{{sheetStyle}}">
+<sc-if value="{{hasTag}}" hint-placeholder-val="{{true}}"><div style="font-family: 'Golos Text', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; line-height: 28px; color: #4A4F66">{{tag}}</div></sc-if>
+<div style="font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; line-height: 28px; letter-spacing: -0.01em">{{title}}</div>
+<sc-if value="{{hasFormula}}" hint-placeholder-val="{{true}}"><div style="font-family: 'Spectral', serif; font-style: italic; font-size: 30px; line-height: 56px">{{formula}}</div></sc-if>
+<div style="font-family: 'Golos Text', sans-serif; font-size: 16px; line-height: 28px; color: #2E3452">{{text}}</div>
+</div>
+<div aria-hidden="true" style="position: absolute; top: 0; right: 0; width: 26px; height: 26px; background: linear-gradient(to top right, #DDD3BC 50%, transparent 50%)"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["cell","mm","lined","plain"],"default":"cell"},"tag":{"editor":"text","default":"5–11 классы"},"title":{"editor":"text","default":"Математика"},"formula":{"editor":"text","default":"x² − 5x + 6 = 0"},"text":{"editor":"text","default":"Дроби, уравнения, функции, геометрия, подготовка к экзаменам и ЦТ."},"tilt":{"editor":"float","default":0,"min":-4,"max":4,"step":0.5},"$preview":{"width":360,"height":330}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const kind = this.props.kind || 'cell';
+    const tilt = this.props.tilt ?? 0;
+    const bg = {
+      cell: 'background-color: #FBFAF5; background-image: linear-gradient(rgba(58,111,216,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(58,111,216,0.22) 1px, transparent 1px); background-size: 24px 24px;',
+      mm: 'background-color: #FFFDF7; background-image: linear-gradient(rgba(228,87,46,0.35) 1px, transparent 1px), linear-gradient(90deg, rgba(228,87,46,0.35) 1px, transparent 1px), linear-gradient(rgba(228,87,46,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(228,87,46,0.16) 1px, transparent 1px); background-size: 30px 30px, 30px 30px, 6px 6px, 6px 6px;',
+      lined: 'background-color: #FFFFFF; background-image: linear-gradient(90deg, transparent 52px, rgba(228,87,46,0.7) 52px, rgba(228,87,46,0.7) 53px, transparent 53px), repeating-linear-gradient(transparent 0, transparent 27px, rgba(58,111,216,0.28) 27px, rgba(58,111,216,0.28) 28px);',
+      plain: 'background-color: #FBF9F4;'
+    };
+    const padLeft = kind === 'lined' ? 72 : 28;
+    const wrapStyle = 'position: relative; width: 100%; box-sizing: border-box; transform: rotate(' + tilt + 'deg); filter: drop-shadow(0 2px 3px rgba(29,35,64,0.14))';
+    const sheetStyle = 'box-sizing: border-box; padding: 28px 28px 28px ' + padLeft + 'px; color: #1D2340; clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%); ' + (bg[kind] || bg.cell);
+    const tag = this.props.tag ?? '';
+    const formula = this.props.formula ?? '';
+    return { wrapStyle: wrapStyle, sheetStyle: sheetStyle, tag: tag, hasTag: !!tag, formula: formula, hasFormula: !!formula, title: this.props.title ?? '', text: this.props.text ?? '' };
+  }
+}
+</script>
+</body>
+</html>

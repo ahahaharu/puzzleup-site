@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PuzzleUp – каракули на полях</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Golos+Text:wght@400;500;600&amp;family=Spectral:ital,wght@1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D2340}a:hover{color:#B23A17}
+</style>
+</helmet>
+<svg width="{{size}}" height="{{size}}" viewBox="0 0 100 100" aria-hidden="true" fill="none" stroke="{{color}}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+<path d="{{d1}}" stroke-dasharray="{{s1}}"></path>
+<path d="{{d2}}" stroke-dasharray="{{s2}}"></path>
+<path d="{{d3}}" stroke-dasharray="{{s3}}"></path>
+<path d="{{d4}}" stroke-dasharray="{{s4}}"></path>
+</svg>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"shape":{"editor":"enum","options":["circle","sine","lever","cube","triangle"],"default":"circle"},"size":{"editor":"int","default":120,"min":48,"max":240},"opacity":{"editor":"float","default":0.15,"min":0.05,"max":0.5,"step":0.01},"$preview":{"width":120,"height":120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const N = 'M0 0';
+    const set = {
+      circle: [['M10,50 A40,40 0 1 0 90,50 A40,40 0 1 0 10,50 Z', 'none'], ['M10,50 H90', '3 4'], ['M50,50 L84,29', 'none'], [N, 'none']],
+      sine: [['M6,52 H96 M10,10 V92', 'none'], ['M91,48 L96,52 L91,56 M6,15 L10,10 L14,15', 'none'], ['M10,52 C26,4 46,4 56,52 S84,100 94,52', 'none'], [N, 'none']],
+      lever: [['M6,56 L94,40', 'none'], ['M46,48 L36,80 H60 Z', 'none'], ['M14,12 V44 M9,39 L14,44 L19,39', 'none'], ['M88,6 V30 M83,25 L88,30 L93,25', 'none']],
+      cube: [['M38,12 H88 V62 H38 Z', 'none'], ['M12,38 H62 V88 H12 Z', 'none'], ['M12,38 L38,12 M62,38 L88,12 M62,88 L88,62', 'none'], ['M12,88 L38,62', '3 4']],
+      triangle: [['M10,86 L90,86 L64,22 Z', 'none'], ['M64,22 V86', '3 4'], ['M64,80 H58 V86', 'none'], [N, 'none']]
+    };
+    const p = set[this.props.shape || 'circle'] || set.circle;
+    const o = this.props.opacity ?? 0.15;
+    return { size: this.props.size ?? 120, color: 'rgba(29,35,64,' + o + ')', d1: p[0][0], s1: p[0][1], d2: p[1][0], s2: p[1][1], d3: p[2][0], s3: p[2][1], d4: p[3][0], s4: p[3][1] };
+  }
+}
+</script>
+</body>
+</html>

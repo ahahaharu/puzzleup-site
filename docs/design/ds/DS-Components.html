@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PuzzleUp – дизайн-система: компоненты</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Golos+Text:wght@400;500;600&amp;family=Spectral:ital,wght@1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D2340}a:hover{color:#B23A17}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1620px; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 56px; padding: 64px; font-family: 'Golos Text', sans-serif; color: #1D2340; background-color: #F7F4EC; background-image: linear-gradient(rgba(29,35,64,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(29,35,64,0.06) 1px, transparent 1px); background-size: 32px 32px;">
+<div style="display: flex; flex-direction: column; gap: 6px"><div style="font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.03em; line-height: 1">Компоненты<span style="color: #E4572E">.</span></div><div style="font-size: 14px; color: #4A4F66">Каждый блок – отдельный файл (настройки на вкладке Tweaks). В коде это обычные компоненты с теми же пропсами.</div></div>
+<section style="display: flex; flex-direction: column; gap: 16px"><h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em">Кнопки <span style="font-family: 'Golos Text', sans-serif; font-weight: 400; font-size: 14px; color: #4A4F66; margin-left: 8px">Button · primary · secondary · accent · onDark</span></h2>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center"><dc-import name="Button" label="Записаться на пробное занятие" variant="primary" size="lg" hint-size="260px,56px"></dc-import><dc-import name="Button" label="Написать в Telegram" variant="secondary" size="lg" hint-size="260px,56px"></dc-import><dc-import name="Button" label="Записаться" variant="accent" size="lg" hint-size="260px,56px"></dc-import></div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center"><dc-import name="Button" label="Пробное занятие бесплатно" variant="primary" size="md" hint-size="200px,48px"></dc-import><dc-import name="Button" label="Написать в Telegram" variant="secondary" size="md" hint-size="200px,48px"></dc-import></div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 16px"><h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em">Чипы <span style="font-family: 'Golos Text', sans-serif; font-weight: 400; font-size: 14px; color: #4A4F66; margin-left: 8px">Chip · solid · dashed · outline</span></h2>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center"><dc-import name="Chip" label="Математика" variant="solid" hint-size="120px,40px"></dc-import><dc-import name="Chip" label="Физика" variant="solid" hint-size="120px,40px"></dc-import><dc-import name="Chip" label="и другие предметы" variant="dashed" hint-size="120px,40px"></dc-import><dc-import name="Chip" label="Онлайн · 5–11 классы" variant="outline" hint-size="120px,40px"></dc-import></div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 16px"><h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em">Лист из тетради <span style="font-family: 'Golos Text', sans-serif; font-weight: 400; font-size: 14px; color: #4A4F66; margin-left: 8px">Sheet · cell · mm · lined · plain</span></h2><div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px"><div><dc-import name="Sheet" kind="cell" tag="5–11 классы" title="Математика" formula="x² − 5x + 6 = 0" text="Дроби, уравнения, функции, геометрия." tilt="-1" hint-size="100%,300px"></dc-import></div><div><dc-import name="Sheet" kind="mm" tag="7–11 классы" title="Физика" formula="F = m · a" text="Механика, электричество, задачи." tilt="1" hint-size="100%,300px"></dc-import></div><div><dc-import name="Sheet" kind="lined" tag="любой класс" title="Другой предмет" formula="" text="Список предметов растёт." tilt="-0.5" hint-size="100%,300px"></dc-import></div><div><dc-import name="Sheet" kind="plain" tag="" title="[ИМЯ]" formula="" text="[ОПЫТ И СПЕЦИАЛИЗАЦИЯ]" tilt="0.8" hint-size="100%,300px"></dc-import></div></div></section>
+<section style="display: flex; flex-direction: column; gap: 16px"><h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em">Деталь-шаг <span style="font-family: 'Golos Text', sans-serif; font-weight: 400; font-size: 14px; color: #4A4F66; margin-left: 8px">PuzzleStep · цепочка соединяется выступом и пазом</span></h2><div style="display: flex"><dc-import name="PuzzleStep" n="01" title="Пробное занятие" text="30 минут бесплатно. Находим, каких деталей не хватает." tone="cell" left="flat" right="knob" hint-size="280px,250px"></dc-import><dc-import name="PuzzleStep" n="02" title="Подбор репетитора" text="Под характер и уровень ребёнка." tone="sand" left="socket" right="knob" hint-size="280px,250px"></dc-import><dc-import name="PuzzleStep" n="03" title="Занятия" text="Закрываем пробелы по одному." tone="ink" left="socket" right="knob" hint-size="280px,250px"></dc-import><dc-import name="PuzzleStep" n="04" title="Отчёт" text="Раз в месяц – о прогрессе." tone="accent" left="socket" right="flat" hint-size="280px,250px"></dc-import></div></section>
+<section style="display: flex; flex-direction: column; gap: 16px"><h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 500; font-size: 22px; letter-spacing: -0.01em">Каракули на полях <span style="font-family: 'Golos Text', sans-serif; font-weight: 400; font-size: 14px; color: #4A4F66; margin-left: 8px">Doodle · фон между блоками, 15% чернил</span></h2><div style="display: flex; gap: 40px; align-items: center"><dc-import name="Doodle" shape="circle" size="100" opacity="0.3" hint-size="100px,100px"></dc-import><dc-import name="Doodle" shape="sine" size="100" opacity="0.3" hint-size="100px,100px"></dc-import><dc-import name="Doodle" shape="lever" size="100" opacity="0.3" hint-size="100px,100px"></dc-import><dc-import name="Doodle" shape="cube" size="100" opacity="0.3" hint-size="100px,100px"></dc-import><dc-import name="Doodle" shape="triangle" size="100" opacity="0.3" hint-size="100px,100px"></dc-import></div></section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1620}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

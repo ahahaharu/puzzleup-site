@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PuzzleUp – знак</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Golos+Text:wght@400;500;600&amp;family=Spectral:ital,wght@1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D2340}a:hover{color:#B23A17}
+</style>
+</helmet>
+<div style="{{rootStyle}}">
+<svg width="{{size}}" height="{{size}}" viewBox="0 0 120 120" aria-hidden="true" style="flex: none"><path d="M20,28 A8,8 0 0 1 28,20 L48,20 C44,8 52,2 60,2 C68,2 76,8 72,20 L92,20 A8,8 0 0 1 100,28 L100,48 C112,44 118,52 118,60 C118,68 112,76 100,72 L100,92 A8,8 0 0 1 92,100 L72,100 C76,88 68,82 60,82 C52,82 44,88 48,100 L28,100 A8,8 0 0 1 20,92 Z" fill="#E4572E"></path></svg>
+<span style="{{wordStyle}}">PuzzleUp</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"size":{"editor":"int","default":26,"min":16,"max":160},"$preview":{"width":180,"height":40}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const size = this.props.size ?? 26;
+    return {
+      size: size,
+      rootStyle: 'display: inline-flex; align-items: center; gap: ' + Math.round(size * 0.46) + 'px; color: #1D2340',
+      wordStyle: "font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: " + Math.round(size * 0.73) + 'px; line-height: 1; letter-spacing: -0.01em; color: #1D2340; white-space: nowrap'
+    };
+  }
+}
+</script>
+</body>
+</html>

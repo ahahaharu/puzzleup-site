@@ -1,0 +1,791 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "Button.dc.html": {
+   "h": 56,
+   "page": "ds",
+   "title": "Button",
+   "w": 300,
+   "x": 0,
+   "y": 4250
+  },
+  "Chip.dc.html": {
+   "h": 40,
+   "page": "ds",
+   "title": "Chip",
+   "w": 140,
+   "x": 400,
+   "y": 4250
+  },
+  "DS-Components.dc.html": {
+   "h": 1620,
+   "page": "ds",
+   "title": "Компоненты",
+   "w": 1280,
+   "x": 0,
+   "y": 2270
+  },
+  "DS-Foundations.dc.html": {
+   "h": 2150,
+   "page": "ds",
+   "title": "Основы: цвета, шрифты, текстуры",
+   "w": 1280,
+   "x": 0,
+   "y": 0
+  },
+  "Doodle.dc.html": {
+   "h": 120,
+   "page": "ds",
+   "title": "Doodle",
+   "w": 120,
+   "x": 1480,
+   "y": 4250
+  },
+  "PuzzleStep.dc.html": {
+   "h": 250,
+   "page": "ds",
+   "title": "PuzzleStep",
+   "w": 280,
+   "x": 1100,
+   "y": 4250
+  },
+  "SectionHead.dc.html": {
+   "h": 190,
+   "page": "ds",
+   "title": "SectionHead",
+   "w": 640,
+   "x": 1700,
+   "y": 4250
+  },
+  "Sheet.dc.html": {
+   "h": 330,
+   "page": "ds",
+   "title": "Sheet",
+   "w": 360,
+   "x": 640,
+   "y": 4250
+  },
+  "D-1-hero.dc.html": {
+   "title": "Блок 0–1 · шапка и первый экран – десктоп",
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 802,
+   "page": "home-d"
+  },
+  "D-2-situations.dc.html": {
+   "title": "Блок 2 · Узнаёте ситуацию? – десктоп",
+   "x": 0,
+   "y": 1753,
+   "w": 1280,
+   "h": 959,
+   "page": "home-d"
+  },
+  "D-3-how.dc.html": {
+   "title": "Блок 3 · Как это работает – десктоп",
+   "x": 0,
+   "y": 2792,
+   "w": 1280,
+   "h": 1068,
+   "page": "home-d"
+  },
+  "D-4-subjects.dc.html": {
+   "title": "Блок 4 · Предметы – десктоп",
+   "x": 0,
+   "y": 3940,
+   "w": 1280,
+   "h": 598,
+   "page": "home-d"
+  },
+  "D-5-tutors.dc.html": {
+   "title": "Блок 5 · Репетиторы – десктоп",
+   "x": 0,
+   "y": 882,
+   "w": 1280,
+   "h": 791,
+   "page": "home-d"
+  },
+  "D-6-reviews.dc.html": {
+   "title": "Блок 6 · Отзывы – десктоп",
+   "x": 0,
+   "y": 4618,
+   "w": 1280,
+   "h": 656,
+   "page": "home-d"
+  },
+  "D-7-prices.dc.html": {
+   "title": "Блок 7 · Цены – десктоп",
+   "x": 0,
+   "y": 5354,
+   "w": 1280,
+   "h": 849,
+   "page": "home-d"
+  },
+  "D-8-faq.dc.html": {
+   "title": "Блок 8 · FAQ – десктоп",
+   "x": 0,
+   "y": 6283,
+   "w": 1280,
+   "h": 910,
+   "page": "home-d"
+  },
+  "D-9-form.dc.html": {
+   "title": "Блок 9 · О сайте – десктоп",
+   "x": 0,
+   "y": 7273,
+   "w": 1280,
+   "h": 510,
+   "page": "home-d"
+  },
+  "D-10-footer.dc.html": {
+   "title": "Блок 10 · Подвал – десктоп",
+   "x": 0,
+   "y": 7863,
+   "w": 1280,
+   "h": 472,
+   "page": "home-d"
+  },
+  "M-0-1-hero.dc.html": {
+   "title": "Блок 0–1 · шапка и первый экран – телефон",
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 982,
+   "page": "home-m"
+  },
+  "M-2-situations.dc.html": {
+   "title": "Блок 2 · Узнаёте ситуацию? – телефон",
+   "x": 0,
+   "y": 2356,
+   "w": 390,
+   "h": 611,
+   "page": "home-m"
+  },
+  "M-3-how.dc.html": {
+   "title": "Блок 3 · Как это работает – телефон",
+   "x": 0,
+   "y": 3047,
+   "w": 390,
+   "h": 1672,
+   "page": "home-m"
+  },
+  "M-4-subjects.dc.html": {
+   "title": "Блок 4 · Предметы – телефон",
+   "x": 0,
+   "y": 4799,
+   "w": 390,
+   "h": 685,
+   "page": "home-m"
+  },
+  "M-5-tutors.dc.html": {
+   "title": "Блок 5 · Репетиторы – телефон",
+   "x": 0,
+   "y": 1062,
+   "w": 390,
+   "h": 1214,
+   "page": "home-m"
+  },
+  "M-6-reviews.dc.html": {
+   "title": "Блок 6 · Отзывы – телефон",
+   "x": 0,
+   "y": 5564,
+   "w": 390,
+   "h": 1085,
+   "page": "home-m"
+  },
+  "M-7-prices.dc.html": {
+   "title": "Блок 7 · Цены – телефон",
+   "x": 0,
+   "y": 6729,
+   "w": 390,
+   "h": 945,
+   "page": "home-m"
+  },
+  "M-8-faq.dc.html": {
+   "title": "Блок 8 · FAQ – телефон",
+   "x": 0,
+   "y": 7754,
+   "w": 390,
+   "h": 1150,
+   "page": "home-m"
+  },
+  "M-9-form.dc.html": {
+   "title": "Блок 9 · О сайте – телефон",
+   "x": 0,
+   "y": 8984,
+   "w": 390,
+   "h": 649,
+   "page": "home-m"
+  },
+  "M-10-footer.dc.html": {
+   "title": "Блок 10 · Подвал – телефон",
+   "x": 0,
+   "y": 9713,
+   "w": 390,
+   "h": 937,
+   "page": "home-m"
+  },
+  "X-thanks-d.dc.html": {
+   "title": "«Спасибо» днём – десктоп",
+   "x": 0,
+   "y": 0,
+   "w": 760,
+   "h": 456,
+   "page": "globals"
+  },
+  "X-thanks-m.dc.html": {
+   "title": "«Спасибо» днём – телефон",
+   "x": 860,
+   "y": 0,
+   "w": 390,
+   "h": 374,
+   "page": "globals"
+  },
+  "X-thanks-night.dc.html": {
+   "title": "«Спасибо» ночью – телефон",
+   "x": 1350,
+   "y": 0,
+   "w": 390,
+   "h": 347,
+   "page": "globals"
+  },
+  "X-menu.dc.html": {
+   "title": "Мобильное меню",
+   "x": 0,
+   "y": 546,
+   "w": 390,
+   "h": 669,
+   "page": "globals"
+  },
+  "X-bottombar.dc.html": {
+   "title": "Нижняя панель «Выбрать репетитора»",
+   "x": 490,
+   "y": 546,
+   "w": 390,
+   "h": 64,
+   "page": "globals"
+  },
+  "X-cookie-m.dc.html": {
+   "title": "Cookie – телефон",
+   "x": 980,
+   "y": 546,
+   "w": 390,
+   "h": 174,
+   "page": "globals"
+  },
+  "X-cookie-d.dc.html": {
+   "title": "Cookie – десктоп",
+   "x": 1470,
+   "y": 546,
+   "w": 560,
+   "h": 151,
+   "page": "globals"
+  },
+  "X-form-errors.dc.html": {
+   "title": "Форма: ошибки и чип репетитора",
+   "x": 0,
+   "y": 1366,
+   "w": 720,
+   "h": 927,
+   "page": "globals"
+  },
+  "X-header-m.dc.html": {
+   "title": "Шапка после прокрутки – телефон",
+   "x": 820,
+   "y": 1235,
+   "w": 390,
+   "h": 64,
+   "page": "globals"
+  },
+  "X-header-d.dc.html": {
+   "title": "Шапка после прокрутки – десктоп",
+   "x": 0,
+   "y": 2373,
+   "w": 1280,
+   "h": 72,
+   "page": "globals"
+  },
+  "DS-Papers.dc.html": {
+   "title": "Бумаги для предметов",
+   "x": 0,
+   "y": 4700,
+   "w": 1280,
+   "h": 848,
+   "page": "ds"
+  },
+  "DS-States.dc.html": {
+   "title": "Состояния компонентов",
+   "x": 0,
+   "y": 5700,
+   "w": 1280,
+   "h": 1093,
+   "page": "ds"
+  },
+  "T-1-profile.dc.html": {
+   "title": "Блок 1 · профиль и запись – десктоп",
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 936,
+   "page": "tutor-d"
+  },
+  "T-2-about.dc.html": {
+   "title": "Блок 2 · О репетиторе – десктоп",
+   "x": 0,
+   "y": 1016,
+   "w": 1280,
+   "h": 500,
+   "page": "tutor-d"
+  },
+  "T-3-outside.dc.html": {
+   "title": "Блок 3 · Вне занятий – десктоп",
+   "x": 0,
+   "y": 1596,
+   "w": 1280,
+   "h": 362,
+   "page": "tutor-d"
+  },
+  "T-4-reviews.dc.html": {
+   "title": "Блок 4 · Отзывы – десктоп",
+   "x": 0,
+   "y": 2038,
+   "w": 1280,
+   "h": 1029,
+   "page": "tutor-d"
+  },
+  "T-5-how.dc.html": {
+   "title": "Блок 5 · Как начать – десктоп",
+   "x": 0,
+   "y": 3147,
+   "w": 1280,
+   "h": 480,
+   "page": "tutor-d"
+  },
+  "T-6-form.dc.html": {
+   "title": "Блок 6 · Форма записи – десктоп",
+   "x": 0,
+   "y": 3707,
+   "w": 1280,
+   "h": 1194,
+   "page": "tutor-d"
+  },
+  "T-7-more.dc.html": {
+   "title": "Блок 7 · Ещё на сайте – десктоп",
+   "x": 0,
+   "y": 4981,
+   "w": 1280,
+   "h": 727,
+   "page": "tutor-d"
+  },
+  "TM-1-profile.dc.html": {
+   "title": "Блок 1 · профиль и запись – телефон",
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 925,
+   "page": "tutor-m"
+  },
+  "TM-2-about.dc.html": {
+   "title": "Блок 2 · О репетиторе – телефон",
+   "x": 0,
+   "y": 1005,
+   "w": 390,
+   "h": 846,
+   "page": "tutor-m"
+  },
+  "TM-3-outside.dc.html": {
+   "title": "Блок 3 · Вне занятий – телефон",
+   "x": 0,
+   "y": 1931,
+   "w": 390,
+   "h": 346,
+   "page": "tutor-m"
+  },
+  "TM-4-reviews.dc.html": {
+   "title": "Блок 4 · Отзывы – телефон",
+   "x": 0,
+   "y": 2357,
+   "w": 390,
+   "h": 1209,
+   "page": "tutor-m"
+  },
+  "TM-5-how.dc.html": {
+   "title": "Блок 5 · Как начать – телефон",
+   "x": 0,
+   "y": 3646,
+   "w": 390,
+   "h": 690,
+   "page": "tutor-m"
+  },
+  "TM-6-form.dc.html": {
+   "title": "Блок 6 · Форма записи – телефон",
+   "x": 0,
+   "y": 4416,
+   "w": 390,
+   "h": 1693,
+   "page": "tutor-m"
+  },
+  "TM-7-more.dc.html": {
+   "title": "Блок 7 · Ещё на сайте – телефон",
+   "x": 0,
+   "y": 6189,
+   "w": 390,
+   "h": 765,
+   "page": "tutor-m"
+  },
+  "T-S-full.dc.html": {
+   "title": "Статус «Мест нет» – десктоп",
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 921,
+   "page": "tutor-s"
+  },
+  "T-S-archived.dc.html": {
+   "title": "Статус «Архив» – десктоп",
+   "x": 0,
+   "y": 1001,
+   "w": 1280,
+   "h": 898,
+   "page": "tutor-s"
+  },
+  "T-S-formfull.dc.html": {
+   "title": "Форма при «Мест нет» – десктоп",
+   "x": 0,
+   "y": 1979,
+   "w": 1280,
+   "h": 1194,
+   "page": "tutor-s"
+  },
+  "TM-S-full.dc.html": {
+   "title": "«Мест нет» – телефон",
+   "x": 1360,
+   "y": 0,
+   "w": 390,
+   "h": 884,
+   "page": "tutor-s"
+  },
+  "TM-S-archived.dc.html": {
+   "title": "«Архив» – телефон",
+   "x": 1360,
+   "y": 964,
+   "w": 390,
+   "h": 804,
+   "page": "tutor-s"
+  },
+  "TM-S-formfull.dc.html": {
+   "title": "Форма при «Мест нет» – телефон",
+   "x": 1360,
+   "y": 1826,
+   "w": 390,
+   "h": 1861,
+   "page": "tutor-s"
+  },
+  "P-404-d.dc.html": {
+   "title": "404 – десктоп",
+   "x": 1860,
+   "y": 0,
+   "w": 1280,
+   "h": 644,
+   "page": "tutor-s"
+  },
+  "P-privacy-d.dc.html": {
+   "title": "Политика конфиденциальности – десктоп",
+   "x": 1860,
+   "y": 720,
+   "w": 1280,
+   "h": 974,
+   "page": "tutor-s"
+  },
+  "P-404-m.dc.html": {
+   "title": "404 – телефон",
+   "x": 1860,
+   "y": 1774,
+   "w": 390,
+   "h": 703,
+   "page": "tutor-s"
+  },
+  "P-privacy-m.dc.html": {
+   "title": "Политика – телефон",
+   "x": 1860,
+   "y": 2584,
+   "w": 390,
+   "h": 1455,
+   "page": "tutor-s"
+  },
+  "P-og.dc.html": {
+   "title": "OG-картинка 1200×630",
+   "x": 1860,
+   "y": 4119,
+   "w": 1200,
+   "h": 630,
+   "page": "tutor-s"
+  },
+  "T-S-statuses.dc.html": {
+   "title": "Статусы репетитора",
+   "x": 1860,
+   "y": 4829,
+   "w": 760,
+   "h": 207,
+   "page": "tutor-s"
+  },
+  "Logo.dc.html": {
+   "title": "Logo · знак PuzzleUp",
+   "x": 2420,
+   "y": 4250,
+   "w": 180,
+   "h": 40,
+   "page": "ds"
+  },
+  "S-1-cover.dc.html": {
+   "title": "Слайд 1 · обложка",
+   "x": 0,
+   "y": 0,
+   "w": 1080,
+   "h": 1350,
+   "page": "social"
+  },
+  "S-2-who.dc.html": {
+   "title": "Слайд 2 · кто мы",
+   "x": 1160,
+   "y": 0,
+   "w": 1080,
+   "h": 1350,
+   "page": "social"
+  },
+  "S-3-why.dc.html": {
+   "title": "Слайд 3 · почему PuzzleUp",
+   "x": 2320,
+   "y": 0,
+   "w": 1080,
+   "h": 1350,
+   "page": "social"
+  },
+  "S-4-how.dc.html": {
+   "title": "Слайд 4 · как это работает",
+   "x": 3480,
+   "y": 0,
+   "w": 1080,
+   "h": 1350,
+   "page": "social"
+  },
+  "S-5-cta.dc.html": {
+   "title": "Слайд 5 · призыв",
+   "x": 4640,
+   "y": 0,
+   "w": 1080,
+   "h": 1350,
+   "page": "social"
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-10-08T13:20:00Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "t_comp": {
+   "kind": "title1",
+   "maxW": 1750,
+   "page": "ds",
+   "text": "Отдельные компоненты – правятся здесь, меняются везде",
+   "w": 240,
+   "x": 0,
+   "y": 3990
+  },
+  "t_ds": {
+   "kind": "title1",
+   "maxW": 1750,
+   "page": "ds",
+   "text": "Дизайн-система PuzzleUp",
+   "w": 240,
+   "x": 0,
+   "y": -260
+  },
+  "t_hd": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Главная · десктоп 1280 px · два независимых репетитора, блоки в порядке страницы",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "home-d"
+  },
+  "t_hm": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Главная · телефон 390 px · блоки в порядке страницы",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "home-m"
+  },
+  "t_gl": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Глобальные элементы и состояния: «Спасибо», меню, панель, cookie, ошибки, шапка",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "globals"
+  },
+  "t_pp": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Бумаги и состояния компонентов",
+   "w": 240,
+   "x": 0,
+   "y": 4440,
+   "page": "ds"
+  },
+  "t_tutor-d": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Страница репетитора · десктоп 1280 px, блоки 1–7 по ТЗ (пример: Андрей)",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "tutor-d"
+  },
+  "t_tutor-m": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Страница репетитора · телефон 390 px",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "tutor-m"
+  },
+  "t_social": {
+   "kind": "title1",
+   "maxW": 5720,
+   "text": "Instagram · карусель «Привет, мы PuzzleUp» · 5 слайдов 1080×1350",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "social"
+  },
+  "t_tutor-s": {
+   "kind": "title1",
+   "maxW": 1750,
+   "text": "Статусы «Мест нет» и «Архив», 404, политика, OG-картинка",
+   "w": 240,
+   "x": 0,
+   "y": -260,
+   "page": "tutor-s"
+  }
+ },
+ "order": [
+  "DS-Foundations.dc.html",
+  "DS-Components.dc.html",
+  "Button.dc.html",
+  "Chip.dc.html",
+  "Sheet.dc.html",
+  "PuzzleStep.dc.html",
+  "Doodle.dc.html",
+  "SectionHead.dc.html",
+  "DS-Papers.dc.html",
+  "DS-States.dc.html",
+  "D-1-hero.dc.html",
+  "D-2-situations.dc.html",
+  "D-3-how.dc.html",
+  "D-4-subjects.dc.html",
+  "D-5-tutors.dc.html",
+  "D-6-reviews.dc.html",
+  "D-7-prices.dc.html",
+  "D-8-faq.dc.html",
+  "D-9-form.dc.html",
+  "D-10-footer.dc.html",
+  "M-0-1-hero.dc.html",
+  "M-2-situations.dc.html",
+  "M-3-how.dc.html",
+  "M-4-subjects.dc.html",
+  "M-5-tutors.dc.html",
+  "M-6-reviews.dc.html",
+  "M-7-prices.dc.html",
+  "M-8-faq.dc.html",
+  "M-9-form.dc.html",
+  "M-10-footer.dc.html",
+  "X-thanks-d.dc.html",
+  "X-thanks-m.dc.html",
+  "X-thanks-night.dc.html",
+  "X-menu.dc.html",
+  "X-bottombar.dc.html",
+  "X-cookie-m.dc.html",
+  "X-cookie-d.dc.html",
+  "X-form-errors.dc.html",
+  "X-header-m.dc.html",
+  "X-header-d.dc.html",
+  "T-1-profile.dc.html",
+  "T-2-about.dc.html",
+  "T-3-outside.dc.html",
+  "T-4-reviews.dc.html",
+  "T-5-how.dc.html",
+  "T-6-form.dc.html",
+  "T-7-more.dc.html",
+  "TM-1-profile.dc.html",
+  "TM-2-about.dc.html",
+  "TM-3-outside.dc.html",
+  "TM-4-reviews.dc.html",
+  "TM-5-how.dc.html",
+  "TM-6-form.dc.html",
+  "TM-7-more.dc.html",
+  "T-S-full.dc.html",
+  "T-S-archived.dc.html",
+  "T-S-formfull.dc.html",
+  "TM-S-full.dc.html",
+  "TM-S-archived.dc.html",
+  "TM-S-formfull.dc.html",
+  "P-404-d.dc.html",
+  "P-privacy-d.dc.html",
+  "P-404-m.dc.html",
+  "P-privacy-m.dc.html",
+  "P-og.dc.html",
+  "T-S-statuses.dc.html",
+  "Logo.dc.html",
+  "S-1-cover.dc.html",
+  "S-2-who.dc.html",
+  "S-3-why.dc.html",
+  "S-4-how.dc.html",
+  "S-5-cta.dc.html"
+ ],
+ "pages": [
+  {
+   "id": "home-d",
+   "name": "Главная · десктоп"
+  },
+  {
+   "id": "home-m",
+   "name": "Главная · телефон"
+  },
+  {
+   "id": "globals",
+   "name": "Глобальные и состояния"
+  },
+  {
+   "id": "ds",
+   "name": "Дизайн-система"
+  },
+  {
+   "id": "tutor-d",
+   "name": "Страница репетитора · десктоп"
+  },
+  {
+   "id": "tutor-m",
+   "name": "Страница репетитора · телефон"
+  },
+  {
+   "id": "tutor-s",
+   "name": "Статусы и служебные"
+  },
+  {
+   "id": "social",
+   "name": "Соцсети"
+  }
+ ],
+ "title": "PuzzleUp – главная страница"
+}

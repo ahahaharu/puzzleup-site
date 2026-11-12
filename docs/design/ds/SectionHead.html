@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PuzzleUp – заголовок секции</title>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&amp;family=Golos+Text:wght@400;500;600&amp;family=Spectral:ital,wght@1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D2340}a:hover{color:#B23A17}
+</style>
+</helmet>
+<div style="max-width: 640px; display: flex; flex-direction: column; gap: 14px; font-family: 'Golos Text', sans-serif; color: #1D2340">
+<sc-if value="{{hasNum}}" hint-placeholder-val="{{true}}"><div style="font-family: 'Spectral', serif; font-style: italic; font-size: 24px; color: #B23A17">{{num}}</div></sc-if>
+<h2 style="margin: 0; font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: 44px; line-height: 1.05; letter-spacing: -0.03em">{{title}}<sc-if value="{{dot}}" hint-placeholder-val="{{true}}"><span style="color: #E4572E">.</span></sc-if></h2>
+<sc-if value="{{hasLead}}" hint-placeholder-val="{{true}}"><p style="margin: 0; font-size: 19px; line-height: 1.5; color: #2E3452">{{lead}}</p></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"num":{"editor":"text","default":"01"},"title":{"editor":"text","default":"Как это работает"},"lead":{"editor":"text","default":"Четыре шага от пробного занятия до понятного результата."},"dot":{"editor":"boolean","default":true},"$preview":{"width":640,"height":190}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const num = this.props.num ?? '01';
+    const lead = this.props.lead ?? '';
+    return { num: num, hasNum: !!num, title: this.props.title ?? 'Как это работает', lead: lead, hasLead: !!lead, dot: this.props.dot ?? true };
+  }
+}
+</script>
+</body>
+</html>
