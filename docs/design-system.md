@@ -77,7 +77,7 @@
 - Шаг – 8 px. Вертикальный отступ секции: 96 px на десктопе, 56 px на телефоне.
 - Фон-клетка – на всю ширину окна, у всех секций. Чередуются только `paper` и `paper-alt`.
 - Скругления: карточки 16, кнопки 12, поля 10, тёмные детали формы и «О сайте» 20, чипы и бейджи – 999.
-- Тени: «бумага» – `0 2px 6px` ink 12%; «летящая деталь» – `0 18px 22px` ink 28%, только для декоративной детали пазла. Без `blur` на больших блоках, не больше четырёх теней на экран. Стандартные тени, скругления и `blur` Tailwind сброшены (ADR-025): `shadow-paper`, `shadow-flying`, `rounded-field/button/card/piece`, `rounded-full`.
+- Тени: «бумага» – `0 2px 6px` ink 12%; «летящая деталь» – `0 18px 22px` ink 28%, только для декоративной детали пазла. «Лист» – `drop-shadow` `0 2px 3px` ink 14% (`drop-shadow-sheet`), только для `Sheet`: обычная тень обрезается вместе с загнутым уголком. Без `blur` на больших блоках, не больше четырёх теней на экран. Стандартные тени, скругления и `blur` Tailwind сброшены (ADR-025): `shadow-paper`, `shadow-flying`, `rounded-field/button/card/piece`, `rounded-full`.
 - Якоря: `scroll-margin-top` с учётом высоты шапки (88 / 72 / 64 px).
 - Утилиты: `page-container` – поля и максимальная ширина из таблицы; `page-grid` – колонки и межколонники. Брейкпоинты Tailwind – только `md` 768, `lg` 1024, `xl` 1280.
 - Фокус: глобальное кольцо `:focus-visible` – 2 px `focus`, отступ 2 px. Своё кольцо в компонентах не нужно.
@@ -180,7 +180,7 @@ background-size: 32px 32px;   /* 24px на телефоне */
 | `Checkbox` | Квадрат 24 px, зона клика от 44×44 вместе с текстом | DS-States |
 | `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `slanted` / `staff` / `margin` / `plain` (все бумаги раздела 4), `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
 | `PuzzlePiece` | Форма из логотипа (SVG ниже), `currentColor` | Logo |
-| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
+| `PuzzleStep` | Деталь-шаг, цепочка только горизонтальная (на телефоне – лента с прокруткой), соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
 | `Doodle` | Каракули на полях: `circle`, `sine`, `lever`, `cube`, `triangle`; не больше 6 на экран, на телефоне часть скрыта, `aria-hidden` | Doodle |
 | `SectionHead` | H2 + лид | SectionHead |
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |
