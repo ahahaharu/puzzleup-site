@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
@@ -21,10 +21,11 @@ describe('content/', () => {
     expect(issues.filter((issue) => !issue.message.startsWith('placeholder '))).toEqual([]);
   });
 
-  it('has a page for every tutor file', () => {
-    expect(raw.tutors.map((source) => source.file).sort()).toEqual([
-      'content/tutors/andrei.mdx',
-      'content/tutors/maxim.mdx',
-    ]);
+  // Content Collections молча выбрасывает файл с битым YAML – репетитор не должен пропасть.
+  it('loads every tutor file', () => {
+    const files = readdirSync('content/tutors').filter((name) => name.endsWith('.mdx'));
+    expect(raw.tutors.map((source) => source.file).sort()).toEqual(
+      files.map((name) => `content/tutors/${name}`).sort(),
+    );
   });
 });
