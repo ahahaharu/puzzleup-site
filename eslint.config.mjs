@@ -58,6 +58,23 @@ export default defineConfig([
     rules: layerImports(['app', 'components', 'features', 'server']),
   },
   {
+    // Контент – только через загрузчик с проверкой и server-only (src/content/index.ts).
+    files: ['src/app/**', 'src/components/**', 'src/features/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '^@/content/(?!index$).+',
+              message: 'Import content from @/content only (src/content/index.ts).',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['src/server/**'],
     rules: layerImports(['app', 'components', 'features']),
   },
