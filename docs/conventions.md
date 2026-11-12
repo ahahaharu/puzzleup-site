@@ -10,7 +10,7 @@
 
 - `main` и `develop` защищены: только через PR, обязательный зелёный CI, без force push.
 - Одна фича – одна ветка – один PR. Если PR получается больше ~400 строк без учёта тестов и контента, его нужно делить.
-- Имена веток: `feature/lead-form`, `feature/home-hero`, `fix/phone-mask-ios`, `chore/bootstrap`. Для фикса внутри `develop` используется `feature/`-подобная ветка с префиксом `fix/`.
+- Имена веток: `feature/lead-form`, `feature/home-hero`, `fix/phone-mask-ios`, `chore/bootstrap`, `ci/github-actions`. Префиксы `chore/` и `ci/` – для пунктов без кода приложения (инструменты, CI), работают как `feature/`. Для фикса внутри `develop` используется `feature/`-подобная ветка с префиксом `fix/`.
 - Версии – SemVer: `0.x` до запуска рекламы, `1.0.0` – первый публичный запуск.
 
 ## Коммиты
