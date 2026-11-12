@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 
 import { Button, LOADING_LABEL } from './Button';
 
@@ -53,9 +54,12 @@ describe('Button', () => {
 
   it('shows the spinner and "Отправляем…" while loading and cannot be pressed again', async () => {
     const onSubmit = vi.fn((event: SubmitEvent) => event.preventDefault());
+    const onClick = vi.fn();
     const screen = await render(
       <form onSubmit={(event) => onSubmit(event.nativeEvent)}>
-        <Button type="submit" variant="accent" loading>
+        <input name="name" aria-label="Имя" />
+        <input name="phone" aria-label="Телефон" />
+        <Button type="submit" variant="accent" loading onClick={onClick}>
           Записаться на пробное занятие
         </Button>
       </form>,
@@ -67,10 +71,15 @@ describe('Button', () => {
     expect(button.element().hasAttribute('disabled')).toBe(false);
     expect(button.element().querySelector('[aria-hidden="true"]')).not.toBeNull();
 
-    // Клик по-настоящему: pointer-events отключены, поэтому через DOM, как это сделал бы Enter.
+    // Мышью не нажать (pointer-events), поэтому клик – через DOM, как клавиатурой.
     const element = button.element();
     if (element instanceof HTMLElement) element.click();
+    // Enter в поле формы – неявная отправка.
+    await screen.getByRole('textbox', { name: 'Имя' }).click();
+    await userEvent.keyboard('{Enter}');
+
     expect(onSubmit).not.toHaveBeenCalled();
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('submits the form when not loading', async () => {

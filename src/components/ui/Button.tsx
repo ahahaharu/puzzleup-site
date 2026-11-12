@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { ComponentProps, MouseEvent, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -52,8 +52,9 @@ type NativeButtonProps = CommonProps &
   Omit<ComponentProps<'button'>, keyof CommonProps> & {
     href?: undefined;
     /**
-     * Идёт отправка: спиннер и «Отправляем…», кнопку не нажать повторно. Клиентское состояние
-     * (`useFormStatus`), поэтому кнопка не теряет фокус, как с `disabled`, – используется `aria-disabled`.
+     * Идёт отправка: спиннер и «Отправляем…», кнопку не нажать повторно. Вместо `disabled` –
+     * `aria-disabled`, чтобы кнопка не теряла фокус; повторную отправку блокирует `type="button"`
+     * (без обработчиков событий – кнопка остаётся серверным компонентом).
      */
     loading?: boolean;
   };
@@ -85,11 +86,6 @@ function Spinner() {
       className="size-4.5 flex-none animate-spin rounded-full border-[2.5px] border-current/40 border-t-current"
     />
   );
-}
-
-function preventRepeat(event: MouseEvent<HTMLButtonElement>) {
-  // Отменяет и клик, и отправку формы клавишей Enter: браузер посылает её через click по кнопке.
-  event.preventDefault();
 }
 
 /**
@@ -132,10 +128,12 @@ export function Button(props: ButtonProps) {
 
   return (
     <button
-      type={type}
+      // Кнопка не отправляет форму ни кликом, ни клавишей Enter в поле: у формы заявки
+      // несколько текстовых полей, без кнопки отправки неявная отправка не срабатывает.
+      type={loading ? 'button' : type}
       className={buttonClassName({ variant, size, fullWidth, className })}
       aria-disabled={loading || undefined}
-      onClick={loading ? preventRepeat : onClick}
+      onClick={loading ? undefined : onClick}
       {...buttonProps}
     >
       {loading ? <Spinner /> : icon && <Icon name={icon} size={20} />}
