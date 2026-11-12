@@ -46,7 +46,10 @@ function Label({
   const prefix = label === 'short' ? `Написать ${nameDative} в ` : 'Написать в ';
   return (
     <span>
-      <span className={label === 'action' ? 'sr-only @lg:not-sr-only' : 'sr-only'}>{prefix}</span>
+      {/* «Написать в Telegram» при 17 px помещается в пару от 532 px – порог с запасом. */}
+      <span className={label === 'action' ? 'sr-only @[34rem]:not-sr-only' : 'sr-only'}>
+        {prefix}
+      </span>
       {title}
     </span>
   );
@@ -72,7 +75,8 @@ export function MessengerButtons({
 
   return (
     // Зазор 10 px – из макетов карточки и профиля.
-    <div className={cn('@container', className)}>
+    // Контейнер не берёт ширину из содержимого: без w-full пара схлопнулась бы в колонке items-start.
+    <div className={cn('@container w-full', className)}>
       <div
         className={cn(
           'grid gap-2.5',

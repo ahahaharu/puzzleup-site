@@ -105,4 +105,21 @@ describe('MessengerButtons', () => {
     expect(telegram.width).toBe(viber.width);
     expect(telegram.height).toBe(48);
   });
+
+  it('fills the column width inside a flex column aligned to the start', async () => {
+    const screen = await render(
+      <div
+        style={{ width: 600, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
+      >
+        <MessengerButtons {...TUTOR} label="action" />
+      </div>,
+    );
+    const telegram = screen.getByRole('link', { name: 'Написать в Telegram' }).element();
+    const viber = screen.getByRole('link', { name: 'Написать в Viber' }).element();
+
+    expect(telegram.getBoundingClientRect().right).toBeLessThanOrEqual(
+      viber.getBoundingClientRect().left,
+    );
+    expect(telegram.getBoundingClientRect().width).toBeGreaterThan(250);
+  });
 });
