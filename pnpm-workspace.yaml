@@ -2,3 +2,6 @@
 onlyBuiltDependencies:
   - esbuild
   - lefthook
+
+# Версии фиксируются точно: обновления приходят через Dependabot отдельными PR.
+savePrefix: ''

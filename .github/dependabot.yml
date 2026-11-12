@@ -9,6 +9,13 @@ updates:
       day: monday
       timezone: Europe/Minsk
     open-pull-requests-limit: 10
+    ignore:
+      # typescript-eslint поддерживает только TypeScript <6.1 (ADR-018).
+      - dependency-name: typescript
+        versions: ['>=6.1']
+      # Новая мажорная ESLint – вручную, после проверки плагинов eslint-config-next (ADR-019).
+      - dependency-name: eslint
+        versions: ['>=11']
     commit-message:
       prefix: chore
       include: scope
