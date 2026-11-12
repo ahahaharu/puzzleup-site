@@ -1,5 +1,7 @@
 # PuzzleUp
 
+[![CI](https://github.com/ahahaharu/puzzleup-site/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/ahahaharu/puzzleup-site/actions/workflows/ci.yml)
+
 Сайт независимых онлайн-репетиторов по математике для 5–11 классов в Беларуси: https://puzzle-up.by
 
 PuzzleUp – общий сайт независимых репетиторов. Не является организацией, юридическим лицом или ИП.
@@ -35,6 +37,8 @@ pnpm e2e            # Playwright: собирает и запускает при�
 ```
 
 Остальные команды из `CLAUDE.md` появляются в фичах, где они впервые нужны (`docs/roadmap.md`).
+
+CI (`.github/workflows/ci.yml`) на каждый PR в `develop` и `main`: Prettier, ESLint, типы, юнит-тесты, сборка, Playwright, gitleaks по всей истории и `pnpm audit`. Без зелёных `checks` и `build-e2e` PR не сливается.
 
 Git-хуки: `pre-commit` – gitleaks, ESLint и Prettier по изменённым файлам; `commit-msg` – commitlint (Conventional Commits, `docs/conventions.md`); `pre-push` – typecheck и тесты.
 

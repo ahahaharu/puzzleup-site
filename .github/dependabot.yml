@@ -30,8 +30,9 @@ updates:
       commit-hooks:
         patterns: ['lefthook', '@commitlint/*']
 
+  # Composite actions Dependabot сам не находит – их каталоги перечисляются явно.
   - package-ecosystem: github-actions
-    directory: /
+    directories: ['/', '/.github/actions/*']
     target-branch: develop
     schedule:
       interval: weekly
