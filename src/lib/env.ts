@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
 /**
- * Переменные окружения. Новая переменная добавляется сюда в той фиче,
- * где она впервые нужна (список – docs/architecture.md, раздел 8).
+ * Схема переменных окружения – чистая, без чтения process.env.
+ * Экземпляр для приложения – src/server/env.ts, проверка при старте – src/instrumentation.ts.
+ * Новая переменная добавляется сюда в той фиче, где она впервые нужна
+ * (список – docs/architecture.md, раздел 8).
  */
 const envSchema = z
   .object({
@@ -10,13 +12,23 @@ const envSchema = z
     SITE_URL: z.url({ protocol: /^https?$/ }).optional(),
   })
   .transform((raw, ctx) => {
-    if (raw.APP_ENV !== 'local' && raw.SITE_URL === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['SITE_URL'],
-        message: `SITE_URL is required when APP_ENV=${raw.APP_ENV}`,
-      });
-      return z.NEVER;
+    if (raw.APP_ENV !== 'local') {
+      if (raw.SITE_URL === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['SITE_URL'],
+          message: `SITE_URL is required when APP_ENV=${raw.APP_ENV}`,
+        });
+        return z.NEVER;
+      }
+      if (!raw.SITE_URL.startsWith('https://')) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['SITE_URL'],
+          message: `SITE_URL must use https when APP_ENV=${raw.APP_ENV}`,
+        });
+        return z.NEVER;
+      }
     }
     return {
       APP_ENV: raw.APP_ENV,
@@ -46,5 +58,3 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
   }
   return result.data;
 }
-
-export const env: Env = parseEnv(process.env);

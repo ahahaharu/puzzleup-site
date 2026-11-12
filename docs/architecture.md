@@ -1,6 +1,6 @@
 # Архитектура PuzzleUp
 
-Состояние на 11 ноября 2026. Почему выбрано именно так – в `docs/decisions.md`.
+Состояние на 12 ноября 2026. Почему выбрано именно так – в `docs/decisions.md`.
 
 ## 1. Обзор
 
@@ -81,8 +81,10 @@
 │  │  ├─ sheets/               client.ts, row.ts (маппинг A–Q)
 │  │  ├─ availability/         repository.ts, cache.ts (cacheTag)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
+│  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
-│  ├─ lib/                     env.ts, time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts
+│  ├─ instrumentation.ts       проверка окружения при старте сервера
+│  ├─ lib/                     env.ts (схема), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/
@@ -104,7 +106,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 
 ## 4. Рендеринг и кэш
 
-- В `next.config.ts` включены `cacheComponents: true` и `output: 'standalone'`.
+- В `next.config.ts` включены `cacheComponents: true`, `partialPrefetching: true` (ADR-020), `output: 'standalone'` и `poweredByHeader: false`.
 - Главная и `/tutors/[slug]` должны оставаться статическими. Проверять через `ensureStatic` (Next 16.4) и вывод `next build`.
 - `/tutors/[slug]`: `generateStaticParams` по всем файлам `content/tutors`, включая ушедших; `dynamicParams = false`.
 - Фильтр по предметам на главной – клиентский компонент, который читает `?subject=` через `useSearchParams` внутри `<Suspense>`. Статическая оболочка показывает всех репетиторов, так что без JS виден полный список.
@@ -173,7 +175,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 | staging | `develop` | dev.puzzle-up.by (basic auth, `noindex`) | `puzzleup_staging` | отдельный тестовый бот и чат, отдельная тестовая Таблица |
 | production | `main` (тег `v*`) | puzzle-up.by | `puzzleup` | боевой бот и общий чат репетиторов |
 
-Переменные (схема и проверка – `src/lib/env.ts` на Zod, приложение не стартует при ошибке):
+Переменные: схема – чистая функция `parseEnv` в `src/lib/env.ts` на Zod, экземпляр – `src/server/env.ts` (`server-only`), проверка при старте – `register()` в `src/instrumentation.ts`: при ошибке процесс завершается с кодом 1. Переменные добавляются в схему в тех фичах, где они впервые нужны:
 
 ```
 APP_ENV=local|staging|production

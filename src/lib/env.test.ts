@@ -25,6 +25,16 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ APP_ENV: appEnv })).toThrow(/SITE_URL is required/);
   });
 
+  it.each(['staging', 'production'])('requires https SITE_URL when APP_ENV=%s', (appEnv) => {
+    expect(() => parseEnv({ APP_ENV: appEnv, SITE_URL: 'http://puzzle-up.by' })).toThrow(
+      /must use https/,
+    );
+  });
+
+  it('allows http SITE_URL locally', () => {
+    expect(parseEnv({ SITE_URL: 'http://127.0.0.1:3100' }).SITE_URL).toBe('http://127.0.0.1:3100');
+  });
+
   it('rejects unknown APP_ENV', () => {
     expect(() => parseEnv({ APP_ENV: 'prod' })).toThrow(EnvError);
   });
