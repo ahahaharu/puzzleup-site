@@ -9,6 +9,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'content-collections': fileURLToPath(
+        new URL('./.content-collections/generated', import.meta.url),
+      ),
     },
   },
   test: {
@@ -20,6 +23,7 @@ export default defineConfig({
           environment: 'node',
           include: ['src/**/*.test.{ts,tsx}'],
           exclude: ['**/*.int.test.ts', '**/*.browser.test.tsx', 'node_modules/**'],
+          globalSetup: ['./tests/setup/content.ts'],
         },
       },
       {

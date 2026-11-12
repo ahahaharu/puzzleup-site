@@ -1,3 +1,4 @@
+import { withContentCollections } from '@content-collections/next';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
@@ -7,4 +8,5 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
 };
 
-export default nextConfig;
+// Content Collections собирает `content/` перед `next build`, `next dev` (с отслеживанием) и `next typegen`.
+export default withContentCollections(nextConfig);

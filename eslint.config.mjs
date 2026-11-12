@@ -30,6 +30,7 @@ export default defineConfig([
     '.vitest/**',
     'next-env.d.ts',
     'docs/**',
+    '.content-collections/**',
   ]),
   ...nextCoreWebVitals,
   ...nextTypescript,
@@ -51,6 +52,10 @@ export default defineConfig([
   {
     files: ['src/lib/**'],
     rules: layerImports(['app', 'components', 'features', 'server', 'content']),
+  },
+  {
+    files: ['src/content/**'],
+    rules: layerImports(['app', 'components', 'features', 'server']),
   },
   {
     files: ['src/server/**'],
