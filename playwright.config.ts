@@ -20,7 +20,8 @@ export default defineConfig({
     { name: 'no-js', use: { ...devices['Pixel 7'], javaScriptEnabled: false } },
   ],
   webServer: {
-    command: `pnpm build && PORT=${PORT} pnpm start`,
+    // В CI сборка – отдельный шаг workflow перед e2e, второй раз не собираем.
+    command: process.env.CI ? `PORT=${PORT} pnpm start` : `pnpm build && PORT=${PORT} pnpm start`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
