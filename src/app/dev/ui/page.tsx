@@ -95,14 +95,17 @@ export default function UiKitPage() {
 
       <Section id="messengers" title="MessengerButtons">
         <Caption>
-          Узкая пара (карточка, телефон) – только названия; широкая – «Написать в Telegram». Для
-          дикторов всегда «Написать Андрею в Telegram».
+          short – карточка, action – профиль (широкая пара – «Написать в Telegram»), personal –
+          «Спасибо». Пара тянется на всю ширину колонки и в колонке items-start.
         </Caption>
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="max-w-82 rounded-card border border-ink/12 bg-card p-5">
             <MessengerButtons {...TUTOR} />
           </div>
-          <MessengerButtons {...TUTOR} label="action" size="lg" />
+          <div className="flex flex-col items-start gap-4">
+            <Badge status="available" />
+            <MessengerButtons {...TUTOR} label="action" size="lg" />
+          </div>
         </div>
         <Dark>
           <MessengerButtons {...TUTOR} label="personal" tone="dark" />
@@ -255,6 +258,18 @@ export default function UiKitPage() {
             <p className="font-display text-h3">Чистый лист</p>
             <p>Без разметки.</p>
           </Sheet>
+          <Sheet as="li" kind="slanted" tilt={-0.8}>
+            <p className="font-display text-h3">Косая линейка</p>
+            <p>Начальная школа, письмо.</p>
+          </Sheet>
+          <Sheet as="li" kind="staff" tilt={0.5}>
+            <p className="font-display text-h3">Нотный стан</p>
+            <p>Музыка.</p>
+          </Sheet>
+          <Sheet as="li" kind="margin" tilt={-0.3}>
+            <p className="font-display text-h3">Лист с полями</p>
+            <p>История, рисование.</p>
+          </Sheet>
         </ul>
       </Section>
 
@@ -269,28 +284,37 @@ export default function UiKitPage() {
             <Logo tone="paper" />
           </span>
         </div>
-        <ol className="grid max-w-5xl grid-cols-1 md:grid-cols-4">
-          <li>
-            <PuzzleStep n="01" title="Выбираете репетитора" tone="cell" right="knob">
-              Заявка на странице репетитора.
-            </PuzzleStep>
-          </li>
-          <li>
-            <PuzzleStep n="02" title="Репетитор пишет вам" tone="sand" left="socket" right="knob">
-              В выбранный мессенджер.
-            </PuzzleStep>
-          </li>
-          <li>
-            <PuzzleStep n="03" title="Пробное занятие" tone="ink" left="socket" right="knob">
-              30 минут, бесплатно.
-            </PuzzleStep>
-          </li>
-          <li>
-            <PuzzleStep n="04" title="Итог и план" tone="accent" left="socket" right="flat">
-              Решаете вы.
-            </PuzzleStep>
-          </li>
-        </ol>
+        {/* Цепочка только горизонтальная: на телефоне – лента с прокруткой. */}
+        <div
+          role="region"
+          aria-label="Шаги"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- ленту с прокруткой листают с клавиатуры (axe scrollable-region-focusable)
+          tabIndex={0}
+          className="-mx-4 overflow-x-auto px-4 pb-4 md:mx-0 md:px-0"
+        >
+          <ol className="grid w-[56rem] max-w-5xl grid-cols-4 md:w-auto">
+            <li>
+              <PuzzleStep n="01" title="Выбираете репетитора" tone="cell" right="knob">
+                Заявка на странице репетитора.
+              </PuzzleStep>
+            </li>
+            <li>
+              <PuzzleStep n="02" title="Репетитор пишет вам" tone="sand" left="socket" right="knob">
+                В выбранный мессенджер.
+              </PuzzleStep>
+            </li>
+            <li>
+              <PuzzleStep n="03" title="Пробное занятие" tone="ink" left="socket" right="knob">
+                30 минут, бесплатно.
+              </PuzzleStep>
+            </li>
+            <li>
+              <PuzzleStep n="04" title="Итог и план" tone="accent" left="socket" right="flat">
+                Решаете вы.
+              </PuzzleStep>
+            </li>
+          </ol>
+        </div>
       </Section>
 
       <Section id="doodles" title="Doodle и Icon">
