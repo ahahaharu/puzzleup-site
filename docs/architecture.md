@@ -199,7 +199,7 @@ YANDEX_METRIKA_ID=
 
 ## 9. Сборка, деплой, инфраструктура
 
-- **Dockerfile** многоступенчатый: `deps` → `build` (`next build` + сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `worker.js`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
+- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `worker.js`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
 - **CI** (`ci.yml`, на каждый PR в `develop`/`main` и push в них): install → format:check → lint → typecheck → `content:check` → unit → integration (Testcontainers) → build → e2e (Playwright против собранного приложения + Postgres service) → Lighthouse CI для `/` и `/tutors/andrei`. Параллельно – gitleaks по всей истории и `pnpm audit` (не блокирует). Шаги добавляются в фичах, где появляется то, что они проверяют; job `checks` и `build-e2e` обязательны для слияния в `develop` и `main`. Actions закреплены по SHA (ADR-022), сборка – отдельный шаг перед Playwright (ADR-024).
 - **Deploy** (`deploy.yml`):
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;
