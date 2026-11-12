@@ -9,7 +9,10 @@ const THEME_BLOCK = /@theme\b[^{]*\{([^}]*)\}/g;
 const COLOR_DECLARATION = /--color-([a-z0-9-]+)\s*:\s*([^;]+);/g;
 const HEX = /^#([0-9a-f]{6})$/i;
 
-/** Цвета в порядке объявления; сброс `--color-*: initial` пропускается. */
+/**
+ * Цвета в порядке объявления; сброс `--color-*: initial` пропускается.
+ * Блок `@theme` читается до первой `}`: вложенные правила (`@keyframes`) ставить после цветов.
+ */
 export function parseThemeColors(css: string): ThemeColor[] {
   const colors: ThemeColor[] = [];
   for (const [, block = ''] of css.matchAll(THEME_BLOCK)) {

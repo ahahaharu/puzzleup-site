@@ -88,11 +88,18 @@
   --text-hand-lg: clamp(1.5rem, 1.2554rem + 1.087vw, 2.125rem);
   --text-hand-lg--line-height: 1.1;
 
+  --radius-*: initial;
   --radius-field: 10px;
   --radius-button: 12px;
   --radius-card: 16px;
   --radius-piece: 20px;
 
+  /* Тени – только из ДС; blur у больших блоков запрещён, поэтому шкала blur тоже сброшена. */
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --blur-*: initial;
   --shadow-paper: 0 2px 6px rgb(29 35 64 / 0.12);
   --shadow-flying: 0 18px 22px rgb(29 35 64 / 0.28);
 }
@@ -133,7 +140,9 @@
     ::before,
     ::after {
       animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
       animation-iteration-count: 1 !important;
+      transition-delay: 0s !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
@@ -194,6 +203,12 @@
   }
 }
 
+/* Секции чередуют только тон бумаги, клетка остаётся. */
+@utility paper-page-alt {
+  @apply paper-page;
+  background-color: var(--color-paper-alt);
+}
+
 /* Клетка – математика, алгебра. */
 @utility paper-cell {
   --paper-line: color-mix(in srgb, var(--color-focus) 22%, transparent);
@@ -225,7 +240,7 @@
 @utility paper-lined {
   --paper-margin: color-mix(in srgb, var(--color-accent) 70%, transparent);
   --paper-line: color-mix(in srgb, var(--color-focus) 28%, transparent);
-  background-color: #ffffff;
+  background-color: var(--color-white);
   background-image:
     linear-gradient(
       90deg,
@@ -241,7 +256,7 @@
 @utility paper-slanted {
   --paper-slant: color-mix(in srgb, var(--color-focus) 20%, transparent);
   --paper-line: color-mix(in srgb, var(--color-focus) 30%, transparent);
-  background-color: #ffffff;
+  background-color: var(--color-white);
   background-image:
     repeating-linear-gradient(65deg, transparent 0 33px, var(--paper-slant) 33px 34px),
     repeating-linear-gradient(transparent 0 27px, var(--paper-line) 27px 28px);
@@ -249,7 +264,7 @@
 
 /* Нотный стан – музыка: пять линеек через 9 px, станы повторяются каждые 72 px. */
 @utility paper-staff {
-  --paper-line: rgb(29 35 64 / 0.45);
+  --paper-line: color-mix(in srgb, var(--color-ink) 45%, transparent);
   background-color: #fffdf7;
   background-image:
     linear-gradient(var(--paper-line) 1px, transparent 1px),
