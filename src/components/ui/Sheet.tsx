@@ -12,8 +12,9 @@ const PAPER: Record<SheetKind, string> = {
   cell: 'paper-cell',
   mm: 'paper-mm',
   // Текст линейки начинается правее красного поля (52 px).
-  lined: 'paper-lined pl-18',
-  slanted: 'paper-slanted',
+  // Межстрочный 28 px – текст стоит на линейках.
+  lined: 'paper-lined pl-18 leading-7',
+  slanted: 'paper-slanted leading-7',
   staff: 'paper-staff',
   // Поле чистого листа – на 40 px.
   margin: 'paper-margin pl-14',
@@ -41,11 +42,8 @@ export function Sheet({
   return (
     <Tag
       style={style}
-      // Тень листа – как на холсте: drop-shadow, потому что box-shadow обрезал бы clip-path.
-      className={cn(
-        'relative rotate-(--tilt) drop-shadow-[0_2px_3px_rgb(29_35_64/0.14)]',
-        className,
-      )}
+      // Тень листа – токен drop-shadow-sheet: box-shadow обрезал бы clip-path.
+      className={cn('relative rotate-(--tilt) drop-shadow-sheet', className)}
     >
       <div
         className={cn(
