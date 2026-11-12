@@ -122,4 +122,15 @@ describe('MessengerButtons', () => {
     );
     expect(telegram.getBoundingClientRect().width).toBeGreaterThan(250);
   });
+
+  it('wraps a long name inside the button with label "personal"', async () => {
+    const screen = await render(
+      <div style={{ width: 288 }}>
+        <MessengerButtons {...TUTOR} nameDative="Александре" label="personal" />
+      </div>,
+    );
+    const telegram = screen.getByRole('link', { name: 'Написать Александре в Telegram' }).element();
+
+    expect(telegram.scrollWidth).toBeLessThanOrEqual(telegram.clientWidth);
+  });
 });

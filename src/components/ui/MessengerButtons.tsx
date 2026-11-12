@@ -40,7 +40,12 @@ function Label({
   nameDative: string;
   title: string;
 }) {
-  if (label === 'personal') return <span>{`Написать ${nameDative} в ${title}`}</span>;
+  if (label === 'personal') {
+    // Длинное имя («Александре») переносится внутри кнопки, а не вылезает за край.
+    return (
+      <span className="text-center whitespace-normal">{`Написать ${nameDative} в ${title}`}</span>
+    );
+  }
 
   // Скрытый текст – в начале имени: видимое слово остаётся его цельным хвостом.
   const prefix = label === 'short' ? `Написать ${nameDative} в ` : 'Написать в ';
