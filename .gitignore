@@ -11,6 +11,8 @@ next-env.d.ts
 coverage/
 playwright-report/
 test-results/
+# Скриншоты упавших компонентных тестов Vitest Browser Mode
+.vitest/
 blob-report/
 .design-review/
 

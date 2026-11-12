@@ -27,6 +27,7 @@ export default defineConfig([
     'coverage/**',
     'playwright-report/**',
     'test-results/**',
+    '.vitest/**',
     'next-env.d.ts',
     'docs/**',
   ]),

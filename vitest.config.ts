@@ -24,6 +24,8 @@ export default defineConfig({
       },
       {
         extends: true,
+        // next/link читает process.env.__NEXT_*, которого в браузере нет; пустой объект – значения по умолчанию.
+        define: { 'process.env': '{}' },
         test: {
           name: 'browser',
           include: ['src/**/*.browser.test.tsx'],
