@@ -7,11 +7,13 @@ import { cn } from '@/lib/cn';
 export type ChipVariant = 'solid' | 'dashed' | 'outline' | 'kraft';
 
 // Рамка 1,5 px у `dashed` – из макета ds/Chip, в шкале Tailwind такой ширины нет.
+// Отступ и размер текста – в каждом варианте: `cn` не разрешает конфликты классов.
+const SMALL = 'py-2 text-caption';
 const VARIANTS: Record<ChipVariant, string> = {
-  solid: 'bg-ink text-paper',
-  dashed: 'border-[1.5px] border-dashed border-ink/45 text-ink-2',
-  outline: 'border border-ink/25 bg-paper text-ink',
-  // Предметы с классами в профиле репетитора: «Математика · 5–9 класс».
+  solid: cn(SMALL, 'bg-ink text-paper'),
+  dashed: cn(SMALL, 'border-[1.5px] border-dashed border-ink/45 text-ink-2'),
+  outline: cn(SMALL, 'border border-ink/25 bg-paper text-ink'),
+  // Предметы с классами в профиле репетитора: «Математика · 5–9 класс», 15 px, как в T-1-profile.
   kraft: 'bg-kraft py-1.5 text-small text-ink',
 };
 
@@ -26,7 +28,7 @@ export function Chip({ variant = 'solid', className, children }: ChipProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-3.5 py-2 text-caption font-medium whitespace-nowrap',
+        'inline-flex items-center rounded-full px-3.5 font-medium whitespace-nowrap',
         VARIANTS[variant],
         className,
       )}

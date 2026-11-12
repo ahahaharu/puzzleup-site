@@ -36,4 +36,12 @@ describe('Chip', () => {
     expect(style.whiteSpace).toBe('nowrap');
     expect(Number.parseFloat(style.borderTopLeftRadius)).toBeGreaterThan(100);
   });
+
+  it('variant "kraft" is 15 px with 6 px vertical padding', async () => {
+    const screen = await render(<Chip variant="kraft">Математика · 5–9 класс</Chip>);
+    const style = getComputedStyle(screen.getByText('Математика · 5–9 класс').element());
+
+    expect(style.fontSize).toBe('15px');
+    expect(style.paddingTop).toBe('6px');
+  });
 });
