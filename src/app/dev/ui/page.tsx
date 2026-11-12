@@ -284,7 +284,7 @@ export default function UiKitPage() {
             <Logo tone="paper" />
           </span>
         </div>
-        {/* Цепочка только горизонтальная: на телефоне – лента с прокруткой. */}
+        {/* На телефоне – лента с прокруткой: четыре детали по 224 px (56rem) не помещаются. */}
         <div
           role="region"
           aria-label="Шаги"
