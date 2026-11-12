@@ -75,7 +75,7 @@ pnpm build            # production-сборка
 
 - **Git flow.** `main` – production, `develop` – staging. Работа – только в `feature/<kebab-name>` от `develop`. Релиз – `release/x.y.z` от `develop` → merge в `main` с тегом `vx.y.z` → back-merge в `develop`. Срочные правки – `hotfix/<name>` от `main`.
 - Никогда не коммить и не пушить напрямую в `main` и `develop`. Не делай force push в общие ветки.
-- **Коммиты** – Conventional Commits на английском, повелительное наклонение, до 72 символов в заголовке: `feat(leads): add phone validation for BY mobile codes`. Типы: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `build`, `perf`, `style`. Скоупы – имена модулей: `ui`, `layout`, `home`, `tutor-page`, `content`, `leads`, `outbox`, `bot`, `sheets`, `db`, `seo`, `legal`, `analytics`, `infra`.
+- **Коммиты** – Conventional Commits на английском, повелительное наклонение, до 72 символов в заголовке: `feat(leads): add phone validation for BY mobile codes`. Типы: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `build`, `perf`, `style`. Скоупы – имена модулей: `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`, плюс `decisions` для журнала решений. Список проверяет commitlint (`commitlint.config.ts`).
 - Коммиты маленькие и атомарные: одна логическая правка – один коммит. Перед коммитом: `pnpm lint && pnpm typecheck && pnpm test`.
 - PR в `develop` – squash merge, описание по шаблону из `docs/conventions.md`.
 - Перед началом фичи: прочитай нужные разделы ТЗ, составь план, назови файлы, которые затронешь. После – проверь Definition of Done из `docs/roadmap.md`.

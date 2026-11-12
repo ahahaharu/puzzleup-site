@@ -26,7 +26,7 @@ Conventional Commits, английский, повелительное накл�
 ```
 
 - **Типы:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `chore`, `build`, `ci`, `revert`.
-- **Скоупы:** `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`.
+- **Скоупы:** `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`, `decisions` (записи в `docs/decisions.md`: `docs(decisions): …`).
 
 Примеры:
 
