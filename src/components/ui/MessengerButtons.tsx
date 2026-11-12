@@ -8,11 +8,12 @@ import type { IconName } from './Icon';
 // docs/design-system.md, раздел 6; макеты D-5-tutors, T-1-profile, X-thanks.
 
 /**
- * Видимая подпись на широкой паре кнопок. Пока пара узкая (телефон, карточка), видно только
- * название мессенджера. Доступное имя всегда полное: «Написать Андрею в Telegram» (ADR-029).
- * - `short` – «Telegram» на любой ширине (карточка репетитора);
- * - `action` – «Написать в Telegram» (профиль);
- * - `personal` – «Написать Андрею в Telegram» (экран «Спасибо»).
+ * Подпись и доступное имя (ADR-029). Видимая подпись всегда входит в доступное имя (WCAG 2.5.3):
+ * - `short` – видно «Telegram», имя «Написать Андрею в Telegram» (карточка репетитора, ТЗ главной, раздел 5);
+ * - `action` – на широкой паре видно «Написать в Telegram», на узкой – «Telegram»; имя «Написать
+ *   в Telegram»: страница и так про этого репетитора (профиль, ТЗ страницы репетитора, раздел 1);
+ * - `personal` – всегда видно «Написать Андрею в Telegram» (экран «Спасибо», ТЗ главной, раздел 9);
+ *   пока пара не помещается в строку, кнопки стоят столбиком.
  */
 export type MessengerLabel = 'short' | 'action' | 'personal';
 
@@ -28,13 +29,8 @@ type MessengerButtonsProps = {
   className?: string;
 };
 
-// Скрытые слова остаются в доступном имени: видимая подпись – его часть (WCAG 2.5.3).
-// Длинная подпись включается по ширине самой пары (container query), а не окна: пара стоит
-// и в узкой колонке карточки, и в широкой колонке профиля.
-const SR_ONLY = 'sr-only';
-const WIDE_ACTION = 'sr-only @lg:not-sr-only';
-const WIDE_PERSONAL = 'sr-only @2xl:not-sr-only';
-
+// Ширина решается по самой паре (container query), а не по окну: пара стоит и в узкой колонке
+// карточки, и в широкой колонке профиля.
 function Label({
   label,
   nameDative,
@@ -44,20 +40,22 @@ function Label({
   nameDative: string;
   title: string;
 }) {
-  const verb = label === 'short' ? SR_ONLY : label === 'action' ? WIDE_ACTION : WIDE_PERSONAL;
-  const name = label === 'personal' ? WIDE_PERSONAL : SR_ONLY;
+  if (label === 'personal') return <span>{`Написать ${nameDative} в ${title}`}</span>;
 
+  // Скрытый текст – в начале имени: видимое слово остаётся его цельным хвостом.
+  const prefix = label === 'short' ? `Написать ${nameDative} в ` : 'Написать в ';
   return (
     <span>
-      <span className={verb}>Написать </span>
-      <span className={name}>{nameDative} </span>
-      <span className={verb}>в </span>
+      <span className={label === 'action' ? 'sr-only @lg:not-sr-only' : 'sr-only'}>{prefix}</span>
       {title}
     </span>
   );
 }
 
-/** Telegram и Viber репетитора – всегда парой, в два равных столбца, без переноса по одной. */
+/**
+ * Telegram и Viber репетитора – всегда парой и равного веса: в два равных столбца, без переноса
+ * по одной; длинная подпись `personal` – столбиком, пока пара не помещается в строку.
+ */
 export function MessengerButtons({
   label = 'short',
   tone = 'light',
@@ -75,7 +73,13 @@ export function MessengerButtons({
   return (
     // Зазор 10 px – из макетов карточки и профиля.
     <div className={cn('@container', className)}>
-      <div className="grid grid-cols-2 gap-2.5">
+      <div
+        className={cn(
+          'grid gap-2.5',
+          // «Написать Александре в Telegram» – около 300 px на кнопку.
+          label === 'personal' ? 'grid-cols-1 @2xl:grid-cols-2' : 'grid-cols-2',
+        )}
+      >
         {messengers.map(({ icon, title, href }) => (
           <Button
             key={title}
