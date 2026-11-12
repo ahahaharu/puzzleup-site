@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import type { CSSProperties, ReactNode } from 'react';
+import { Suspense, type CSSProperties, type ReactNode } from 'react';
 
 import { contrastRatio, isHexColor, parseThemeColors } from '@/lib/theme-tokens';
 
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Без 'use cache': globals.css читается на каждый запрос, правка токенов сразу видна в pnpm dev.
 async function readThemeCss() {
-  'use cache';
   return readFile(path.join(process.cwd(), 'src/styles/globals.css'), 'utf8');
 }
 
@@ -124,13 +124,39 @@ function formatRatio(foreground: string, background: string | undefined) {
   return `${contrastRatio(foreground, background).toFixed(1).replace('.', ',')}:1`;
 }
 
-export default async function TokensPage() {
-  if (process.env.NODE_ENV === 'production') notFound();
-
+async function ColorSwatches() {
   const colors = parseThemeColors(await readThemeCss());
   const byName = new Map(colors.map(({ name, value }) => [name, value]));
   const paper = byName.get('paper');
   const ink = byName.get('ink');
+
+  return (
+    <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {colors.map(({ name, value }) => (
+        <li
+          key={name}
+          className="flex gap-3 rounded-card border border-ink/12 bg-card p-3"
+          style={swatchStyle(name)}
+        >
+          <span
+            aria-hidden="true"
+            className="size-16 flex-none rounded-field border border-ink/12 bg-(--swatch)"
+          />
+          <span className="flex flex-col gap-0.5 text-caption">
+            <span className="font-semibold text-ink">{name}</span>
+            <span>{value}</span>
+            <span className="text-ink-muted">
+              на paper {formatRatio(value, paper)} · на ink {formatRatio(value, ink)}
+            </span>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default function TokensPage() {
+  if (process.env.NODE_ENV === 'production') notFound();
 
   return (
     <main className="page-container flex flex-col gap-14 py-14 lg:gap-24 lg:py-24">
@@ -143,27 +169,9 @@ export default async function TokensPage() {
       </header>
 
       <Section id="colors" title="Цвета">
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {colors.map(({ name, value }) => (
-            <li
-              key={name}
-              className="flex gap-3 rounded-card border border-ink/12 bg-card p-3"
-              style={swatchStyle(name)}
-            >
-              <span
-                aria-hidden="true"
-                className="size-16 flex-none rounded-field border border-ink/12 bg-(--swatch)"
-              />
-              <span className="flex flex-col gap-0.5 text-caption">
-                <span className="font-semibold text-ink">{name}</span>
-                <span>{value}</span>
-                <span className="text-ink-muted">
-                  на paper {formatRatio(value, paper)} · на ink {formatRatio(value, ink)}
-                </span>
-              </span>
-            </li>
-          ))}
-        </ul>
+        <Suspense fallback={<p className="text-caption text-ink-muted">Чтение globals.css…</p>}>
+          <ColorSwatches />
+        </Suspense>
       </Section>
 
       <Section id="type" title="Шрифты и роли текста">
@@ -181,9 +189,10 @@ export default async function TokensPage() {
         <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {PAPERS.map(({ className, label, hint }) => (
             <li key={className} className="flex flex-col gap-2">
+              {/* Радиус 4 px – как у образцов бумаги в макете ds/DS-Papers, в шкале ДС его нет. */}
               <span
                 aria-hidden="true"
-                className={`${className} block h-40 rounded-sm border border-ink/15 shadow-paper`}
+                className={`${className} block h-40 rounded-[4px] border border-ink/15 shadow-paper`}
               />
               <span className="font-semibold text-ink">{label}</span>
               <span className="text-caption text-ink-muted">{hint}</span>
@@ -252,8 +261,11 @@ export default async function TokensPage() {
           >
             Кнопка
           </button>
-          <span className="inline-flex rounded-piece bg-ink p-4">
-            <a href="#focus" className="text-accent-light underline">
+          <span className="inline-flex rounded-piece bg-ink px-4 py-2">
+            <a
+              href="#focus"
+              className="inline-flex min-h-11 items-center text-accent-light underline"
+            >
               Ссылка на тёмном
             </a>
           </span>
