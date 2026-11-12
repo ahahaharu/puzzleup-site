@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-react';
 import { Sheet, type SheetKind } from './Sheet';
 
 describe('Sheet', () => {
-  it.each<SheetKind>(['cell', 'mm', 'lined', 'plain'])(
+  it.each<SheetKind>(['cell', 'mm', 'lined', 'slanted', 'staff', 'margin', 'plain'])(
     'draws "%s" paper without images',
     async (kind) => {
       const screen = await render(<Sheet kind={kind}>Математика</Sheet>);

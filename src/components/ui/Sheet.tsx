@@ -5,13 +5,18 @@ import { cn } from '@/lib/cn';
 // Лист тетради – docs/design-system.md, разделы 4 и 6; макет ds/Sheet.
 // Вместо скругления – загнутый уголок 26 px: лист обрезается clip-path, а уголок рисуется поверх.
 
-export type SheetKind = 'cell' | 'mm' | 'lined' | 'plain';
+// Все бумаги ДС: новый предмет выбирает бумагу в данных, без правки компонента.
+export type SheetKind = 'cell' | 'mm' | 'lined' | 'slanted' | 'staff' | 'margin' | 'plain';
 
 const PAPER: Record<SheetKind, string> = {
   cell: 'paper-cell',
   mm: 'paper-mm',
   // Текст линейки начинается правее красного поля (52 px).
   lined: 'paper-lined pl-18',
+  slanted: 'paper-slanted',
+  staff: 'paper-staff',
+  // Поле чистого листа – на 40 px.
+  margin: 'paper-margin pl-14',
   plain: 'paper-plain',
 };
 
