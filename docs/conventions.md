@@ -26,7 +26,7 @@ Conventional Commits, английский, повелительное накл�
 ```
 
 - **Типы:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `style`, `chore`, `build`, `ci`, `revert`.
-- **Скоупы:** `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`.
+- **Скоупы:** `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`, `decisions` (записи в `docs/decisions.md`: `docs(decisions): …`).
 
 Примеры:
 
@@ -67,7 +67,7 @@ chore(deps): bump next to 16.4.2
 - **Тексты интерфейса.** В контенте (`content/`) или рядом с компонентом константами. Без i18n-фреймворка: сайт одноязычный. Тире «–», кавычки «».
 - **Стили.** Только классы Tailwind и токены из `@theme`. Произвольные значения (`[17px]`) – только если их нет в шкале ДС, с комментарием. Без inline `style`, кроме CSS-переменных для динамики (например, угол поворота).
 - **Доступность.** Семантические теги, один H1 на страницу, `aria-*` только когда нет нативного аналога. Новый интерактивный компонент проверяется с клавиатуры.
-- **Импорты.** Алиас `@/` → `src/`. Порядок упорядочивает Prettier-плагин или ESLint `import/order`.
+- **Импорты.** Алиас `@/` → `src/`. Порядок упорядочивает Prettier-плагин `@ianvs/prettier-plugin-sort-imports` (ESLint `import/order` не работает с ESLint 10, ADR-019).
 
 ## Тесты
 

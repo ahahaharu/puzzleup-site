@@ -1,0 +1,41 @@
+# Обновления зависимостей раз в неделю, PR в develop (docs/architecture.md, раздел 10).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Minsk
+    open-pull-requests-limit: 10
+    ignore:
+      # typescript-eslint поддерживает только TypeScript <6.1 (ADR-018).
+      - dependency-name: typescript
+        versions: ['>=6.1']
+      # Новая мажорная ESLint – вручную, после проверки плагинов eslint-config-next (ADR-019).
+      - dependency-name: eslint
+        versions: ['>=11']
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      next-react:
+        patterns:
+          ['next', 'eslint-config-next', 'react', 'react-dom', '@types/react', '@types/react-dom']
+      lint-format:
+        patterns: ['eslint', 'eslint-*', 'typescript-eslint', 'prettier', 'prettier-*', '@ianvs/*']
+      testing:
+        patterns: ['vitest', '@vitest/*', '@playwright/test']
+      commit-hooks:
+        patterns: ['lefthook', '@commitlint/*']
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Minsk
+    commit-message:
+      prefix: ci

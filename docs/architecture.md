@@ -1,6 +1,6 @@
 # Архитектура PuzzleUp
 
-Состояние на 11 ноября 2026. Почему выбрано именно так – в `docs/decisions.md`.
+Состояние на 12 ноября 2026. Почему выбрано именно так – в `docs/decisions.md`.
 
 ## 1. Обзор
 
@@ -26,7 +26,7 @@
 | Слой | Выбор | Примечание |
 |---|---|---|
 | Среда | Node.js 26 LTS, pnpm | Temporal API для времени по Минску |
-| Фреймворк | Next.js 16.4, React 19.3, TypeScript strict | App Router, Cache Components, `output: 'standalone'` |
+| Фреймворк | Next.js 16.4, React 19.3, TypeScript 6.0 strict | App Router, Cache Components, `output: 'standalone'` |
 | Стили | Tailwind CSS 4.3 | Токены в `@theme` (`src/styles/globals.css`), без JS-конфига |
 | Шрифты | `next/font/google` | Unbounded 500/700, Golos Text 400/500/600, Spectral Italic 400/500; latin + cyrillic; preload только Unbounded 700 и Golos 400 |
 | Контент | Content Collections + `@content-collections/mdx` | Zod-схемы, сборка падает на ошибке контента |
@@ -37,8 +37,8 @@
 | Таблица | Google Sheets API v4, сервисный аккаунт | Только обезличенные строки |
 | Защита формы | honeypot, `rate-limiter-flexible` (memory), проверка Origin | Один инстанс на окружение |
 | Аналитика | Umami self-hosted (без cookie), Яндекс Метрика после согласия | |
-| Качество | ESLint 9 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `prettier-plugin-tailwindcss` | |
-| Тесты | Vitest 4, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
+| Качество | ESLint 10 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `@ianvs/prettier-plugin-sort-imports` + `prettier-plugin-tailwindcss` | |
+| Тесты | Vitest 5, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
 | Хуки | lefthook, commitlint, gitleaks | |
 | CI/CD | GitHub Actions → GHCR → SSH-деплой | |
 | Инфраструктура | VPS cloudvps.by, Ubuntu 24.04, Docker Compose, Caddy | |
@@ -81,8 +81,10 @@
 │  │  ├─ sheets/               client.ts, row.ts (маппинг A–Q)
 │  │  ├─ availability/         repository.ts, cache.ts (cacheTag)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
+│  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
-│  ├─ lib/                     env.ts, time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts
+│  ├─ instrumentation.ts       проверка окружения при старте сервера
+│  ├─ lib/                     env.ts (схема), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/
@@ -104,7 +106,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 
 ## 4. Рендеринг и кэш
 
-- В `next.config.ts` включены `cacheComponents: true` и `output: 'standalone'`.
+- В `next.config.ts` включены `cacheComponents: true`, `partialPrefetching: true` (ADR-020), `output: 'standalone'` и `poweredByHeader: false`.
 - Главная и `/tutors/[slug]` должны оставаться статическими. Проверять через `ensureStatic` (Next 16.4) и вывод `next build`.
 - `/tutors/[slug]`: `generateStaticParams` по всем файлам `content/tutors`, включая ушедших; `dynamicParams = false`.
 - Фильтр по предметам на главной – клиентский компонент, который читает `?subject=` через `useSearchParams` внутри `<Suspense>`. Статическая оболочка показывает всех репетиторов, так что без JS виден полный список.
@@ -173,7 +175,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 | staging | `develop` | dev.puzzle-up.by (basic auth, `noindex`) | `puzzleup_staging` | отдельный тестовый бот и чат, отдельная тестовая Таблица |
 | production | `main` (тег `v*`) | puzzle-up.by | `puzzleup` | боевой бот и общий чат репетиторов |
 
-Переменные (схема и проверка – `src/lib/env.ts` на Zod, приложение не стартует при ошибке):
+Переменные: схема – чистая функция `parseEnv` в `src/lib/env.ts` на Zod, экземпляр – `src/server/env.ts` (`server-only`), проверка при старте – `register()` в `src/instrumentation.ts`: при ошибке процесс завершается с кодом 1. Переменные добавляются в схему в тех фичах, где они впервые нужны:
 
 ```
 APP_ENV=local|staging|production

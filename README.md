@@ -6,15 +6,37 @@ PuzzleUp – общий сайт независимых репетиторов. 
 
 ## Быстрый старт
 
-Требования: Node.js 26, pnpm, Docker, GitHub CLI (`gh auth login`) – нужен для создания PR из Claude Code.
+Требования:
+
+- Node.js 26 (версия в `.nvmrc`: `nvm use`);
+- pnpm 10 – точная версия зафиксирована в `packageManager`, pnpm переключится на неё сам;
+- [gitleaks](https://github.com/gitleaks/gitleaks) – проверка секретов в хуке `pre-commit` (`brew install gitleaks`);
+- Docker – для базы и интеграционных тестов (с этапа 3);
+- GitHub CLI (`gh auth login`) – нужен для создания PR из Claude Code.
 
 ```bash
-pnpm install
+pnpm install                   # заодно ставит git-хуки (lefthook)
+pnpm exec playwright install   # браузеры для E2E
 cp .env.example .env.local     # заполнить значения
-pnpm db:up && pnpm db:migrate
 pnpm dev                       # http://localhost:3000
-pnpm worker:dev                # в отдельном терминале, если нужны уведомления
 ```
+
+## Команды
+
+```bash
+pnpm dev            # dev-сервер
+pnpm build          # production-сборка (output: standalone)
+pnpm start          # запуск собранного standalone-сервера
+pnpm lint           # ESLint
+pnpm format         # Prettier
+pnpm typecheck      # типы маршрутов + tsc --noEmit
+pnpm test           # Vitest: юнит-тесты
+pnpm e2e            # Playwright: собирает и запускает приложение сам
+```
+
+Остальные команды из `CLAUDE.md` появляются в фичах, где они впервые нужны (`docs/roadmap.md`).
+
+Git-хуки: `pre-commit` – gitleaks, ESLint и Prettier по изменённым файлам; `commit-msg` – commitlint (Conventional Commits, `docs/conventions.md`); `pre-push` – typecheck и тесты.
 
 ## Документация
 
