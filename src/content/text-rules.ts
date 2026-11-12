@@ -11,6 +11,14 @@ function word(pattern: string): RegExp {
   return new RegExp(`${START}${pattern}${END}`, 'giu');
 }
 
+// Формы перечислены явно: корень с любым окончанием задел бы обычные слова –
+// «нашёл», «централизованное тестирование», «подберу» (первое лицо репетитора).
+function forms(stem: string, endings: readonly string[]): RegExp {
+  return word(`${stem}(?:${endings.join('|')})`);
+}
+
+const NOUN = ['', 'а', 'е', 'у', 'ом', 'ой', 'ы', 'и', 'ов', 'ам', 'ами', 'ах'];
+
 type Rule = { pattern: RegExp; message: string };
 
 const NOT_ORGANIZATION = 'PuzzleUp is not an organization';
@@ -18,18 +26,27 @@ const NO_GUARANTEES = 'no guarantees of results';
 
 const WORDING: readonly Rule[] = [
   { pattern: word('мы'), message: 'the site never speaks as «мы»' },
-  { pattern: word('наш\\p{L}*'), message: 'the site never speaks as «наш»' },
+  {
+    pattern: forms('наш', ['', 'а', 'е', 'и', 'его', 'ей', 'ему', 'им', 'ими', 'ем', 'у', 'их']),
+    message: 'the site never speaks as «наш»',
+  },
   {
     pattern: word('(?:находим|разбираем|решаем)'),
     message: 'use an impersonal form or the tutor’s first person',
   },
-  { pattern: word('команд\\p{L}*'), message: NOT_ORGANIZATION },
-  { pattern: word('центр\\p{L}*'), message: NOT_ORGANIZATION },
+  { pattern: forms('команд', NOUN), message: NOT_ORGANIZATION },
+  { pattern: forms('центр', NOUN), message: NOT_ORGANIZATION },
   // Только сама «школа»: «учится в школе», «справка из школы» – обязательные тексты ТЗ.
   { pattern: word('школа'), message: NOT_ORGANIZATION },
-  { pattern: word('компани\\p{L}*'), message: NOT_ORGANIZATION },
+  {
+    pattern: forms('компани', ['я', 'и', 'ю', 'ей', 'ям', 'ями', 'ях', 'й']),
+    message: NOT_ORGANIZATION,
+  },
   { pattern: /©\s*PuzzleUp/giu, message: NOT_ORGANIZATION },
-  { pattern: word('подбер\\p{L}*'), message: 'parents choose a tutor themselves' },
+  {
+    pattern: forms('подбер', ['ём', 'ем', 'ёт', 'ет']),
+    message: 'parents choose a tutor themselves',
+  },
   { pattern: word('гарантир\\p{L}*'), message: NO_GUARANTEES },
   { pattern: word('с\\s+первого\\s+раза'), message: NO_GUARANTEES },
   { pattern: word('педагог\\p{L}*'), message: 'forbidden word' },
