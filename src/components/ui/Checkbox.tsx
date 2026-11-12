@@ -25,9 +25,10 @@ const BOX: Record<Tone, string> = {
   light: 'border-ink/60 text-paper group-has-checked:border-ink group-has-checked:bg-ink',
   dark: 'border-paper/60 text-ink group-has-checked:border-paper group-has-checked:bg-paper',
 };
+// Отмеченный после ошибки сервера (форма без JS) – та же заливка, что у обычного отмеченного.
 const BOX_ERROR: Record<Tone, string> = {
-  light: 'border-2 border-error',
-  dark: 'border-2 border-error-light',
+  light: 'border-2 border-error text-paper group-has-checked:bg-ink',
+  dark: 'border-2 border-error-light text-ink group-has-checked:bg-paper',
 };
 const TEXT: Record<Tone, string> = { light: 'text-ink-2', dark: 'text-on-ink-label' };
 const ERROR_TEXT: Record<Tone, string> = { light: 'text-error', dark: 'text-error-light' };

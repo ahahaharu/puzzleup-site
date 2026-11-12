@@ -65,4 +65,25 @@ describe('Checkbox', () => {
     const description = screen.getByText('Операторы – репетиторы сайта.').element();
     expect(getComputedStyle(description).fontSize).toBe('14px');
   });
+
+  it('keeps the checked fill after a server error', async () => {
+    const screen = await render(
+      <Checkbox
+        id="consent"
+        label="Согласен"
+        tone="dark"
+        defaultChecked
+        error="Без согласия репетиторы не смогут обработать заявку"
+      />,
+    );
+    const box = screen
+      .getByRole('checkbox', { name: 'Согласен' })
+      .element()
+      .closest('label')
+      ?.querySelector('span[aria-hidden="true"]');
+    if (!box) throw new Error('checkbox box not found');
+
+    expect(getComputedStyle(box).backgroundColor).toBe('rgb(247, 244, 236)');
+    expect(getComputedStyle(box).borderTopColor).toBe('rgb(255, 180, 168)');
+  });
 });
