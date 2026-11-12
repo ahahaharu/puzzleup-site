@@ -27,4 +27,10 @@ describe('Logo', () => {
     expect(Number.parseFloat(style.fontSize)).toBeCloseTo(29.2, 1);
     expect(getComputedStyle(word.parentElement ?? word).color).toBe('rgb(247, 244, 236)');
   });
+
+  it('never makes the word smaller than 14 px', async () => {
+    const screen = await render(<Logo size={16} />);
+
+    expect(getComputedStyle(screen.getByText('PuzzleUp').element()).fontSize).toBe('14px');
+  });
 });

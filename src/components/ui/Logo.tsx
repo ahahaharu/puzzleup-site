@@ -28,8 +28,8 @@ export function Logo({ size = 26, tone = 'ink', className }: LogoProps) {
       )}
     >
       <PuzzlePiece size={size} className="text-accent" />
-      {/* Пропорции слова – из макета ds/Logo: 0,73 стороны детали. */}
-      <span className="font-display text-[calc(var(--logo)*0.73)] leading-none font-bold tracking-[-0.01em] whitespace-nowrap">
+      {/* Пропорции слова – из макета ds/Logo: 0,73 стороны детали, но не мельче 14 px. */}
+      <span className="font-display text-[max(0.875rem,calc(var(--logo)*0.73))] leading-none font-bold tracking-[-0.01em] whitespace-nowrap">
         PuzzleUp
       </span>
     </span>
