@@ -70,4 +70,34 @@ test.describe('global styles', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     expect(await page.evaluate(scrollBehavior)).toBe('auto');
   });
+
+  test('reduced motion collapses transitions and animations', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+
+    const motion = await page.evaluate(() => {
+      const probe = document.createElement('div');
+      probe.style.transition = 'transform 600ms ease-out 200ms';
+      probe.style.animation = 'none 600ms ease-out 200ms 3';
+      document.body.append(probe);
+      const style = getComputedStyle(probe);
+      // Браузеры по-разному печатают секунды («1e-05s», «0.00001s») – сравниваем числа.
+      const seconds = (value: string) => Number.parseFloat(value);
+      return {
+        transitionDuration: seconds(style.transitionDuration),
+        transitionDelay: seconds(style.transitionDelay),
+        animationDuration: seconds(style.animationDuration),
+        animationDelay: seconds(style.animationDelay),
+        animationIterationCount: style.animationIterationCount,
+      };
+    });
+
+    expect(motion.transitionDuration).toBeLessThan(0.001);
+    expect(motion.animationDuration).toBeLessThan(0.001);
+    expect(motion).toMatchObject({
+      transitionDelay: 0,
+      animationDelay: 0,
+      animationIterationCount: '1',
+    });
+  });
 });
