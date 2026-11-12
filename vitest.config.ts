@@ -26,6 +26,23 @@ export default defineConfig({
         extends: true,
         // next/link читает process.env.__NEXT_*, которого в браузере нет; пустой объект – значения по умолчанию.
         define: { 'process.env': '{}' },
+        resolve: {
+          alias: {
+            'next/image': fileURLToPath(new URL('./tests/setup/next-image.tsx', import.meta.url)),
+          },
+        },
+        // Зависимости собираются заранее: иначе Vite находит их посреди прогона, перезагружает
+        // страницу тестов и роняет уже запущенные файлы – на CI кэша нет, так было бы каждый раз.
+        optimizeDeps: {
+          include: [
+            'next/dist/shared/lib/image-external',
+            'next/link',
+            'react',
+            'react/jsx-dev-runtime',
+            'react-dom/client',
+            'vitest-browser-react',
+          ],
+        },
         test: {
           name: 'browser',
           include: ['src/**/*.browser.test.tsx'],
