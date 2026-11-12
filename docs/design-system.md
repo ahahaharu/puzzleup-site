@@ -172,15 +172,15 @@ background-size: 32px 32px;   /* 24px на телефоне */
 | Компонент | Варианты и правила | Артборд |
 |---|---|---|
 | `Button` | `primary` (ink / paper, наведение – ink-2), `secondary` (прозрачная, рамка 1,5 px ink), `accent` (accent-strong, белый текст – только отправка формы), `onDark`, `secondaryOnDark` (контур paper 60 % на тёмной детали, X-thanks). Размеры `lg` 56 px (первый экран, форма), `md` 48 px. Состояния: наведение, фокус, нажатие `scale(.98)`, неактивная 40%, загрузка со спиннером и «Отправляем…» (`aria-disabled`, ADR-030). Ссылка или кнопка – по смыслу (`href` → `<a>`/`next/link`) | Button, DS-States |
-| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись. Подпись `short` / `action` / `personal`: на узкой паре видно «Telegram», на широкой – «Написать в Telegram» / «Написать Андрею в Telegram». Доступное имя всегда «Написать Андрею в Telegram» – через скрытый текст, не `aria-label` (ADR-029). Тон `light` / `dark` | D-5-tutors, T-1-profile, X-thanks |
+| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись. Подпись (ADR-029): `short` – видно «Telegram», имя «Написать Андрею в Telegram» (карточка); `action` – на широкой паре «Написать в Telegram», на узкой «Telegram», имя «Написать в Telegram» (профиль); `personal` – всегда «Написать Андрею в Telegram», столбиком, пока пара не помещается в строку («Спасибо»). Видимая подпись всегда входит в доступное имя: скрытый текст, а не `aria-label`. Тон `light` / `dark` | D-5-tutors, T-1-profile, X-thanks |
 | `Chip` | `solid`, `dashed`, `outline`, `kraft` (предметы с классами в профиле) – метки и плашки | Chip, T-1-profile |
 | `ChoiceChip` | 44 px, рамка 1,5 px ink 25%. Выбранный – заливка ink, текст paper, галочка слева. На тёмной форме – инверсия. Нативные `radio`/`checkbox` внутри `<label>` | DS-States, T-6-form |
 | `Badge` (статус занятости) | Высота от 32, кружок 8 px + текст Golos 500 14 px, `nowrap` | T-S-statuses |
 | `Field` | Высота 52, рамка 1,5 px ink 30%, подпись всегда над полем, подсказка и ошибка под полем. Ошибка: рамка error / error-light, иконка, текст, `aria-describedby`, `aria-invalid` | DS-States, X-form-errors |
 | `Checkbox` | Квадрат 24 px, зона клика от 44×44 вместе с текстом | DS-States |
-| `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `plain`, `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
+| `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `slanted` / `staff` / `margin` / `plain` (все бумаги раздела 4), `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
 | `PuzzlePiece` | Форма из логотипа (SVG ниже), `currentColor` | Logo |
-| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left`/`right` = `flat` / `knob` / `socket`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
+| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
 | `Doodle` | Каракули на полях: `circle`, `sine`, `lever`, `cube`, `triangle`; не больше 6 на экран, на телефоне часть скрыта, `aria-hidden` | Doodle |
 | `SectionHead` | H2 + лид | SectionHead |
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |

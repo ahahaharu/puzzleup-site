@@ -84,7 +84,7 @@
 │  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
 │  ├─ instrumentation.ts       проверка окружения при старте сервера
-│  ├─ lib/                     env.ts (схема), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts
+│  ├─ lib/                     env.ts (схема), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), cn.ts (склейка классов)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/
