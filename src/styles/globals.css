@@ -1,0 +1,285 @@
+/* Классы ищутся только в src/: в docs/ лежат HTML-макеты, их стили в сборку попадать не должны. */
+@import 'tailwindcss' source('..');
+
+/*
+ * Токены дизайн-системы «Тетрадь» – docs/design-system.md.
+ * Стандартные палитра, шкала размеров текста, шрифты и брейкпоинты Tailwind отключены (ADR-025):
+ * в коде доступны только значения ДС.
+ */
+
+/* static: переменные цветов выводятся всегда – их читает витрина /dev/tokens. */
+@theme static {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-paper: #f7f4ec;
+  --color-paper-alt: #efeae0;
+  --color-card: #fbf9f4;
+  --color-grid: rgb(29 35 64 / 0.06);
+  --color-kraft: #e9dfc7;
+  --color-kraft-dark: #d6ccb2;
+  --color-kraft-shadow: #e2daca;
+  --color-ink: #1d2340;
+  --color-ink-2: #2e3452;
+  --color-ink-muted: #4a4f66;
+  --color-on-ink-label: #c9ccda;
+  --color-accent: #e4572e;
+  --color-accent-strong: #c94a24;
+  --color-accent-text: #b23a17;
+  --color-accent-light: #f2a487;
+  --color-error: #b3261e;
+  --color-error-light: #ffb4a8;
+  --color-focus: #3a6fd8;
+  --color-success: #2f7d57;
+}
+
+/* inline: переменные next/font висят на <html>, значение подставляется в месте использования. */
+@theme inline {
+  --font-*: initial;
+  --font-display: var(--font-unbounded), sans-serif;
+  --font-sans: var(--font-golos), sans-serif;
+  /* Spectral подключён только курсивом: класс `font-hand` ставится вместе с `italic`. */
+  --font-hand: var(--font-spectral), serif;
+}
+
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+
+  /*
+   * Роли текста – docs/design-system.md, раздел 2. Мельче 14 px нет ничего.
+   * Заголовки и «пометки от руки» тянутся плавно между 360 и 1280 px (ADR-026),
+   * лид, текст и кнопки переключаются на lg – значения в --fs-* ниже.
+   */
+  --text-*: initial;
+  --text-slogan: clamp(3rem, 1.8261rem + 5.2174vw, 6rem);
+  --text-slogan--line-height: 1;
+  --text-slogan--letter-spacing: -0.03em;
+  --text-slogan--font-weight: 700;
+  --text-name: clamp(2.125rem, 1.3913rem + 3.2609vw, 4rem);
+  --text-name--line-height: 1.05;
+  --text-name--letter-spacing: -0.02em;
+  --text-name--font-weight: 700;
+  --text-h2: clamp(1.875rem, 1.4348rem + 1.9565vw, 3rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 700;
+  --text-h3: clamp(1.1875rem, 1.1141rem + 0.3261vw, 1.375rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--font-weight: 500;
+  --text-lead: var(--fs-lead);
+  --text-lead--line-height: 1.5;
+  --text-body: var(--fs-body);
+  --text-body--line-height: 1.55;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.45;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.45;
+  --text-button: var(--fs-button);
+  --text-button--line-height: 1.2;
+  --text-button--font-weight: 600;
+  --text-field: 1rem;
+  --text-field--line-height: 1.2;
+  --text-hand-sm: clamp(1rem, 0.9511rem + 0.2174vw, 1.125rem);
+  --text-hand-sm--line-height: 1.1;
+  --text-hand-md: clamp(1.25rem, 1.1033rem + 0.6522vw, 1.625rem);
+  --text-hand-md--line-height: 1.1;
+  --text-hand-lg: clamp(1.5rem, 1.2554rem + 1.087vw, 2.125rem);
+  --text-hand-lg--line-height: 1.1;
+
+  --radius-field: 10px;
+  --radius-button: 12px;
+  --radius-card: 16px;
+  --radius-piece: 20px;
+
+  --shadow-paper: 0 2px 6px rgb(29 35 64 / 0.12);
+  --shadow-flying: 0 18px 22px rgb(29 35 64 / 0.28);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --fs-lead: 1.125rem;
+    --fs-body: 1rem;
+    --fs-button: 1rem;
+
+    @variant lg {
+      --fs-lead: 1.25rem;
+      --fs-body: 1.0625rem;
+      --fs-button: 1.0625rem;
+    }
+  }
+
+  body {
+    @apply paper-page font-sans text-body text-ink-2;
+  }
+
+  /* Кольцо фокуса – 2 px focus с отступом 2 px, одно на весь сайт. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Движение выключено целиком; состояния меняются мгновенно, конечный кадр анимации сохраняется. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Контейнер: поля 16 / 32 / 48 / 64 px, от 1280 px – 1152 px по центру, дальше растут только поля. */
+@utility page-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+
+  @variant md {
+    padding-inline: 2rem;
+  }
+  @variant lg {
+    padding-inline: 3rem;
+  }
+  @variant xl {
+    padding-inline: 4rem;
+  }
+}
+
+/* Сетка: 4 / 8 / 12 колонок, межколонник 16 / 24 / 24 / 32 px. */
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: 1rem;
+
+  @variant md {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    column-gap: 1.5rem;
+  }
+  @variant lg {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  @variant xl {
+    column-gap: 2rem;
+  }
+}
+
+/*
+ * Бумага – только CSS-градиенты, без картинок (docs/design-system.md, раздел 4; макет ds/DS-Papers).
+ * Цвета листов, которых нет среди токенов, взяты из макета.
+ */
+
+/* Фон страницы и секций: клетка ink 6 %, 24 px на телефоне и 32 px от 768 px. */
+@utility paper-page {
+  background-color: var(--color-paper);
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+
+  @variant md {
+    background-size: 32px 32px;
+  }
+}
+
+/* Клетка – математика, алгебра. */
+@utility paper-cell {
+  --paper-line: color-mix(in srgb, var(--color-focus) 22%, transparent);
+  background-color: #fbfaf5;
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Миллиметровка – физика, чертежи. */
+@utility paper-mm {
+  --paper-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  --paper-line-fine: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  background-color: #fffdf7;
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px),
+    linear-gradient(var(--paper-line-fine) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line-fine) 1px, transparent 1px);
+  background-size:
+    30px 30px,
+    30px 30px,
+    6px 6px,
+    6px 6px;
+}
+
+/* Линейка с полями – языки, литература. Текст на листе начинается правее поля (52 px). */
+@utility paper-lined {
+  --paper-margin: color-mix(in srgb, var(--color-accent) 70%, transparent);
+  --paper-line: color-mix(in srgb, var(--color-focus) 28%, transparent);
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 52px,
+      var(--paper-margin) 52px,
+      var(--paper-margin) 53px,
+      transparent 53px
+    ),
+    repeating-linear-gradient(transparent 0 27px, var(--paper-line) 27px 28px);
+}
+
+/* Косая линейка – начальная школа, письмо. */
+@utility paper-slanted {
+  --paper-slant: color-mix(in srgb, var(--color-focus) 20%, transparent);
+  --paper-line: color-mix(in srgb, var(--color-focus) 30%, transparent);
+  background-color: #ffffff;
+  background-image:
+    repeating-linear-gradient(65deg, transparent 0 33px, var(--paper-slant) 33px 34px),
+    repeating-linear-gradient(transparent 0 27px, var(--paper-line) 27px 28px);
+}
+
+/* Нотный стан – музыка: пять линеек через 9 px, станы повторяются каждые 72 px. */
+@utility paper-staff {
+  --paper-line: rgb(29 35 64 / 0.45);
+  background-color: #fffdf7;
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size: 100% 72px;
+  background-position:
+    0 12px,
+    0 21px,
+    0 30px,
+    0 39px,
+    0 48px;
+}
+
+/* Чистый лист с полями – история, рисование, общее. */
+@utility paper-margin {
+  --paper-margin: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background-color: var(--color-card);
+  background-image: linear-gradient(
+    90deg,
+    transparent 40px,
+    var(--paper-margin) 40px,
+    var(--paper-margin) 41px,
+    transparent 41px
+  );
+}
+
+/* Чистый лист. */
+@utility paper-plain {
+  background-color: var(--color-card);
+}
