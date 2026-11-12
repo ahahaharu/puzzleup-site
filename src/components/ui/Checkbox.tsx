@@ -57,7 +57,9 @@ export function Checkbox({
       <label
         htmlFor={id}
         className={cn(
-          'group relative flex min-h-11 cursor-pointer items-start gap-3 py-2.5 text-small has-disabled:cursor-not-allowed has-disabled:opacity-40',
+          'group relative flex min-h-11 cursor-pointer items-start gap-3 pt-2.5 text-small has-disabled:cursor-not-allowed has-disabled:opacity-40',
+          // Мелкий текст и ошибка – на 6 px ниже подписи, как в T-6-form; без них зона клика симметрична.
+          description || error ? 'pb-0' : 'pb-2.5',
           TEXT[tone],
         )}
       >
