@@ -45,11 +45,11 @@
 
 ## Стек (кратко)
 
-Node.js 26 LTS · pnpm · TypeScript strict · Next.js 16.4 (App Router, React 19.3, Cache Components, `output: 'standalone'`) · Tailwind CSS 4.3 · Content Collections + MDX · Zod 4 · Conform · PostgreSQL 18 + Drizzle ORM · grammY · Google Sheets API · Vitest 4 · Testcontainers · Playwright · Docker Compose + Caddy на одном VPS.
+Node.js 26 LTS · pnpm · TypeScript 6 strict · Next.js 16.4 (App Router, React 19.3, Cache Components, `output: 'standalone'`) · Tailwind CSS 4.3 · Content Collections + MDX · Zod 4 · Conform · PostgreSQL 18 + Drizzle ORM · grammY · Google Sheets API · Vitest 5 · Testcontainers · Playwright · Docker Compose + Caddy на одном VPS.
 
 Подробно – `docs/architecture.md`.
 
-**Next.js 16 отличается от того, что ты мог видеть раньше:** `middleware.ts` переименован в `proxy.ts`, `params`/`searchParams` асинхронные, Cache Components (`'use cache'`, `cacheTag`, `cacheLife`, `updateTag`, `revalidateTag`), `next lint` удалён. Перед использованием API, в котором не уверен, сверяйся с документацией: https://nextjs.org/docs (индекс для агентов – https://nextjs.org/docs/llms.txt). То же для Tailwind 4 (конфиг в CSS через `@theme`, без `tailwind.config.js`), Zod 4 и Vitest 4.
+**Next.js 16 отличается от того, что ты мог видеть раньше:** `middleware.ts` переименован в `proxy.ts`, `params`/`searchParams` асинхронные, Cache Components (`'use cache'`, `cacheTag`, `cacheLife`, `updateTag`, `revalidateTag`), `next lint` удалён. Перед использованием API, в котором не уверен, сверяйся с документацией: https://nextjs.org/docs (индекс для агентов – https://nextjs.org/docs/llms.txt). То же для Tailwind 4 (конфиг в CSS через `@theme`, без `tailwind.config.js`), Zod 4, Vitest 5 и ESLint 10.
 
 ## Команды
 

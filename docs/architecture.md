@@ -26,7 +26,7 @@
 | Слой | Выбор | Примечание |
 |---|---|---|
 | Среда | Node.js 26 LTS, pnpm | Temporal API для времени по Минску |
-| Фреймворк | Next.js 16.4, React 19.3, TypeScript strict | App Router, Cache Components, `output: 'standalone'` |
+| Фреймворк | Next.js 16.4, React 19.3, TypeScript 6.0 strict | App Router, Cache Components, `output: 'standalone'` |
 | Стили | Tailwind CSS 4.3 | Токены в `@theme` (`src/styles/globals.css`), без JS-конфига |
 | Шрифты | `next/font/google` | Unbounded 500/700, Golos Text 400/500/600, Spectral Italic 400/500; latin + cyrillic; preload только Unbounded 700 и Golos 400 |
 | Контент | Content Collections + `@content-collections/mdx` | Zod-схемы, сборка падает на ошибке контента |
@@ -37,8 +37,8 @@
 | Таблица | Google Sheets API v4, сервисный аккаунт | Только обезличенные строки |
 | Защита формы | honeypot, `rate-limiter-flexible` (memory), проверка Origin | Один инстанс на окружение |
 | Аналитика | Umami self-hosted (без cookie), Яндекс Метрика после согласия | |
-| Качество | ESLint 9 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `prettier-plugin-tailwindcss` | |
-| Тесты | Vitest 4, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
+| Качество | ESLint 10 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `@ianvs/prettier-plugin-sort-imports` + `prettier-plugin-tailwindcss` | |
+| Тесты | Vitest 5, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
 | Хуки | lefthook, commitlint, gitleaks | |
 | CI/CD | GitHub Actions → GHCR → SSH-деплой | |
 | Инфраструктура | VPS cloudvps.by, Ubuntu 24.04, Docker Compose, Caddy | |

@@ -6,7 +6,7 @@
 
 | # | Ветка | Что входит | Готово, когда |
 |---|---|---|---|
-| 0.1 | `chore/bootstrap` | Next.js 16.4 (TS strict, App Router, `cacheComponents`, `output: 'standalone'`), pnpm, Node 26 в `.nvmrc` и `engines`, ESLint 9 + Prettier, Vitest 4, Playwright, lefthook + commitlint + gitleaks, `.editorconfig`, `.env.example`, `.gitignore` (включая `.env*`, `.design-review/`, `.claude/settings.local.json`), `tsx` для скриптов, `src/lib/env.ts`, шаблон PR, Dependabot, README | `pnpm lint/typecheck/test/build` проходят на пустой странице |
+| 0.1 | `chore/bootstrap` | Next.js 16.4 (TS strict, App Router, `cacheComponents`, `output: 'standalone'`), pnpm, Node 26 в `.nvmrc` и `engines`, ESLint 10 + Prettier, Vitest 5, Playwright, lefthook + commitlint + gitleaks, `.editorconfig`, `.env.example`, `.gitignore` (включая `.env*`, `.design-review/`, `.claude/settings.local.json`), `tsx` для скриптов, `src/lib/env.ts`, шаблон PR, Dependabot, README | `pnpm lint/typecheck/test/build` проходят на пустой странице |
 | 0.2 | `ci/github-actions` | `ci.yml`: install с кэшем, lint, typecheck, test, build, e2e-заглушка | CI зелёный на PR |
 | 0.3 | `feature/design-tokens` | `globals.css` с `@theme`, шрифты через `next/font`, утилиты бумаги, контейнер и сетка, фокус-кольцо, reduced-motion | Страница-витрина `/dev/tokens` (только в dev) показывает цвета, шрифты, бумагу |
 
