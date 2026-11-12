@@ -86,4 +86,22 @@ describe('Checkbox', () => {
     expect(getComputedStyle(box).backgroundColor).toBe('rgb(247, 244, 236)');
     expect(getComputedStyle(box).borderTopColor).toBe('rgb(255, 180, 168)');
   });
+
+  it('puts the small text 6 px under a one-line label and keeps a 44 px target on the box', async () => {
+    const screen = await render(
+      <div style={{ width: 600 }}>
+        <Checkbox id="consent" label="Согласен" description="Мелкий текст." />
+      </div>,
+    );
+    const label = screen.getByRole('checkbox', { name: 'Согласен' }).element().closest('label');
+    const box = label?.querySelector('span[aria-hidden="true"]');
+    if (!label || !box) throw new Error('checkbox not found');
+    const description = screen.getByText('Мелкий текст.').element();
+
+    const gap = description.getBoundingClientRect().top - label.getBoundingClientRect().bottom;
+    expect(gap).toBe(6);
+    const target = getComputedStyle(box, '::before');
+    expect(box.getBoundingClientRect().width + 2 * -Number.parseFloat(target.left)).toBe(44);
+    expect(box.getBoundingClientRect().height + 2 * -Number.parseFloat(target.top)).toBe(44);
+  });
 });

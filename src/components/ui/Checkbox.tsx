@@ -57,9 +57,10 @@ export function Checkbox({
       <label
         htmlFor={id}
         className={cn(
-          'group relative flex min-h-11 cursor-pointer items-start gap-3 pt-2.5 text-small has-disabled:cursor-not-allowed has-disabled:opacity-40',
-          // Мелкий текст и ошибка – на 6 px ниже подписи, как в T-6-form; без них зона клика симметрична.
-          description || error ? 'pb-0' : 'pb-2.5',
+          'group relative flex cursor-pointer items-start gap-3 pt-2.5 text-small has-disabled:cursor-not-allowed has-disabled:opacity-40',
+          // Мелкий текст и ошибка – на 6 px ниже подписи, как в T-6-form: высоту 44 px тогда держит
+          // зона клика вокруг квадрата (::before), а не вся подпись.
+          description || error ? 'pb-0' : 'min-h-11 pb-2.5',
           TEXT[tone],
         )}
       >
@@ -74,7 +75,9 @@ export function Checkbox({
         <span
           aria-hidden="true"
           className={cn(
-            'grid size-6 flex-none place-items-center rounded-[6px]',
+            'relative grid size-6 flex-none place-items-center rounded-[6px]',
+            // Зона клика 44×44 вокруг квадрата 24 px.
+            "before:absolute before:-inset-2.5 before:content-['']",
             'group-has-focus-visible:outline-2 group-has-focus-visible:outline-offset-2 group-has-focus-visible:outline-focus',
             error ? BOX_ERROR[tone] : cn('border-[1.5px]', BOX[tone]),
           )}
