@@ -10,6 +10,9 @@ pre-commit:
     - name: prettier
       glob: '*.{js,mjs,cjs,ts,tsx,json,css,yml,yaml}'
       run: pnpm exec prettier --check --ignore-unknown {staged_files}
+    - name: content
+      glob: 'content/**'
+      run: pnpm content:check
 
 commit-msg:
   jobs:
