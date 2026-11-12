@@ -24,6 +24,8 @@ type PuzzleStepProps = {
   tone?: StepTone;
   left?: StepLeft;
   right?: StepRight;
+  /** Уровень заголовка шага – по иерархии секции. */
+  as?: 'h3' | 'h4';
   /** Пропорции детали; ширина – по контейнеру. По умолчанию 280×250, как на холсте. */
   width?: number;
   height?: number;
@@ -37,6 +39,7 @@ export function PuzzleStep({
   tone = 'cell',
   left = 'flat',
   right = 'knob',
+  as: Heading = 'h3',
   width = 280,
   height = 250,
   className,
@@ -59,7 +62,7 @@ export function PuzzleStep({
           <defs>
             {/* Клетка, как у paper-cell: 24 px, focus 22 %. */}
             <pattern id={patternId} width="24" height="24" patternUnits="userSpaceOnUse">
-              <rect width="24" height="24" fill="#fbfaf5" />
+              <rect width="24" height="24" className="fill-(--paper-cell)" />
               <path d="M24 0 L0 0 0 24" fill="none" className="stroke-focus/22" strokeWidth="1" />
             </pattern>
           </defs>
@@ -81,8 +84,14 @@ export function PuzzleStep({
           colors.text,
         )}
       >
-        <span className={cn('font-hand text-hand-lg leading-none italic', colors.number)}>{n}</span>
-        <h3 className="font-display text-h3 leading-[1.15]">{title}</h3>
+        {/* Номер – декор: порядок шагов задаёт список <ol> вокруг деталей. */}
+        <span
+          aria-hidden="true"
+          className={cn('font-hand text-hand-lg leading-none italic', colors.number)}
+        >
+          {n}
+        </span>
+        <Heading className="font-display text-h3 leading-[1.15]">{title}</Heading>
         {children && <p className="text-small">{children}</p>}
       </div>
     </div>

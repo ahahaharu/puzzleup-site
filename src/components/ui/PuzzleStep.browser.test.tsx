@@ -43,4 +43,17 @@ describe('PuzzleStep', () => {
     expect(ids).toHaveLength(2);
     expect(new Set(ids).size).toBe(2);
   });
+
+  it('hides the decorative number and takes the heading level', async () => {
+    const screen = await render(
+      <ol>
+        <li>
+          <PuzzleStep n="01" title="Заявка" as="h4" />
+        </li>
+      </ol>,
+    );
+
+    await expect.element(screen.getByRole('heading', { level: 4, name: 'Заявка' })).toBeVisible();
+    expect(screen.getByText('01').element().getAttribute('aria-hidden')).toBe('true');
+  });
 });

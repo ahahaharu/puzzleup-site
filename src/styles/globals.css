@@ -110,6 +110,8 @@
     --fs-lead: 1.125rem;
     --fs-body: 1rem;
     --fs-button: 1rem;
+    /* Лист в клетку: утилита paper-cell и SVG-деталь PuzzleStep. */
+    --paper-cell: #fbfaf5;
 
     @variant lg {
       --fs-lead: 1.25rem;
@@ -212,7 +214,7 @@
 /* Клетка – математика, алгебра. */
 @utility paper-cell {
   --paper-line: color-mix(in srgb, var(--color-focus) 22%, transparent);
-  background-color: #fbfaf5;
+  background-color: var(--paper-cell);
   background-image:
     linear-gradient(var(--paper-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
