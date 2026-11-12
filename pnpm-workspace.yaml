@@ -1,0 +1,4 @@
+# Пакеты, которым разрешено запускать install-скрипты (pnpm 10 по умолчанию их блокирует).
+onlyBuiltDependencies:
+  - esbuild
+  - lefthook

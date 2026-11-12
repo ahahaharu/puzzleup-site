@@ -1,10 +1,29 @@
-# Секреты
+# Зависимости
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Тесты и отчёты
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.design-review/
+
+# Секреты: в репозитории только .env.example
 .env
 .env.*
 !.env.example
 
-# Локальные настройки Claude Code
+# Локальные настройки
 .claude/settings.local.json
+.vscode/
+.idea/
 
-# Система
+# Система и логи
 .DS_Store
+*.log
