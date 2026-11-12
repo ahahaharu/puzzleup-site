@@ -25,7 +25,8 @@ const TONES = {
 /**
  * Нативный `radio`/`checkbox` внутри `<label>`: выбор, клавиатура и отправка формы работают
  * без JavaScript. Выбранный отличается заливкой и галочкой, а не только цветом.
- * Кольцо фокуса рисуется на чипе: сам инпут визуально скрыт.
+ * Кольцо фокуса рисуется на чипе: сам инпут визуально скрыт; `relative` держит его внутри
+ * чипа, иначе фокус прокручивал бы страницу к началу.
  */
 export function ChoiceChip({
   type,
@@ -37,7 +38,7 @@ export function ChoiceChip({
   return (
     <label
       className={cn(
-        'inline-flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-4.5 text-field font-medium whitespace-nowrap select-none',
+        'relative inline-flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-4.5 text-field font-medium whitespace-nowrap select-none',
         'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus',
         'has-disabled:cursor-not-allowed has-disabled:opacity-40',
         TONES[tone],
