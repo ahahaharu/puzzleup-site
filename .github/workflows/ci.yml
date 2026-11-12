@@ -36,6 +36,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      # Компонентные тесты (*.browser.test.tsx) идут в Vitest Browser Mode на Chromium.
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
 
   build-e2e:

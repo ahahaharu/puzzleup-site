@@ -6,4 +6,5 @@ pnpm-lock.yaml
 coverage/
 playwright-report/
 test-results/
+.vitest/
 next-env.d.ts

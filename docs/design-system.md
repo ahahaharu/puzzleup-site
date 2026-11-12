@@ -77,7 +77,7 @@
 - Шаг – 8 px. Вертикальный отступ секции: 96 px на десктопе, 56 px на телефоне.
 - Фон-клетка – на всю ширину окна, у всех секций. Чередуются только `paper` и `paper-alt`.
 - Скругления: карточки 16, кнопки 12, поля 10, тёмные детали формы и «О сайте» 20, чипы и бейджи – 999.
-- Тени: «бумага» – `0 2px 6px` ink 12%; «летящая деталь» – `0 18px 22px` ink 28%, только для декоративной детали пазла. Без `blur` на больших блоках, не больше четырёх теней на экран. Стандартные тени, скругления и `blur` Tailwind сброшены (ADR-025): `shadow-paper`, `shadow-flying`, `rounded-field/button/card/piece`, `rounded-full`.
+- Тени: «бумага» – `0 2px 6px` ink 12%; «летящая деталь» – `0 18px 22px` ink 28%, только для декоративной детали пазла. «Лист» – `drop-shadow` `0 2px 3px` ink 14% (`drop-shadow-sheet`), только для `Sheet`: обычная тень обрезается вместе с загнутым уголком. Без `blur` на больших блоках, не больше четырёх теней на экран. Стандартные тени, скругления и `blur` Tailwind сброшены (ADR-025): `shadow-paper`, `shadow-flying`, `rounded-field/button/card/piece`, `rounded-full`.
 - Якоря: `scroll-margin-top` с учётом высоты шапки (88 / 72 / 64 px).
 - Утилиты: `page-container` – поля и максимальная ширина из таблицы; `page-grid` – колонки и межколонники. Брейкпоинты Tailwind – только `md` 768, `lg` 1024, `xl` 1280.
 - Фокус: глобальное кольцо `:focus-visible` – 2 px `focus`, отступ 2 px. Своё кольцо в компонентах не нужно.
@@ -171,23 +171,25 @@ background-size: 32px 32px;   /* 24px на телефоне */
 
 | Компонент | Варианты и правила | Артборд |
 |---|---|---|
-| `Button` | `primary` (ink / paper, наведение – ink-2), `secondary` (прозрачная, рамка 1,5 px ink), `accent` (accent-strong, белый текст – только отправка формы), `onDark`. Размеры `lg` 56 px (первый экран, форма), `md` 48 px. Состояния: наведение, фокус, нажатие `scale(.98)`, неактивная 40%, загрузка со спиннером и «Отправляем…». Ссылка или кнопка – по смыслу (`href` → `<a>`/`next/link`) | Button, DS-States |
-| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись, `aria-label` «Написать Андрею в Telegram» | D-5-tutors, T-1-profile |
-| `Chip` | `solid`, `dashed`, `outline` – метки и плашки | Chip |
+| `Button` | `primary` (ink / paper, наведение – ink-2), `secondary` (прозрачная, рамка 1,5 px ink), `accent` (accent-strong, белый текст – только отправка формы), `onDark`, `secondaryOnDark` (контур paper 60 % на тёмной детали, X-thanks). Размеры `lg` 56 px (первый экран, форма), `md` 48 px. Состояния: наведение, фокус, нажатие `scale(.98)`, неактивная 40%, загрузка со спиннером и «Отправляем…» (`aria-disabled`, ADR-030). Ссылка или кнопка – по смыслу (`href` → `<a>`/`next/link`) | Button, DS-States |
+| `MessengerButtons` | Telegram + Viber всегда парой, равного веса, в два равных столбца, иконка + подпись. Подпись (ADR-029): `short` – видно «Telegram», имя «Написать Андрею в Telegram» (карточка); `action` – на широкой паре «Написать в Telegram», на узкой «Telegram», имя «Написать в Telegram» (профиль); `personal` – всегда «Написать Андрею в Telegram», столбиком, пока пара не помещается в строку («Спасибо»). Видимая подпись всегда входит в доступное имя: скрытый текст, а не `aria-label`. Тон `light` / `dark` | D-5-tutors, T-1-profile, X-thanks |
+| `Chip` | `solid`, `dashed`, `outline`, `kraft` (предметы с классами в профиле) – метки и плашки | Chip, T-1-profile |
 | `ChoiceChip` | 44 px, рамка 1,5 px ink 25%. Выбранный – заливка ink, текст paper, галочка слева. На тёмной форме – инверсия. Нативные `radio`/`checkbox` внутри `<label>` | DS-States, T-6-form |
 | `Badge` (статус занятости) | Высота от 32, кружок 8 px + текст Golos 500 14 px, `nowrap` | T-S-statuses |
 | `Field` | Высота 52, рамка 1,5 px ink 30%, подпись всегда над полем, подсказка и ошибка под полем. Ошибка: рамка error / error-light, иконка, текст, `aria-describedby`, `aria-invalid` | DS-States, X-form-errors |
 | `Checkbox` | Квадрат 24 px, зона клика от 44×44 вместе с текстом | DS-States |
-| `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `plain`, `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
+| `Sheet` | Лист тетради: `kind` = `cell` / `mm` / `lined` / `slanted` / `staff` / `margin` / `plain` (все бумаги раздела 4), `tilt` в градусах, загнутый уголок 26 px вместо скругления | Sheet |
 | `PuzzlePiece` | Форма из логотипа (SVG ниже), `currentColor` | Logo |
-| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left`/`right` = `flat` / `knob` / `socket`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
+| `PuzzleStep` | Деталь-шаг, цепочка соединяется выступом и пазом: `left` = `flat` / `socket`, `right` = `flat` / `knob`, номер скрыт от дикторов (порядок задаёт `<ol>`), уровень заголовка – `as`, `tone` = `cell` / `sand` / `ink` / `accent` | PuzzleStep |
 | `Doodle` | Каракули на полях: `circle`, `sine`, `lever`, `cube`, `triangle`; не больше 6 на экран, на телефоне часть скрыта, `aria-hidden` | Doodle |
 | `SectionHead` | H2 + лид | SectionHead |
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |
 | `Margins` («пометки на полях») | Формулы Spectral Italic, ink 35–45%, поворот ±3–4°, `aria-hidden`, на телефоне скрываются при наложении на текст | D-1-hero |
 | `PhotoTape` | Фото «вклеено в тетрадь»: белая рамка 8 / 12 px, поворот ±1,5°, полоска «скотча», без фото – инициалы на kraft | D-5-tutors, T-1-profile |
 
-Иконки линейные, толщина 1,6–1,7, 24 px (`viewBox 0 0 24 24`, `stroke="currentColor"`). Эмодзи не используются.
+Все компоненты во всех состояниях – на витрине `/dev/ui` (только `pnpm dev`).
+
+Иконки линейные, толщина 1,6–1,7, 24 px (`viewBox 0 0 24 24`, `stroke="currentColor"`). Исключение – знаки Telegram и Viber: фирменные силуэты, залитые `currentColor`, без фирменных цветов (ADR-032); в макетах на их месте устаревшие линейные значки. Эмодзи не используются.
 
 Логотип (деталь пазла, `viewBox="0 0 120 120"`):
 
