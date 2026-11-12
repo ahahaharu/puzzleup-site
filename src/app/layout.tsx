@@ -34,7 +34,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru" className={`${unbounded.variable} ${golos.variable} ${spectral.variable}`}>
+    <html
+      lang="ru"
+      // Плавная прокрутка из globals.css – только для якорей; при переходах между страницами Next её отключает.
+      data-scroll-behavior="smooth"
+      className={`${unbounded.variable} ${golos.variable} ${spectral.variable}`}
+    >
       <body>{children}</body>
     </html>
   );
