@@ -1,0 +1,40 @@
+[
+  {
+    "id": "math",
+    "name": "математика",
+    "nameAccusative": "математику",
+    "nameDativeWithPrep": "по математике",
+    "gradeFrom": 5,
+    "gradeTo": 11,
+    "topics": [
+      "дроби и проценты",
+      "уравнения и неравенства",
+      "функции и графики",
+      "геометрия",
+      "экзамен после 9 класса",
+      "ЦТ и ЦЭ"
+    ],
+    "formula": "x² − 5x + 6 = 0",
+    "paper": "cell",
+    "status": "active"
+  },
+  {
+    "id": "physics",
+    "name": "физика",
+    "nameAccusative": "физику",
+    "nameDativeWithPrep": "по физике",
+    "gradeFrom": 7,
+    "gradeTo": 11,
+    "topics": [
+      "механика",
+      "тепловые явления",
+      "электричество",
+      "оптика",
+      "решение задач",
+      "ЦТ и ЦЭ"
+    ],
+    "formula": "F = m · a",
+    "paper": "lined",
+    "status": "hidden"
+  }
+]
