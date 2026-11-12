@@ -1,9 +1,9 @@
-import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense, type CSSProperties, type ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { contrastRatio, isHexColor, parseThemeColors } from '@/lib/theme-tokens';
 
@@ -14,9 +14,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Без 'use cache': globals.css читается на каждый запрос, правка токенов сразу видна в pnpm dev.
-async function readThemeCss() {
-  return readFile(path.join(process.cwd(), 'src/styles/globals.css'), 'utf8');
+// Синхронное чтение без кэша: правка токенов сразу видна в pnpm dev, а страница рендерится
+// целиком, без потоковой подстановки через Suspense, – и работает без JavaScript.
+function readThemeCss() {
+  return readFileSync(path.join(process.cwd(), 'src/styles/globals.css'), 'utf8');
 }
 
 const TYPE_ROLES = [
@@ -85,6 +86,11 @@ const TYPE_ROLES = [
 
 const PAPERS = [
   { className: 'paper-page', label: 'Фон страницы', hint: 'paper-page · клетка 24 / 32 px' },
+  {
+    className: 'paper-page-alt',
+    label: 'Фон секции',
+    hint: 'paper-page-alt · paper-alt с клеткой',
+  },
   { className: 'paper-cell', label: 'Клетка', hint: 'paper-cell' },
   { className: 'paper-mm', label: 'Миллиметровка', hint: 'paper-mm' },
   { className: 'paper-lined', label: 'Линейка с полями', hint: 'paper-lined' },
@@ -124,8 +130,8 @@ function formatRatio(foreground: string, background: string | undefined) {
   return `${contrastRatio(foreground, background).toFixed(1).replace('.', ',')}:1`;
 }
 
-async function ColorSwatches() {
-  const colors = parseThemeColors(await readThemeCss());
+function ColorSwatches() {
+  const colors = parseThemeColors(readThemeCss());
   const byName = new Map(colors.map(({ name, value }) => [name, value]));
   const paper = byName.get('paper');
   const ink = byName.get('ink');
@@ -169,9 +175,7 @@ export default function TokensPage() {
       </header>
 
       <Section id="colors" title="Цвета">
-        <Suspense fallback={<p className="text-caption text-ink-muted">Чтение globals.css…</p>}>
-          <ColorSwatches />
-        </Suspense>
+        <ColorSwatches />
       </Section>
 
       <Section id="type" title="Шрифты и роли текста">
