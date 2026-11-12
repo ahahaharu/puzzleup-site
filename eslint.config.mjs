@@ -42,6 +42,8 @@ export default defineConfig([
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
+      // `const { lost, ...rest } = props` – стандартный способ убрать проп перед передачей в DOM.
+      '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
       // `as` – только с eslint-disable и комментарием-обоснованием (docs/conventions.md, «Код»).
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
     },
