@@ -59,3 +59,39 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  # Pre-commit хук можно обойти (`--no-verify`), а репозиторий публичный (ADR-015).
+  # Сканируется вся история: она маленькая, а секрет мог попасть в любой коммит ветки.
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GITLEAKS_VERSION: 8.30.1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -fsSLO "${base}/${archive}"
+          curl -fsSL "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt" | grep " ${archive}\$" | sha256sum -c -
+          tar -xzf "${archive}" gitleaks
+      - run: ./gitleaks git --redact --no-banner .
+
+  # Не блокирует слияние: новая уязвимость в зависимости не должна ронять чужие PR.
+  # Исправление – отдельным PR (обновление или override).
+  audit:
+    name: audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - run: pnpm audit --prod --audit-level=high
