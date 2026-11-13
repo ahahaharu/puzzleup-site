@@ -36,6 +36,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      # Схемы и связи content/ (docs/data-model.md); --strict – только перед релизом.
+      - run: pnpm content:check
       # Компонентные тесты (*.browser.test.tsx) идут в Vitest Browser Mode на Chromium.
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test

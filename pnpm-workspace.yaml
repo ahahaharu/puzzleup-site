@@ -5,3 +5,8 @@ onlyBuiltDependencies:
 
 # Версии фиксируются точно: обновления приходят через Dependabot отдельными PR.
 savePrefix: ''
+
+# mdx-bundler (через @content-collections/mdx) тянет toml 3 с уязвимостями high. TOML-frontmatter
+# (`+++`) в content/ не используется; 5.0.1 – исправленная версия с тем же `parse`.
+overrides:
+  toml: 5.0.1

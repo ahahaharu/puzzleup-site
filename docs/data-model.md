@@ -10,13 +10,13 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 
 | Поле | Тип | Обяз. | Правила |
 |---|---|---|---|
-| `id` | string | да | `t-<slug>`, постоянный, не меняется никогда; хранится в заявках и отзывах |
+| `id` | string | да | `t-<slug>` на момент создания, постоянный, не меняется никогда, даже при смене `slug`; хранится в заявках и отзывах |
 | `slug` | string | да | латиница, нижний регистр, дефисы; уникален |
 | `name` | string | да | имя для заголовков: «Андрей» |
 | `nameDative` | string | да | «Андрею» |
 | `namePrepositional` | string | да | «Андрее» |
 | `fullName` | string | да* | ФИО для «Услуги оказывает» и подвала |
-| `unp` | string | да* | 9 цифр |
+| `unp` | string | да* | 9 цифр, в YAML – в кавычках: `'123456789'` |
 | `photo` | string | нет | файл в `public/tutors/`; нет – инициалы на kraft |
 | `subjects` | `{ id: SubjectId, from: number, to: number }[]` | да | предмет из `subjects.json`, классы в его диапазоне |
 | `education` | string | да | одна строка, только подтверждённое документом |
@@ -29,13 +29,15 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 | `archived` | boolean | да | ушёл: страница с `noindex`, не выводится в списках |
 | `order` | number | да | порядок внутри статуса |
 | `price` | number | да | BYN за 60 минут |
-| `telegram` | string | да | ник без @ или ссылка t.me |
+| `telegram` | string | да | ник без @ или ссылка `https://t.me/…` |
 | `viber` | string | да | номер для `viber://chat?number=`; на странице текстом не показывается |
 | `terms` | string | нет | условия оплаты и переноса; нет – стандартные из `site.json` |
 | `platforms` | string[] | нет | если не «Google Meet, Miro» |
 | `seoDescription` | string | нет | иначе собирается шаблоном |
 
-\* Обязательны, пока репетитор на НПД. На этапе разработки допустимы заглушки вида `[ФИО]`. `pnpm content:check --strict` (запускается перед релизом) падает, если заглушки остались.
+\* Обязательны, пока репетитор на НПД.
+
+**Заглушки.** Пока данных нет, поля `fullName`, `unp`, `education`, `teachingSince`, `telegram`, `viber` могут быть заглушкой вида `[ФИО]` (та же запись, что в макетах). Черновые тексты (`tagline`, `hobby`, тело «О себе») тоже берутся в квадратные скобки – по абзацу. Обычная проверка заглушки пропускает, `pnpm content:check --strict` (перед релизом) падает на любой из них во всех файлах `content/`. Ссылка Markdown `[текст](адрес)` заглушкой не считается.
 
 ### `subjects.json`
 
@@ -48,12 +50,12 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
   gradeFrom: number, gradeTo: number,
   topics: string[],                      // 4–6
   formula: string,                       // декор карточки
-  paper: 'cell' | 'mm' | 'lined' | 'lined-margin' | 'slanted' | 'staff' | 'plain',
+  paper: 'cell' | 'mm' | 'lined' | 'slanted' | 'staff' | 'margin' | 'plain',  // = SheetKind
   status: 'active' | 'hidden'
 }
 ```
 
-Сейчас `active` только `math`, `physics` – `hidden`.
+Сейчас `active` только `math`, `physics` – `hidden`. Значения `paper` совпадают с `kind` компонента `Sheet`: `lined` – линейка с красным полем, `margin` – чистый лист с полями.
 
 ### `reviews.json`
 
@@ -74,26 +76,41 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 
 ### `situations.json`, `faq.json`, `site.json`
 
-- `situations.json`: `{ id, title, text, goal: Goal, tutors?: string[] }`. Без `tutors` – все репетиторы с подходящими классами.
-- `faq.json`: `{ id, question, answer }`. Ответ – строка с простым Markdown. Плейсхолдеры вроде `{tutorsGrades}` собираются из данных.
+Корень `reviews.json`, `subjects.json`, `situations.json`, `faq.json` – массив, `site.json` – объект. Объекты строгие: неизвестное поле – ошибка.
+
+- `situations.json`: `{ id, title, text, goal: Goal, tutors?: string[] }`. Без `tutors` – все репетиторы, у кого в `goals` есть эта цель (ADR-036). Карточка без репетиторов не выводится.
+- `faq.json`: `{ id, question, answer }`. Ответ – строка с простым Markdown. В ответе допустим плейсхолдер `{tutorsGrades}` – собирается из данных.
 - `site.json`:
-  - название, слоган;
-  - тексты раскрытия для подвала и блока «О сайте»;
-  - часы ответа `{ from: '09:00', to: '22:00', tz: 'Europe/Minsk' }`;
-  - стандартные `terms`;
-  - подписи к ценам;
-  - тексты согласия с версией `consentVersion`;
-  - кто ведёт сайт (`siteOperatorTutorId: 't-andrei'`).
+
+| Поле | Что |
+|---|---|
+| `name`, `slogan` | «PuzzleUp», «Всё сложится.» |
+| `disclosure` | раскрытие статуса сайта для каждой страницы |
+| `about` | текст блока «О сайте» как есть (решение владельца, ADR-035) |
+| `footer.tagline`, `footer.requisites`, `footer.copyright` | подвал; реквизиты – шаблон с `{tutorsRequisites}` и `{siteOperatorFullName}`, копирайт – с `{tutorsFullNames}` |
+| `responseHours` | `{ from: '09:00', to: '22:00', tz: 'Europe/Minsk' }`, `from` раньше `to` |
+| `defaultTerms` | стандартные условия оплаты и переноса |
+| `defaultPlatforms` | `['Google Meet', 'Miro']` для репетитора без `platforms` |
+| `prices` | заголовки и подписи карточек «Пробное занятие» и «Занятие», строка об оплате, сноска об оферте |
+| `consent` | `version` (дата редакции, `YYYY-MM-DD`), `label`, `policyLinkLabel`, `details` – шаблон с `{operators}` |
+| `siteOperatorTutorId` | кто ведёт сайт: `t-andrei` |
+
+Плейсхолдеры `{key}` разрешены только в перечисленных полях (`src/content/schemas.ts`), подстановка – `src/lib/template.ts`.
 
 ### Перекрёстные проверки (`pnpm content:check`, тест)
 
-- `id` и `slug` репетиторов уникальны.
+- `id` и `slug` репетиторов уникальны, `slug` совпадает с именем файла, `id` – вида `t-…`.
 - Предмет репетитора есть в `subjects.json`, классы – в его диапазоне.
-- `reviews[].tutorId` существует.
+- `reviews[].tutorId` существует, предмет отзыва репетитор ведёт.
 - Указанное фото существует.
 - `goals` содержит `ct` только у репетитора с 10–11 классами.
-- `situations[].tutors` существуют.
-- В строках нет запрещённых слов из ТЗ: «мы», «наш», «команда», «центр», «школа», «компания», «подберём», «гарантир».
+- `situations[].tutors` существуют, и у каждого есть цель карточки.
+- `id` в JSON-файлах уникальны; `siteOperatorTutorId` существует и не в архиве; есть `legal/privacy.mdx` и `legal/cookies.mdx`.
+- Плейсхолдеры `{key}` – только известные.
+- Во всех строках и в теле MDX нет запрещённых слов из ТЗ: «мы», «наш», «находим», «разбираем», «решаем», «команда», «центр», «школа» (только эта форма: «учится в школе» – обязательный текст), «компания», «© PuzzleUp», «подберём», «гарантир», «с первого раза», «педагог», «опытный преподаватель». Типографика: нет дефиса вместо тире, «—» и прямых кавычек.
+- Только `--strict`: нет заглушек `[…]`, «О себе» – 600–1200 символов и 2–4 абзаца.
+
+Где запускается: загрузчик `src/content` при `next build` и `next dev` (схемы и связи), `pnpm content:check` – ещё и синтаксис YAML/MDX и фото – в `pnpm build`, CI и pre-commit при изменении `content/**`. Поэтому production-сборка – только `pnpm build`, не `next build` напрямую (в том числе в Dockerfile).
 
 ## 2. Перечисления (общие для формы, БД и бота)
 

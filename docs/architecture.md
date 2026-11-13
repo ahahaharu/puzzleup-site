@@ -29,7 +29,7 @@
 | Фреймворк | Next.js 16.4, React 19.3, TypeScript 6.0 strict | App Router, Cache Components, `output: 'standalone'` |
 | Стили | Tailwind CSS 4.3 | Токены в `@theme` (`src/styles/globals.css`), без JS-конфига |
 | Шрифты | `next/font/google` | Unbounded 500/700, Golos Text 400/500/600, Spectral Italic 400/500; latin + cyrillic; preload только Unbounded 700 и Golos 400 |
-| Контент | Content Collections + `@content-collections/mdx` | Zod-схемы, сборка падает на ошибке контента |
+| Контент | Content Collections + `@content-collections/mdx` | MDX компилирует Content Collections, проверку схем и связей делает `src/content` – сборка падает на ошибке контента (ADR-033) |
 | Формы | Server Actions + `useActionState`, Zod 4, Conform | Одна схема на клиенте и сервере, работает без JS |
 | БД | PostgreSQL 18, Drizzle ORM + drizzle-kit | Миграции в репозитории |
 | Очередь | Своя таблица `outbox`, `FOR UPDATE SKIP LOCKED` | Без Redis и внешних брокеров |
@@ -72,7 +72,7 @@
 │  │  ├─ tutor-page/           Profile, About, Outside, Reviews, HowToStart, More, статусы
 │  │  ├─ lead-form/            LeadForm (клиент), schema.ts (Zod), action.ts (Server Action), Thanks
 │  │  └─ tutors/               TutorCard, сортировка, availability
-│  ├─ content/                 загрузчики и селекторы поверх Content Collections, cross-reference проверки
+│  ├─ content/                 загрузчик (index.ts, server-only), схемы, перекрёстные проверки и правила текстов
 │  ├─ server/                  только серверный код, каждый index.ts начинается с import 'server-only'
 │  │  ├─ db/                   client.ts, schema/*.ts, migrations/
 │  │  ├─ leads/                domain.ts (типы, статусы), service.ts, repository.ts
@@ -84,13 +84,14 @@
 │  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
 │  ├─ instrumentation.ts       проверка окружения при старте сервера
-│  ├─ lib/                     env.ts (схема), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), cn.ts (склейка классов)
+│  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), cn.ts (склейка классов)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/
 ├─ docker/Dockerfile, compose.dev.yml, compose.prod.yml, Caddyfile
 ├─ .github/workflows/ci.yml, deploy.yml
-├─ content-collections.ts
+├─ content-collections.ts     только чтение и компиляция MDX
+├─ scripts/content-check.ts   `pnpm content:check [--strict]`
 ├─ drizzle.config.ts
 └─ CLAUDE.md
 ```
@@ -198,7 +199,7 @@ YANDEX_METRIKA_ID=
 
 ## 9. Сборка, деплой, инфраструктура
 
-- **Dockerfile** многоступенчатый: `deps` → `build` (`next build` + сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `worker.js`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
+- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `worker.js`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
 - **CI** (`ci.yml`, на каждый PR в `develop`/`main` и push в них): install → format:check → lint → typecheck → `content:check` → unit → integration (Testcontainers) → build → e2e (Playwright против собранного приложения + Postgres service) → Lighthouse CI для `/` и `/tutors/andrei`. Параллельно – gitleaks по всей истории и `pnpm audit` (не блокирует). Шаги добавляются в фичах, где появляется то, что они проверяют; job `checks` и `build-e2e` обязательны для слияния в `develop` и `main`. Actions закреплены по SHA (ADR-022), сборка – отдельный шаг перед Playwright (ADR-024).
 - **Deploy** (`deploy.yml`):
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;

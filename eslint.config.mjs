@@ -30,6 +30,7 @@ export default defineConfig([
     '.vitest/**',
     'next-env.d.ts',
     'docs/**',
+    '.content-collections/**',
   ]),
   ...nextCoreWebVitals,
   ...nextTypescript,
@@ -51,6 +52,28 @@ export default defineConfig([
   {
     files: ['src/lib/**'],
     rules: layerImports(['app', 'components', 'features', 'server', 'content']),
+  },
+  {
+    files: ['src/content/**'],
+    rules: layerImports(['app', 'components', 'features', 'server']),
+  },
+  {
+    // Контент – только через загрузчик с проверкой и server-only (src/content/index.ts).
+    files: ['src/app/**', 'src/components/**', 'src/features/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              // Модули src/content, сгенерированный модуль и файлы content/ напрямую.
+              regex: '^(?:@/content/(?!index$).+|content-collections$|(?:\\.\\./)+content(?:/|$))',
+              message: 'Import content from @/content only (src/content/index.ts).',
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     files: ['src/server/**'],
