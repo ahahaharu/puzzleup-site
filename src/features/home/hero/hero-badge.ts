@@ -17,6 +17,9 @@ function joinWithAnd(items: readonly string[]): string {
   return `${items.slice(0, -1).join(', ')} и ${items.at(-1)}`;
 }
 
+/** «по физике» → «физике». */
+const withoutPrep = (nameDativeWithPrep: string) => nameDativeWithPrep.replace(/^по\s+/, '');
+
 /** Дательный падеж после «по»: «по 21 предмету», «по 5 предметам». */
 function subjectsCount(count: number): string {
   const word = count % 10 === 1 && count % 100 !== 11 ? 'предмету' : 'предметам';
@@ -45,7 +48,12 @@ export function heroBadge(
     parts.push(
       active.length > LISTED_SUBJECTS_MAX
         ? subjectsCount(active.length)
-        : joinWithAnd(active.map((subject) => subject.nameDativeWithPrep)),
+        : joinWithAnd(
+            // Предлог один раз, как в ТЗ: «по математике и физике».
+            active.map((subject, index) =>
+              index === 0 ? subject.nameDativeWithPrep : withoutPrep(subject.nameDativeWithPrep),
+            ),
+          ),
       grades(active),
     );
   }

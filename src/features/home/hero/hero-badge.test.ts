@@ -27,10 +27,10 @@ describe('heroBadge', () => {
 
   it('lists up to three subjects and takes grades across all of them', () => {
     expect(heroBadge([PHYSICS, MATH], [ANDREI, MAXIM])).toBe(
-      'Онлайн-репетиторы по физике и по математике для 5–11 классов: Андрей и Максим',
+      'Онлайн-репетиторы по физике и математике для 5–11 классов: Андрей и Максим',
     );
     expect(heroBadge([PHYSICS, CHEMISTRY, ENGLISH], [ANDREI, MAXIM])).toBe(
-      'Онлайн-репетиторы по физике, по химии и по английскому языку для 1–11 классов: Андрей и Максим',
+      'Онлайн-репетиторы по физике, химии и английскому языку для 1–11 классов: Андрей и Максим',
     );
   });
 
