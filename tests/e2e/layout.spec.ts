@@ -51,7 +51,10 @@ test.describe('desktop', () => {
 
     await expect(page.getByRole('banner').getByRole('navigation')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Меню' })).toBeHidden();
-    await expect(page.getByRole('link', { name: 'Выбрать репетитора' })).toHaveCount(1);
+    // Вне содержимого страницы кнопка одна – в шапке; кнопка первого экрана не в счёт.
+    await expect(
+      page.getByRole('link', { name: 'Выбрать репетитора' }).and(page.locator(':not(main *)')),
+    ).toHaveCount(1);
   });
 });
 
