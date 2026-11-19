@@ -184,7 +184,7 @@ background-size: 32px 32px;   /* 24px на телефоне */
 | `Doodle` | Каракули на полях: `circle`, `sine`, `lever`, `cube`, `triangle`; не больше 6 на экран, на телефоне часть скрыта, `aria-hidden` | Doodle |
 | `SectionHead` | H2 + лид | SectionHead |
 | `Logo` | Деталь accent + «PuzzleUp» Unbounded 700 | Logo |
-| `Margins` («пометки на полях») | Формулы Spectral Italic, ink 35–45%, поворот ±3–4°, `aria-hidden`, на телефоне скрываются при наложении на текст | D-1-hero |
+| `MarginNote` («пометки на полях») | Формула Spectral Italic, ink 35–45%, поворот ±3–4°, `aria-hidden`, на телефоне скрыта (`hideOnMobile`) | D-1-hero |
 | `PhotoTape` | Фото «вклеено в тетрадь»: белая рамка 8 / 12 px, поворот ±1,5°, полоска «скотча», без фото – инициалы на kraft | D-5-tutors, T-1-profile |
 
 Все компоненты во всех состояниях – на витрине `/dev/ui` (только `pnpm dev`).
