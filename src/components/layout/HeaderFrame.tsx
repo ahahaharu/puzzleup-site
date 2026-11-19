@@ -5,7 +5,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 // Шапка после прокрутки – ТЗ главной, блок 0; макеты X-header-d, X-header-m.
 
 /** Прокрутка, после которой шапка сжимается и становится полупрозрачной. */
-export const SCROLLED_AFTER = 80;
+const SCROLLED_AFTER = 80;
 
 /**
  * Закреплённая шапка. После 80 px – фон paper 92 % с размытием и линия снизу; на десктопе шапка

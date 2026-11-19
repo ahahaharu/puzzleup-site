@@ -14,7 +14,7 @@ import { NavAnchor } from './NavAnchor';
 
 // Мобильное меню – ТЗ главной, блок 0 «Телефон»; макет X-menu. До 1023 px.
 
-export const MENU_ID = 'site-menu';
+const MENU_ID = 'site-menu';
 
 export type MenuTutor = { slug: string; nameDative: string; telegram: string; viber: string };
 

@@ -7,7 +7,7 @@ import { Footer } from './Footer';
 import { Header, type Cta } from './Header';
 import { navLinks } from './nav';
 import { MAIN_ID, SkipLink } from './SkipLink';
-import { footerTexts, responseHoursLine } from './texts';
+import { footerTexts, listedTutors, responseHoursLine } from './texts';
 
 // Каркас страницы: ссылка «к содержанию», шапка, содержимое, подвал и нижняя панель на телефоне.
 // Данные – из content/, компоненты получают их пропсами.
@@ -31,9 +31,7 @@ type SiteShellProps = {
 
 export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellProps) {
   const site = getSite();
-  const tutors = getTutors()
-    .filter((tutor) => !tutor.archived)
-    .toSorted((a, b) => a.order - b.order);
+  const tutors = listedTutors(getTutors());
   const links = navLinks(
     {
       hasSubjects: getSubjects().some((subject) => subject.status === 'active'),

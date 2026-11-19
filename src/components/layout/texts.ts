@@ -36,3 +36,10 @@ const hour = (time: string) => time.replace(/^0(?=\d:)/, '');
 export function responseHoursLine({ from, to }: Site['responseHours']): string {
   return `Каждый репетитор отвечает сам, обычно с ${hour(from)} до ${hour(to)}`;
 }
+
+/** Репетиторы в меню и подвале: без ушедших (docs/data-model.md, `archived`), по `order`. */
+export function listedTutors<T extends Pick<Tutor, 'archived' | 'order'>>(
+  tutors: readonly T[],
+): T[] {
+  return tutors.filter((tutor) => !tutor.archived).toSorted((a, b) => a.order - b.order);
+}

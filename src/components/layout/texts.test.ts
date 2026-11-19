@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { footerTexts, responseHoursLine } from './texts';
+import { footerTexts, listedTutors, responseHoursLine } from './texts';
 
 // Шаблоны – как в content/site.json.
 const SITE = {
@@ -52,5 +52,17 @@ describe('responseHoursLine', () => {
     expect(responseHoursLine({ from: '09:00', to: '22:00', tz: 'Europe/Minsk' })).toBe(
       'Каждый репетитор отвечает сам, обычно с 9:00 до 22:00',
     );
+  });
+});
+
+describe('listedTutors', () => {
+  it('drops archived tutors and sorts the rest by order', () => {
+    const tutors = [
+      { id: 't-maxim', archived: false, order: 20 },
+      { id: 't-gone', archived: true, order: 5 },
+      { id: 't-andrei', archived: false, order: 10 },
+    ];
+
+    expect(listedTutors(tutors).map((tutor) => tutor.id)).toEqual(['t-andrei', 't-maxim']);
   });
 });

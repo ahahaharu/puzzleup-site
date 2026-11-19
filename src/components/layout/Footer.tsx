@@ -35,13 +35,13 @@ const LINK =
 
 function Column({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1">
       {/* Unbounded 500, 16 px – из макета. */}
       <h2 id={id} className="font-display text-[1rem] leading-snug font-medium text-paper">
         {title}
       </h2>
       {children}
-    </section>
+    </div>
   );
 }
 
