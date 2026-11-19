@@ -48,7 +48,7 @@ export function Header({ links, spy, cta, menu }: HeaderProps) {
             <Logo size={26} />
           </span>
           <span className="hidden lg:inline">
-            <Logo size={32} />
+            <Logo size={32} wordSize={22} />
           </span>
         </Link>
 

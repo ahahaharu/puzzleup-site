@@ -34,3 +34,13 @@ describe('Logo', () => {
     expect(getComputedStyle(screen.getByText('PuzzleUp').element()).fontSize).toBe('14px');
   });
 });
+
+describe('Logo with an explicit word size', () => {
+  it('sets the word to 22 px and the gap to 12 px next to a 32 px piece', async () => {
+    const screen = await render(<Logo size={32} wordSize={22} />);
+    const word = screen.getByText('PuzzleUp').element();
+
+    expect(getComputedStyle(word).fontSize).toBe('22px');
+    expect(getComputedStyle(word.parentElement ?? word).columnGap).toBe('12px');
+  });
+});

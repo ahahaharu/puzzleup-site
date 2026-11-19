@@ -73,7 +73,7 @@ export function Footer({
         <div className="grid gap-8 md:grid-cols-2 md:gap-12 lg:grid-cols-[1.3fr_1fr_1.3fr_1.3fr]">
           <div className="flex flex-col gap-3.5">
             <Link href="/" className="inline-flex min-h-11 items-center self-start rounded-button">
-              <Logo size={30} tone="paper" />
+              <Logo size={32} wordSize={22} tone="paper" />
             </Link>
             <Slogan text={slogan} />
             <p className="text-small text-paper/70">{tagline}</p>
