@@ -62,6 +62,7 @@ export function BottomBar({ cta, telegram, showAfter, hideWhenVisible }: BottomB
     <div
       data-visible={visible || undefined}
       inert={!visible}
+      // Фон paper 95 % с размытием 8 px – из ТЗ и макета X-bottombar.
       // Селектор меню – литерал: Tailwind не видит классы, собранные из переменных (id – MENU_ID).
       className="fixed inset-x-0 bottom-0 z-30 translate-y-full border-t border-ink/12 bg-paper/95 pb-[env(safe-area-inset-bottom)] opacity-0 backdrop-blur-[8px] transition-[translate,opacity] duration-200 ease-out data-visible:translate-y-0 data-visible:opacity-100 lg:hidden [html:has(#site-menu[open])_&]:hidden [html:has([data-cookie-banner])_&]:hidden"
     >

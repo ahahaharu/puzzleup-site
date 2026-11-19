@@ -29,9 +29,10 @@ type FooterProps = {
   copyright: string;
 };
 
-// Ссылки – paper 85 %, при наведении accent-light; строка от 44 px – зона клика.
+// Ссылки – paper 85 %, при наведении accent-light; строка от 44 px – зона клика. Поля 8 px держат
+// первую строку двухстрочной ссылки на одной линии с соседними колонками.
 const LINK =
-  'inline-flex min-h-11 items-center text-paper/85 no-underline transition-colors hover:text-accent-light';
+  'inline-flex min-h-11 items-center py-2 text-paper/85 no-underline transition-colors hover:text-accent-light';
 
 function Column({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
@@ -95,7 +96,7 @@ export function Footer({
 
           {tutors.length > 0 && (
             <Column id="footer-tutors" title="Репетиторы">
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-4">
                 {tutors.map((tutor) => (
                   <li key={tutor.slug}>
                     <Link href={`/tutors/${tutor.slug}`} className={`${LINK} font-medium`}>

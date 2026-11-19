@@ -25,7 +25,8 @@ type MobileMenuProps = {
   hoursLine: string;
 };
 
-// Квадратная контурная кнопка 44×44 – бургер и ✕ (макеты X-header-m, X-menu).
+// Квадратная контурная кнопка 44×44 – бургер и ✕ (макеты X-header-m, X-menu); рамка 1,5 px – как у
+// контурной кнопки ДС.
 const SQUARE =
   'inline-flex size-11 flex-none items-center justify-center rounded-button border-[1.5px] border-ink text-ink hover:bg-ink/6';
 
@@ -126,7 +127,7 @@ export function MobileMenu({ links, cta, tutors, hoursLine }: MobileMenuProps) {
               {cta.label}
             </Button>
             {tutors.length > 0 && (
-              <ul className="flex flex-col">
+              <ul className="flex flex-col gap-2.5">
                 {tutors.map((tutor) => (
                   <li key={tutor.slug} className="flex items-center justify-between gap-2.5 py-1.5">
                     <span className="text-button">{`Написать ${tutor.nameDative}`}</span>
