@@ -66,7 +66,7 @@
 │  │  └─ opengraph-image.tsx
 │  ├─ components/
 │  │  ├─ ui/                   Button, Chip, ChoiceChip, Field, Checkbox, Badge, Sheet, PuzzlePiece, PuzzleStep, Doodle, SectionHead, Logo, Icon
-│  │  └─ layout/               Header, MobileMenu, Footer, BottomBar, CookieBanner, Disclosure
+│  │  └─ layout/               SiteShell (каркас страницы), SkipLink, Header, MobileMenu, Footer, BottomBar, CookieBanner
 │  ├─ features/
 │  │  ├─ home/                 блоки главной: Hero, Tutors (+ фильтр), Situations, How, Subjects, Reviews, Prices, Faq, About
 │  │  ├─ tutor-page/           Profile, About, Outside, Reviews, HowToStart, More, статусы

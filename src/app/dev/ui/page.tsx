@@ -12,6 +12,7 @@ import { Field } from '@/components/ui/Field';
 import { Icon, ICON_NAMES } from '@/components/ui/Icon';
 import { Logo } from '@/components/ui/Logo';
 import { MessengerButtons } from '@/components/ui/MessengerButtons';
+import { MessengerIconButton } from '@/components/ui/MessengerIconButton';
 import { PhotoTape } from '@/components/ui/PhotoTape';
 import { PuzzlePiece } from '@/components/ui/PuzzlePiece';
 import { PuzzleStep } from '@/components/ui/PuzzleStep';
@@ -110,6 +111,11 @@ export default function UiKitPage() {
         <Dark>
           <MessengerButtons {...TUTOR} label="personal" tone="dark" />
         </Dark>
+        <Caption>MessengerIconButton – мобильное меню и нижняя панель страницы репетитора.</Caption>
+        <div className="flex gap-2.5">
+          <MessengerIconButton messenger="telegram" value={TUTOR.telegram} nameDative="Андрею" />
+          <MessengerIconButton messenger="viber" value={TUTOR.viber} nameDative="Андрею" />
+        </div>
       </Section>
 
       <Section id="chips" title="Chip и ChoiceChip">
