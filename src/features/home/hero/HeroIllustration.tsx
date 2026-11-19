@@ -50,8 +50,7 @@ export function HeroIllustration({ className }: { className?: string }) {
           />
         </pattern>
         <pattern id={ref('mm')} width="30" height="30" patternUnits="userSpaceOnUse">
-          {/* Цвет листа миллиметровки – как у утилиты paper-mm. */}
-          <rect width="30" height="30" fill="#fffdf7" />
+          <rect width="30" height="30" className="fill-(--paper-mm)" />
           <path
             d="M6 0 V30 M12 0 V30 M18 0 V30 M24 0 V30 M0 6 H30 M0 12 H30 M0 18 H30 M0 24 H30"
             strokeOpacity="0.16"
@@ -79,12 +78,13 @@ export function HeroIllustration({ className }: { className?: string }) {
         </filter>
       </defs>
 
-      {/* Пустое место, куда встаёт акцентная деталь. */}
+      {/* Пустое место, куда встаёт акцентная деталь. Гаснет к концу анимации: пунктир выходит
+          за контур и иначе виден рваной каймой вокруг вставшей детали. */}
       <path
         d={ACCENT_PIECE}
         strokeOpacity="0.4"
         strokeDasharray="5 4"
-        className="fill-kraft-shadow stroke-ink stroke-[1.6] md:stroke-[1.2]"
+        className="animate-piece-fade fill-kraft-shadow stroke-ink stroke-[1.6] opacity-0 md:stroke-[1.2]"
       />
 
       <g filter={`url(#${ref('paper')})`}>
@@ -166,7 +166,7 @@ export function HeroIllustration({ className }: { className?: string }) {
           <path
             d={ACCENT_PIECE}
             filter={`url(#${ref('flying')})`}
-            className="animate-piece-shadow fill-accent opacity-0"
+            className="animate-piece-fade fill-accent opacity-0"
           />
           <path d={ACCENT_PIECE} filter={`url(#${ref('paper')})`} className="fill-accent" />
           <g

@@ -50,8 +50,10 @@ test('with reduced motion the accent piece is already in place', async ({ page }
   await expect
     .poll(() =>
       illustration.evaluate((svg) =>
-        svg.getAnimations({ subtree: true }).map((animation) => animation.playState),
+        svg
+          .getAnimations({ subtree: true })
+          .every((animation) => animation.playState === 'finished'),
       ),
     )
-    .toEqual(['finished', 'finished']);
+    .toBe(true);
 });

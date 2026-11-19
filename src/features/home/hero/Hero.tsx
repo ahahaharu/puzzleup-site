@@ -31,8 +31,10 @@ export function Hero({ badge, slogan }: HeroProps) {
               D = b² − 4ac
             </MarginNote>
 
-            {/* Рамка ink 25 %, Golos 500 15 px на всех ширинах (ТЗ; в M-0-1-hero – 14 px). */}
-            <h1 className="rounded-full border border-ink/25 bg-paper px-3 py-1.5 text-small font-medium text-balance text-ink md:px-3.5 md:py-2">
+            {/* Рамка ink 25 %, Golos 500 15 px на всех ширинах (ТЗ; в M-0-1-hero – 14 px). На десктопе
+                плашка облегает текст в одну строку и может зайти в колонку иллюстрации: та стоит
+                ниже по центру колонки текста. Перенос – только если текст длиннее полутора колонок. */}
+            <h1 className="rounded-full border border-ink/25 bg-paper px-3 py-1.5 text-small font-medium text-balance text-ink md:px-3.5 md:py-2 lg:w-max lg:max-w-[150%]">
               {/* Диапазон классов «5–11» не разрывается на тире. */}
               {badge.split(/(\d+–\d+)/).map((part, index) =>
                 index % 2 === 1 ? (
@@ -78,7 +80,7 @@ export function Hero({ badge, slogan }: HeroProps) {
               {/* Номер – декор: порядок фактов не важен для смысла. Spectral 22 px – из ТЗ. */}
               <span
                 aria-hidden="true"
-                className="flex-none font-hand text-[1.375rem] leading-none text-accent-text italic"
+                className="flex-none font-hand text-[1.375rem] text-accent-text italic"
               >
                 {String(index + 1).padStart(2, '0')}
               </span>
