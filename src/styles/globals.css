@@ -104,6 +104,28 @@
   --shadow-flying: 0 18px 22px rgb(29 35 64 / 0.28);
   /* Тень листа Sheet: drop-shadow, потому что box-shadow обрезает clip-path загнутого уголка. */
   --drop-shadow-sheet: 0 2px 3px rgb(29 35 64 / 0.14);
+
+  /*
+   * Движение – docs/design-system.md, раздел 7: один раз, только transform и opacity.
+   * Акцентная деталь первого экрана «встаёт» на место из положения макета D-1-hero
+   * (сдвиг и поворот −6°), тень полёта гаснет. При reduced-motion сразу виден конечный кадр.
+   */
+  --animate-piece-land: piece-land 600ms ease-out both;
+  --animate-piece-shadow: piece-shadow 600ms ease-out both;
+
+  @keyframes piece-land {
+    from {
+      transform: translate(16px, 14px) rotate(-6deg);
+    }
+  }
+  @keyframes piece-shadow {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
