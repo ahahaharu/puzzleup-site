@@ -31,12 +31,12 @@ export function Hero({ badge, slogan }: HeroProps) {
               D = b² − 4ac
             </MarginNote>
 
-            {/* Рамка ink 25 %, Golos 500: 15 px от 768 px, на телефоне 14 px (M-0-1-hero). */}
-            <h1 className="rounded-full border border-ink/25 bg-paper px-3 py-1.5 text-caption font-medium text-balance text-ink md:px-3.5 md:py-2 md:text-small">
+            {/* Рамка ink 25 %, Golos 500 15 px на всех ширинах (ТЗ; в M-0-1-hero – 14 px). */}
+            <h1 className="rounded-full border border-ink/25 bg-paper px-3 py-1.5 text-small font-medium text-balance text-ink md:px-3.5 md:py-2">
               {/* Диапазон классов «5–11» не разрывается на тире. */}
               {badge.split(/(\d+–\d+)/).map((part, index) =>
                 index % 2 === 1 ? (
-                  <span key={part} className="whitespace-nowrap">
+                  <span key={index} className="whitespace-nowrap">
                     {part}
                   </span>
                 ) : (
@@ -48,7 +48,7 @@ export function Hero({ badge, slogan }: HeroProps) {
             {/* Слоган – декоративный абзац, не заголовок (ТЗ, раздел 8). */}
             <p className="font-display text-slogan text-ink">
               {lines.map((line, index) => (
-                <span key={line} className="block">
+                <span key={index} className="block">
                   {line}
                   {index === lines.length - 1 && dot ? (
                     <span className="text-accent">{dot}</span>

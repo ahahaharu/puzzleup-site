@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 import { cn } from '@/lib/cn';
 
 // «Пометка на полях» – формула от руки: docs/design-system.md, раздел 6 (Margins); ТЗ главной,
@@ -8,6 +10,8 @@ const SIZES = {
   md: 'text-hand-md',
   lg: 'text-hand-lg',
 } as const;
+
+type NoteStyle = CSSProperties & Record<'--note-opacity', number>;
 
 type MarginNoteProps = {
   /** Формула: «D = b² − 4ac». */
@@ -28,12 +32,15 @@ export function MarginNote({
   hideOnMobile = true,
   className,
 }: MarginNoteProps) {
+  // Прозрачность – переменной: inline-стиль допустим только для CSS-переменных (conventions).
+  const style: NoteStyle = { '--note-opacity': opacity };
+
   return (
     <span
       aria-hidden="true"
-      style={{ opacity }}
+      style={style}
       className={cn(
-        'pointer-events-none font-hand whitespace-nowrap text-ink italic select-none',
+        'pointer-events-none font-hand whitespace-nowrap text-ink italic opacity-(--note-opacity) select-none',
         SIZES[size],
         hideOnMobile && 'max-md:hidden',
         className,

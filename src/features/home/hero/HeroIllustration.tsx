@@ -23,6 +23,7 @@ const MM_PIECE =
 const LINED_PIECE =
   'M30,210 L102,210 C98,222 104,236 120,236 C136,236 142,222 138,210 L210,210 L210,282 C198,278 184,284 184,300 C184,316 198,322 210,318 L210,390 L40,390 A10,10 0 0 1 30,380 Z';
 
+// Цвет тени – стилем: атрибут flood-color не принимает var(), а утилиты для него в Tailwind нет.
 const INK = { floodColor: 'var(--color-ink)' };
 
 export function HeroIllustration({ className }: { className?: string }) {
@@ -39,7 +40,7 @@ export function HeroIllustration({ className }: { className?: string }) {
     >
       <defs>
         <pattern id={ref('cell')} width="12" height="12" patternUnits="userSpaceOnUse">
-          <rect width="12" height="12" style={{ fill: 'var(--paper-cell)' }} />
+          <rect width="12" height="12" className="fill-(--paper-cell)" />
           <path
             d="M12 0 L0 0 0 12"
             fill="none"
@@ -178,10 +179,10 @@ export function HeroIllustration({ className }: { className?: string }) {
             <path d="M300,292 L354,292" />
           </g>
           <circle cx="300" cy="292" r="2.6" className="fill-ink" />
-          <text x="322" y="284" className="fill-ink text-[16px]">
+          <text x="322" y="284" className="fill-ink text-[19px] md:text-[16px]">
             r
           </text>
-          <text x="300" y="374" textAnchor="middle" className="fill-ink text-[18px]">
+          <text x="300" y="374" textAnchor="middle" className="fill-ink text-[20px] md:text-[18px]">
             C = 2πr
           </text>
         </g>
