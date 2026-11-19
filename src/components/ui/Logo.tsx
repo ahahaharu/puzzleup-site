@@ -25,9 +25,10 @@ type LogoStyle = CSSProperties & Record<'--logo-word' | '--logo-gap', string>;
 /** Слово «PuzzleUp» – текст, поэтому ссылка с логотипом получает доступное имя без aria-label. */
 export function Logo({ size = 26, wordSize, tone = 'ink', className }: LogoProps) {
   // Пропорции холста (ds/Logo): слово – 0,73 стороны детали, зазор – 0,46; слово не мельче 14 px.
-  const style: LogoStyle = wordSize
-    ? { '--logo-word': `${wordSize}px`, '--logo-gap': `${(wordSize * 12) / 22}px` }
-    : { '--logo-word': `${size * 0.73}px`, '--logo-gap': `${size * 0.46}px` };
+  const style: LogoStyle =
+    wordSize !== undefined
+      ? { '--logo-word': `${wordSize}px`, '--logo-gap': `${(wordSize * 12) / 22}px` }
+      : { '--logo-word': `${size * 0.73}px`, '--logo-gap': `${size * 0.46}px` };
 
   return (
     <span
