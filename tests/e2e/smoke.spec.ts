@@ -5,9 +5,8 @@ test('home page responds and shows the site disclosure', async ({ page }) => {
 
   expect(response?.status()).toBe(200);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
-  await expect(
-    page.getByText(
-      'PuzzleUp – общий сайт независимых репетиторов. Не является организацией, юридическим лицом или ИП.',
-    ),
-  ).toBeVisible();
+  // Раскрытие в подвале входит в реквизиты (ADR-041): обе фразы есть, между ними – ФИО и УНП.
+  const footer = page.getByRole('contentinfo');
+  await expect(footer).toContainText('PuzzleUp – общий сайт независимых репетиторов.');
+  await expect(footer).toContainText('Не является организацией, юридическим лицом или ИП.');
 });

@@ -11,6 +11,7 @@ import { Doodle, DOODLE_SHAPES } from '@/components/ui/Doodle';
 import { Field } from '@/components/ui/Field';
 import { Icon, ICON_NAMES } from '@/components/ui/Icon';
 import { Logo } from '@/components/ui/Logo';
+import { MarginNote } from '@/components/ui/MarginNote';
 import { MessengerButtons } from '@/components/ui/MessengerButtons';
 import { MessengerIconButton } from '@/components/ui/MessengerIconButton';
 import { PhotoTape } from '@/components/ui/PhotoTape';
@@ -323,11 +324,22 @@ export default function UiKitPage() {
         </div>
       </Section>
 
-      <Section id="doodles" title="Doodle и Icon">
+      <Section id="doodles" title="Doodle, MarginNote и Icon">
         <div className="flex flex-wrap items-center gap-10">
           {DOODLE_SHAPES.map((shape) => (
             <Doodle key={shape} shape={shape} size={100} opacity={0.3} hideOnMobile={false} />
           ))}
+        </div>
+        <div className="flex flex-wrap items-center gap-10">
+          <MarginNote size="sm" hideOnMobile={false} className="rotate-3">
+            sin²α + cos²α = 1
+          </MarginNote>
+          <MarginNote hideOnMobile={false} className="-rotate-3">
+            D = b² − 4ac
+          </MarginNote>
+          <MarginNote size="lg" opacity={0.45} hideOnMobile={false} className="-rotate-4">
+            a² + b² = c²
+          </MarginNote>
         </div>
         <ul className="flex flex-wrap gap-6 text-ink">
           {ICON_NAMES.map((name) => (

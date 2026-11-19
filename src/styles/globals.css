@@ -104,6 +104,28 @@
   --shadow-flying: 0 18px 22px rgb(29 35 64 / 0.28);
   /* Тень листа Sheet: drop-shadow, потому что box-shadow обрезает clip-path загнутого уголка. */
   --drop-shadow-sheet: 0 2px 3px rgb(29 35 64 / 0.14);
+
+  /*
+   * Движение – docs/design-system.md, раздел 7: один раз, только transform и opacity.
+   * Акцентная деталь первого экрана «встаёт» на место из положения макета D-1-hero
+   * (сдвиг и поворот −6°), тень полёта и пустое место под ней гаснут. При reduced-motion сразу виден конечный кадр.
+   */
+  --animate-piece-land: piece-land 600ms ease-out both;
+  --animate-piece-fade: piece-fade 600ms ease-out both;
+
+  @keyframes piece-land {
+    from {
+      transform: translate(16px, 14px) rotate(-6deg);
+    }
+  }
+  @keyframes piece-fade {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
@@ -114,6 +136,8 @@
     --fs-button: 1rem;
     /* Лист в клетку: утилита paper-cell и SVG-деталь PuzzleStep. */
     --paper-cell: #fbfaf5;
+    /* Лист миллиметровки и нотного стана: утилиты paper-mm, paper-staff и иллюстрация первого экрана. */
+    --paper-mm: #fffdf7;
 
     @variant lg {
       --fs-lead: 1.25rem;
@@ -244,7 +268,7 @@
 @utility paper-mm {
   --paper-line: color-mix(in srgb, var(--color-accent) 35%, transparent);
   --paper-line-fine: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  background-color: #fffdf7;
+  background-color: var(--paper-mm);
   background-image:
     linear-gradient(var(--paper-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--paper-line) 1px, transparent 1px),
@@ -286,7 +310,7 @@
 /* Нотный стан – музыка: пять линеек через 9 px, станы повторяются каждые 72 px. */
 @utility paper-staff {
   --paper-line: color-mix(in srgb, var(--color-ink) 45%, transparent);
-  background-color: #fffdf7;
+  background-color: var(--paper-mm);
   background-image:
     linear-gradient(var(--paper-line) 1px, transparent 1px),
     linear-gradient(var(--paper-line) 1px, transparent 1px),
