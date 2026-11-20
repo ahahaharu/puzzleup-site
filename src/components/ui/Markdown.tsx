@@ -12,6 +12,11 @@ export type Inline =
 
 const INLINE = /\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)\s]+)\)/g;
 
+// Допустимые адреса ссылок: свои страницы, якоря, http(s), почта и телефон. Остальное (`javascript:`,
+// `//host`) ссылкой не становится – остаётся текстом.
+const SAFE_HREF = /^(?:\/(?!\/)|#|https?:\/\/|mailto:|tel:)/i;
+const EXTERNAL = /^https?:\/\//i;
+
 /** Строка → абзацы из кусков текста, жирного и ссылок. */
 export function parseMarkdown(source: string): Inline[][] {
   return source
@@ -25,11 +30,9 @@ export function parseMarkdown(source: string): Inline[][] {
         if (match.index > last)
           parts.push({ kind: 'text', text: paragraph.slice(last, match.index) });
         const [, strong, text, href] = match;
-        parts.push(
-          strong === undefined
-            ? { kind: 'link', text: text ?? '', href: href ?? '' }
-            : { kind: 'strong', text: strong },
-        );
+        if (strong !== undefined) parts.push({ kind: 'strong', text: strong });
+        else if (href && SAFE_HREF.test(href)) parts.push({ kind: 'link', text: text ?? '', href });
+        else parts.push({ kind: 'text', text: text ?? '' });
         last = match.index + match[0].length;
       }
       if (last < paragraph.length) parts.push({ kind: 'text', text: paragraph.slice(last) });
@@ -51,12 +54,19 @@ function renderInline(part: Inline, key: number): ReactNode {
       );
     case 'link':
       // Свои страницы – в той же вкладке, внешние ссылки – в новой (ТЗ главной, раздел 3).
-      return part.href.startsWith('/') ? (
-        <Link key={key} href={part.href} className={LINK}>
-          {part.text}
-        </Link>
-      ) : (
+      if (part.href.startsWith('/')) {
+        return (
+          <Link key={key} href={part.href} className={LINK}>
+            {part.text}
+          </Link>
+        );
+      }
+      return EXTERNAL.test(part.href) ? (
         <a key={key} href={part.href} target="_blank" rel="noopener noreferrer" className={LINK}>
+          {part.text}
+        </a>
+      ) : (
+        <a key={key} href={part.href} className={LINK}>
           {part.text}
         </a>
       );

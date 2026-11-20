@@ -27,4 +27,19 @@ describe('parseMarkdown', () => {
     expect(parseMarkdown('[Текст отзыва]')).toEqual([[{ kind: 'text', text: '[Текст отзыва]' }]]);
     expect(parseMarkdown('')).toEqual([]);
   });
+
+  it('keeps unsafe link targets as plain text', () => {
+    expect(parseMarkdown('[жми](javascript:void0) и [сайт](//evil.example)')).toEqual([
+      [
+        { kind: 'text', text: 'жми' },
+        { kind: 'text', text: ' и ' },
+        { kind: 'text', text: 'сайт' },
+      ],
+    ]);
+    expect(parseMarkdown('[чат](https://t.me/x)')[0]?.[0]).toEqual({
+      kind: 'link',
+      text: 'чат',
+      href: 'https://t.me/x',
+    });
+  });
 });
