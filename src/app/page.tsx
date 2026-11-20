@@ -1,6 +1,7 @@
 import { SiteShell } from '@/components/layout/SiteShell';
 import { listedTutors } from '@/components/layout/texts';
 import {
+  getFaq,
   getPublishedReviews,
   getSite,
   getSituations,
@@ -9,6 +10,8 @@ import {
   type Site,
   type Tutor,
 } from '@/content';
+import { Faq } from '@/features/home/faq/Faq';
+import { faqItems } from '@/features/home/faq/items';
 import { Hero } from '@/features/home/hero/Hero';
 import { heroBadge } from '@/features/home/hero/hero-badge';
 import { How } from '@/features/home/how/How';
@@ -58,6 +61,7 @@ export default async function HomePage() {
       />
       <Subjects subjects={subjectCards(subjects, tutors)} />
       <Prices prices={site.prices} rows={priceRows(tutors, subjects)} />
+      <Faq items={faqItems(getFaq(), tutors, subjects)} />
     </SiteShell>
   );
 }
