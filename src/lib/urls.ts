@@ -1,6 +1,9 @@
+import type { Entry } from './entry';
+import type { Goal } from './goal';
+
 /**
- * Ссылки на личные чаты репетитора (docs/data-model.md: поля `telegram` и `viber`).
- * Формат значений проверяет схема контента; здесь – только сборка ссылки.
+ * Сборка ссылок: личные чаты репетитора (docs/data-model.md: поля `telegram` и `viber`)
+ * и страницы репетиторов. Формат значений проверяет схема контента.
  */
 
 const TELEGRAM_LINK = /^(?:https?:\/\/)?(?:www\.)?(?:t\.me|telegram\.me)\/(.+)$/i;
@@ -17,4 +20,27 @@ export function telegramUrl(value: string): string {
 export function viberUrl(phone: string): string {
   const digits = phone.replace(/\D/g, '');
   return `viber://chat?number=${encodeURIComponent(`+${digits}`)}`;
+}
+
+/** Страница репетитора: `/tutors/andrei`. */
+export function tutorUrl(slug: string, hash?: 'reviews' | 'lead'): string {
+  const path = `/tutors/${encodeURIComponent(slug)}`;
+  return hash ? `${path}#${hash}` : path;
+}
+
+type LeadContext = {
+  entry: Entry;
+  subject?: string | undefined;
+  goal?: Goal | undefined;
+};
+
+/**
+ * Форма на странице репетитора с контекстом в адресе: `/tutors/andrei?entry=tutors#lead`
+ * (ТЗ главной, раздел 3: параметры `subject`, `goal`, `entry`; репетитор задан самой страницей).
+ */
+export function tutorLeadUrl(slug: string, { entry, subject, goal }: LeadContext): string {
+  const params = new URLSearchParams({ entry });
+  if (subject) params.set('subject', subject);
+  if (goal) params.set('goal', goal);
+  return `${tutorUrl(slug)}?${params.toString()}#lead`;
 }
