@@ -35,8 +35,18 @@ describe('subjectCards', () => {
       ctaHref: '#tutors',
     });
     expect(card?.tutors).toEqual([
-      { slug: 'andrei', name: 'Андрей', grades: '5–⁠9 класс', href: '/tutors/andrei' },
-      { slug: 'maxim', name: 'Максим', grades: '5–⁠11 класс', href: '/tutors/maxim' },
+      {
+        slug: 'andrei',
+        name: 'Андрей',
+        grades: '5–\u20609',
+        href: '/tutors/andrei?entry=subjects&subject=math#lead',
+      },
+      {
+        slug: 'maxim',
+        name: 'Максим',
+        grades: '5–\u206011',
+        href: '/tutors/maxim?entry=subjects&subject=math#lead',
+      },
     ]);
   });
 

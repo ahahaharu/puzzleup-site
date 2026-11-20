@@ -28,8 +28,8 @@ const subjects = (count: number): SubjectCardData[] =>
     formula: 'x² − 5x + 6 = 0',
     paper: PAPERS[index % PAPERS.length] ?? 'cell',
     tutors: [
-      { slug: 'example-1', name: 'Анна', grades: '5–9 класс', href: '/tutors/example-1' },
-      { slug: 'example-2', name: 'Игорь', grades: '7–11 класс', href: '/tutors/example-2' },
+      { slug: 'example-1', name: 'Анна', grades: '5–9', href: '/tutors/example-1#lead' },
+      { slug: 'example-2', name: 'Игорь', grades: '7–11', href: '/tutors/example-2#lead' },
     ],
     ctaLabel: `Выбрать репетитора по предмету ${index + 1}`,
     ctaHref: `/?subject=subject-${index + 1}#tutors`,

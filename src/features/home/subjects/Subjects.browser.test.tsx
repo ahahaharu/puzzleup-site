@@ -12,7 +12,14 @@ const subject = (id: string): SubjectCardData => ({
   topics: ['Дроби и проценты', 'уравнения и неравенства', 'ЦТ и ЦЭ'],
   formula: 'x² − 5x + 6 = 0',
   paper: 'cell',
-  tutors: [{ slug: 'andrei', name: 'Андрей', grades: '5–9 класс', href: '/tutors/andrei' }],
+  tutors: [
+    {
+      slug: 'andrei',
+      name: 'Андрей',
+      grades: '5–9',
+      href: '/tutors/andrei?entry=subjects&subject=math#lead',
+    },
+  ],
   ctaLabel: 'Выбрать репетитора по математике',
   ctaHref: `/?subject=${id}#tutors`,
 });
@@ -36,8 +43,12 @@ describe('Subjects', () => {
     const screen = await render(<Subjects subjects={[subject('math')]} />);
 
     await expect.element(screen.getByRole('heading', { level: 2, name: 'Предметы' })).toBeVisible();
-    const tutor = screen.getByRole('link', { name: 'Андрей · 5–9 класс' });
-    await expect.element(tutor).toHaveAttribute('href', '/tutors/andrei');
+    const tutor = screen.getByRole('link', {
+      name: 'Андрей · 5–9 – записаться на пробное занятие',
+    });
+    await expect
+      .element(tutor)
+      .toHaveAttribute('href', '/tutors/andrei?entry=subjects&subject=math#lead');
     expect(tutor.element().getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     await expect
       .element(screen.getByRole('link', { name: 'Выбрать репетитора по математике' }))

@@ -6,3 +6,6 @@ export const SUBJECTS_TITLE = 'Предметы';
 export const SUBJECTS_LEAD = 'Занятия по школьной программе – индивидуально и онлайн';
 
 export const TAUGHT_BY = 'Ведут:';
+
+/** Продолжение имени в ссылке для дикторов: «Андрей · 5–9 – записаться на пробное занятие». */
+export const LEAD_LINK_HINT = ' – записаться на пробное занятие';

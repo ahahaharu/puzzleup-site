@@ -1,7 +1,9 @@
 import type { Subject, Tutor } from '@/content';
+import { filterTabs } from '@/features/home/tutors/filter';
 import { gradesLabel } from '@/features/tutors/card-data';
+import { gradesRange } from '@/features/tutors/grades';
 import { capitalize } from '@/lib/text';
-import { tutorUrl } from '@/lib/urls';
+import { tutorLeadUrl } from '@/lib/urls';
 
 // Карточки блока «Предметы» – ТЗ главной, блок 4. Блок строится из `subjects.json` и сам
 // подстраивается под число предметов.
@@ -16,7 +18,7 @@ export type SubjectCardData = {
   topics: string[];
   formula: string;
   paper: Subject['paper'];
-  /** «Ведут:» – имя, классы по этому предмету и страница репетитора. */
+  /** «Ведут:» – имя, классы по этому предмету («5–9») и форма репетитора с этим предметом. */
   tutors: { slug: string; name: string; grades: string; href: string }[];
   /** «Выбрать репетитора по математике». */
   ctaLabel: string;
@@ -26,9 +28,9 @@ export type SubjectCardData = {
 type SubjectsTutor = Pick<Tutor, 'slug' | 'name' | 'subjects'>;
 
 /**
- * Активные предметы, которые кто-то ведёт; `tutors` – неушедшие, по порядку вывода. Кнопка
- * включает фильтр блока «Репетиторы» по предмету (`?subject=`), если вкладки фильтра есть –
- * то есть предметов с репетиторами больше одного.
+ * Активные предметы, которые кто-то ведёт; `tutors` – неушедшие, по порядку вывода. Имя в строке
+ * «Ведут:» ведёт на форму репетитора с предметом (ТЗ главной, раздел 3, «Андрей →»). Кнопка
+ * включает фильтр блока «Репетиторы» по предмету (`?subject=`), если у предмета есть вкладка.
  */
 export function subjectCards(
   subjects: readonly Subject[],
@@ -44,7 +46,12 @@ export function subjectCards(
       }),
     }))
     .filter(({ teaching }) => teaching.length > 0);
-  const filter = cards.length > 1;
+  // То же правило, что у вкладок блока «Репетиторы»: кнопка не включает фильтр, которого нет.
+  const tabs = filterTabs(
+    cards.map(({ subject }) => subject),
+    tutors.map((tutor) => ({ subjectIds: tutor.subjects.map((item) => item.id) })),
+  );
+  const filtered = new Set(tabs.map((tab) => tab.id));
 
   return cards.map(({ subject, teaching }) => ({
     id: subject.id,
@@ -56,11 +63,13 @@ export function subjectCards(
     tutors: teaching.map(({ tutor, item }) => ({
       slug: tutor.slug,
       name: tutor.name,
-      grades: gradesLabel(item.from, item.to),
-      href: tutorUrl(tutor.slug),
+      grades: gradesRange(item),
+      href: tutorLeadUrl(tutor.slug, { entry: 'subjects', subject: subject.id }),
     })),
     ctaLabel: `Выбрать репетитора ${subject.nameDativeWithPrep}`,
-    ctaHref: filter ? `/?subject=${encodeURIComponent(subject.id)}#tutors` : '#tutors',
+    ctaHref: filtered.has(subject.id)
+      ? `/?subject=${encodeURIComponent(subject.id)}#tutors`
+      : '#tutors',
   }));
 }
 

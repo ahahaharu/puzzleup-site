@@ -6,7 +6,7 @@ import { SectionHead } from '@/components/ui/SectionHead';
 import { cn } from '@/lib/cn';
 
 import { subjectColumns, type SubjectCardData } from './cards';
-import { SUBJECTS_LEAD, SUBJECTS_TITLE, TAUGHT_BY } from './texts';
+import { LEAD_LINK_HINT, SUBJECTS_LEAD, SUBJECTS_TITLE, TAUGHT_BY } from './texts';
 
 // Блок «Предметы» – ТЗ главной, блок 4; макеты D-4-subjects, M-4-subjects.
 // Колонки зависят от числа предметов, карточка – от своей ширины (container query): широкая, от
@@ -53,7 +53,7 @@ function SubjectCard({ subject }: { subject: SubjectCardData }) {
       <div className="flex min-w-0 grow flex-col gap-3.5 p-5 @[48rem]:gap-4 @[48rem]:p-8">
         <div className="flex flex-wrap items-center gap-2.5 @[48rem]:gap-3">
           {/* 24 px на десктопе – ТЗ, «Карточка предмета». */}
-          <h3 className="font-display text-[1.25rem] leading-tight font-medium text-ink @[48rem]:text-[1.5rem]">
+          <h3 className="font-display text-[1.25rem] leading-tight font-medium text-ink lg:text-[1.5rem]">
             {subject.title}
           </h3>
           <span className="rounded-full bg-kraft px-3 py-1 text-caption font-medium text-ink">
@@ -78,6 +78,7 @@ function SubjectCard({ subject }: { subject: SubjectCardData }) {
               className="inline-flex min-h-11 items-center gap-1.5 text-field font-semibold text-ink no-underline hover:underline"
             >
               {tutor.name} <span className="font-normal text-ink-muted">· {tutor.grades}</span>
+              <span className="sr-only">{LEAD_LINK_HINT}</span>
               <Icon name="arrow-right" size={18} />
             </Link>
           ))}
