@@ -1,6 +1,6 @@
 import type { Availability } from '@/lib/availability';
 
-import type { TutorCardData } from './card-data';
+import { experienceLabel, type TutorCardData } from './card-data';
 
 // Выдуманные репетиторы для компонентных тестов и витрины /dev/tutors: раскладки на 1, 2, 3 и 7+
 // карточек, все статусы и несколько предметов, которых в настоящем контенте пока нет.
@@ -35,7 +35,7 @@ export const FIXTURE_TUTORS: TutorCardData[] = DRAFTS.map(
     namePrepositional,
     availability,
     ...SUBJECTS[index % SUBJECTS.length]!,
-    credentials: `Стаж ${index + 2} года · Учреждение образования`,
+    credentials: `${experienceLabel(2024 - index, 2026)} · Учреждение образования`,
     tagline: 'Нахожу, где тема перестала быть понятной, и возвращаюсь к этому месту',
     price: '40',
     reviewCount: index % 3 === 0 ? 0 : index + 10,
