@@ -53,7 +53,7 @@ export const tutorSchema = z.strictObject({
   nameGenitive: text,
   nameDative: text,
   namePrepositional: text,
-  /** «он ответит» / «она ответит» – в шаге «Заявка» блока «Как начать». */
+  /** «он ответит», «посмотрите его страницу» – «Как начать», плашка ушедшего, подсказка о классе. */
   pronoun: z.enum(['он', 'она']),
   fullName: orPlaceholder(text),
   // Без кавычек YAML прочитает УНП числом – просим строку, а не молча приводим.

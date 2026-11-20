@@ -12,6 +12,7 @@ import {
   fixtureReview,
 } from '@/features/tutor-page/fixtures';
 import { tutorPageData } from '@/features/tutor-page/page-data';
+import { tutorShell } from '@/features/tutor-page/shell';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
 
 // Витрина страницы репетитора на выдуманных данных: статусы «Есть свободное время», «Последние
@@ -65,7 +66,7 @@ export default async function TutorPageShowcase({ params }: PageProps<'/dev/tuto
   });
 
   return (
-    <SiteShell bottomBar={{ showAfter: 'top', hideWhenVisible: tutor.archived ? 'more' : 'lead' }}>
+    <SiteShell {...tutorShell(tutor)}>
       <TutorPage
         data={data}
         aboutText={

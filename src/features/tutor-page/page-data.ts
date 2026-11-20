@@ -20,10 +20,12 @@ import { leadAnchor, tutorLeadUrl, tutorPhotoUrl, tutorUrl } from '@/lib/urls';
 
 import {
   alternativeLabel,
-  archivedNotice,
+  archivedGone,
+  archivedWithAlternative,
   CHOOSE_TUTOR_CTA,
   formPrice,
-  gradeHintText,
+  gradeHintOther,
+  gradeHintTrial,
   moreLead,
   moreTitle,
   platformsLine,
@@ -195,15 +197,15 @@ function archivedData(
   alternative: Tutor | undefined,
   subjects: readonly Subject[],
 ): ProfileData['archivedNotice'] {
-  if (!alternative) return { text: archivedNotice(tutor.name).text };
-  const notice = archivedNotice(tutor.name, {
+  if (!alternative) return { text: archivedGone(tutor.name) };
+  const notice = archivedWithAlternative(tutor.name, {
     name: alternative.name,
     pronoun: alternative.pronoun,
     subjects: sharedSubjects(tutor, [alternative], subjects),
   });
   return {
     text: notice.text,
-    link: { label: notice.link ?? '', href: tutorUrl(alternative.slug) },
+    link: { label: notice.link, href: tutorUrl(alternative.slug) },
   };
 }
 
@@ -291,37 +293,49 @@ export function leadData(
 
 export type GradeHint = { text: string; link?: { label: string; href: string } };
 
+/** Классы репетитора по предмету `subjectId` или, без него, по всем активным предметам. */
+function gradesFor(
+  tutor: Pick<Tutor, 'subjects'>,
+  subjects: readonly Subject[],
+  subjectId?: string,
+): GradeRange | null {
+  if (subjectId === undefined) return tutorGrades(tutor, subjects);
+  const item = activeSubjects(tutor, subjects).find((subject) => subject.id === subjectId);
+  return item ? { from: item.from, to: item.to } : null;
+}
+
 /**
  * Подсказка под полем «Класс», если репетитор не занимается с выбранным классом: ссылка на форму
- * другого репетитора, который с ним занимается, с тем же классом. Подходящего нет – «можно обсудить
- * на пробном занятии». Класс репетитора – `null`.
+ * другого репетитора, который с ним занимается (по выбранному предмету, если он задан), с тем же
+ * классом. Подходящего нет – «можно обсудить на пробном занятии». Класс репетитора – `null`.
  */
 export function gradeHint(
   tutor: Tutor,
   grade: number,
   tutors: readonly Tutor[],
   subjects: readonly Subject[],
+  subjectId?: string,
 ): GradeHint | null {
   const covers = (range: GradeRange | null) =>
     range !== null && grade >= range.from && grade <= range.to;
-  const own = tutorGrades(tutor, subjects);
+  const own = gradesFor(tutor, subjects, subjectId);
   if (!own || covers(own)) return null;
   const ownText = { range: gradesRange(own), single: own.from === own.to };
 
   const other = otherTutors(
     tutor,
-    tutors.filter((candidate) => covers(tutorGrades(candidate, subjects))),
+    tutors.filter((candidate) => covers(gradesFor(candidate, subjects, subjectId))),
     subjects,
   )[0];
-  const theirs = other ? tutorGrades(other, subjects) : null;
-  if (!other || !theirs) return { text: gradeHintText(tutor.name, ownText, undefined, grade).text };
+  const theirs = other ? gradesFor(other, subjects, subjectId) : null;
+  if (!other || !theirs) return { text: gradeHintTrial(tutor.name, ownText, grade) };
 
   // Классы другого репетитора, с которыми этот не занимается, – по ту сторону от выбранного.
   const range =
     grade > own.to
       ? { from: Math.max(theirs.from, own.to + 1), to: theirs.to }
       : { from: theirs.from, to: Math.min(theirs.to, own.from - 1) };
-  const hint = gradeHintText(tutor.name, ownText, {
+  const hint = gradeHintOther(tutor.name, ownText, {
     name: other.name,
     pronoun: other.pronoun,
     range: gradesRange(range),
@@ -329,8 +343,12 @@ export function gradeHint(
   return {
     text: hint.text,
     link: {
-      label: hint.link ?? '',
-      href: tutorLeadUrl(other.slug, { entry: 'tutor_more', grade }),
+      label: hint.link,
+      href: tutorLeadUrl(other.slug, {
+        entry: 'tutor_more',
+        subject: subjectId,
+        grade,
+      }),
     },
   };
 }

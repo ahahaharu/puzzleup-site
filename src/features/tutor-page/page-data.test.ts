@@ -220,6 +220,20 @@ describe('gradeHint', () => {
     });
   });
 
+  it('compares the grades of the chosen subject only', () => {
+    const mixed = fixtureTutor('mixed', {
+      subjects: [
+        { id: 'math', from: 5, to: 9 },
+        { id: 'physics', from: 10, to: 11 },
+      ],
+    });
+    const senior = fixtureTutor('senior', { subjects: [{ id: 'math', from: 10, to: 11 }] });
+    expect(gradeHint(mixed, 10, [mixed, senior], SUBJECTS)).toBeNull();
+    expect(gradeHint(mixed, 10, [mixed, senior], SUBJECTS, 'math')?.link?.href).toBe(
+      '/tutors/senior?entry=tutor_more&subject=math&grade=10#lead',
+    );
+  });
+
   it('uses the singular for a single grade', () => {
     const ninth = fixtureTutor('ninth', { subjects: [{ id: 'math', from: 9, to: 9 }] });
     expect(gradeHint(ninth, 5, [ninth], SUBJECTS)?.text).toBe(

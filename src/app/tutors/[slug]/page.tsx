@@ -5,10 +5,9 @@ import { notFound } from 'next/navigation';
 import { SiteShell } from '@/components/layout/SiteShell';
 import { getPublishedReviews, getSite, getSubjects, getTutorBySlug, getTutors } from '@/content';
 import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
+import { tutorShell } from '@/features/tutor-page/shell';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
 import { currentYear } from '@/features/tutors/current-year';
-import { leadLabel } from '@/features/tutors/texts';
-import { leadAnchor } from '@/lib/urls';
 
 // Страница репетитора – ТЗ страницы репетитора. Статическая: по странице на каждый файл
 // `content/tutors`, включая ушедших (раздел 6). Неизвестный адрес – 404 через `notFound()`:
@@ -45,24 +44,8 @@ export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>
     year: await currentYear(),
   });
 
-  // Шапка и нижняя панель записывают к этому репетитору; у ушедшего – «Выбрать репетитора».
-  const shell = tutor.archived
-    ? { bottomBar: { showAfter: 'top', hideWhenVisible: 'more' } }
-    : {
-        cta: {
-          label: leadLabel(tutor.nameDative),
-          short: 'Записаться',
-          href: leadAnchor('header'),
-        },
-        bottomBar: {
-          telegram: { value: tutor.telegram, nameDative: tutor.nameDative },
-          showAfter: 'top',
-          hideWhenVisible: 'lead',
-        },
-      };
-
   return (
-    <SiteShell {...shell}>
+    <SiteShell {...tutorShell(tutor)}>
       <TutorPage data={data} aboutText={<MDXContent code={tutor.mdx} />} />
     </SiteShell>
   );

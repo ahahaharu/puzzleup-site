@@ -28,6 +28,8 @@ export const FACT_EDUCATION = 'Образование';
 export const TRIAL_FREE = 'Пробное занятие – бесплатно';
 
 export const WAITLIST_CTA = 'Встать в лист ожидания';
+/** Короткая подпись в шапке телефона – часть полной. */
+export const WAITLIST_SHORT = 'Лист ожидания';
 export const CHOOSE_TUTOR_CTA = 'Выбрать репетитора';
 
 export const alternativeLabel = (name: string) => `Ещё на сайте: ${name}`;
@@ -41,15 +43,16 @@ export function providerLine(fullName: string, unp: string): string {
 /** «его» / «её» – о другом репетиторе: «посмотрите его страницу». */
 export const possessive = (pronoun: 'он' | 'она') => (pronoun === 'он' ? 'его' : 'её');
 
-/** Плашка ушедшего репетитора (раздел 5). Ссылка на страницу другого – в конце фразы. */
-export function archivedNotice(
+/** Плашка ушедшего репетитора (раздел 5): первая фраза. */
+export const archivedGone = (name: string) => `${name} больше не принимает новых учеников.`;
+
+/** Плашка ушедшего с другим репетитором: ссылка на его страницу – в конце фразы. */
+export function archivedWithAlternative(
   name: string,
-  alternative?: { name: string; pronoun: 'он' | 'она'; subjects: string },
-): { text: string; link?: string } {
-  const gone = `${name} больше не принимает новых учеников.`;
-  if (!alternative) return { text: gone };
+  alternative: { name: string; pronoun: 'он' | 'она'; subjects: string },
+): { text: string; link: string } {
   return {
-    text: `${gone} ${capitalize(alternative.subjects)} на сайте есть ${alternative.name} – `,
+    text: `${archivedGone(name)} ${capitalize(alternative.subjects)} на сайте есть ${alternative.name} – `,
     link: `посмотрите ${possessive(alternative.pronoun)} страницу`,
   };
 }
@@ -161,18 +164,23 @@ export const ALL_TUTORS = 'Все репетиторы';
 const withGrades = (range: string, single: boolean) =>
   `${range}${NBSP}${single ? 'классом' : 'классами'}`;
 
-export function gradeHintText(
+type OwnGrades = { range: string; single: boolean };
+
+const ownGradesSentence = (name: string, own: OwnGrades) =>
+  `${name} занимается с ${withGrades(own.range, own.single)}.`;
+
+/** Подходящего репетитора нет: «… 10 класс можно обсудить на пробном занятии». */
+export const gradeHintTrial = (name: string, own: OwnGrades, grade: number) =>
+  `${ownGradesSentence(name, own)} ${grade}${NBSP}класс можно обсудить на пробном занятии.`;
+
+/** «… С 10–11 классом работает Максим – его страница»: ссылка – в конце фразы. */
+export function gradeHintOther(
   name: string,
-  own: { range: string; single: boolean },
-  other?: { name: string; pronoun: 'он' | 'она'; range: string },
-  grade?: number,
-): { text: string; link?: string } {
-  const first = `${name} занимается с ${withGrades(own.range, own.single)}.`;
-  if (!other) {
-    return { text: `${first} ${grade}${NBSP}класс можно обсудить на пробном занятии.` };
-  }
+  own: OwnGrades,
+  other: { name: string; pronoun: 'он' | 'она'; range: string },
+): { text: string; link: string } {
   return {
-    text: `${first} С ${other.range}${NBSP}классом работает ${other.name} – `,
+    text: `${ownGradesSentence(name, own)} С ${other.range}${NBSP}классом работает ${other.name} – `,
     link: `${possessive(other.pronoun)} страница`,
   };
 }

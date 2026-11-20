@@ -18,7 +18,7 @@ import { FACT_EDUCATION, FACT_EXPERIENCE, REVIEWS_LINK, TRIAL_FREE } from './tex
 // Блок 1 «Профиль» – ТЗ страницы репетитора, раздел 4, блок 1, и раздел 5 (статусы); макеты
 // T-1-profile, TM-1-profile, T-S-full, T-S-archived, TM-S-*.
 // - Телефон: плашка отдельной строкой, фото 132 px рядом с H1, ниже – во всю ширину: предметы,
-//   факты, кнопки, фраза, цена. Колонка текста – `contents`, её строки встают в общую сетку.
+//   факты, кнопки, «Услуги оказывает», фраза, цена. Колонка текста – `contents`, её строки встают в общую сетку.
 // - От 1024 px: фото – 5 колонок слева, текст – 7 колонок справа; фраза и цена – над кнопками.
 
 export const PROFILE_ID = 'top';
@@ -143,6 +143,12 @@ export function Profile({ profile }: { profile: ProfileData }) {
               )}
             </div>
 
+            {/* Реквизиты – сразу после кнопок мессенджеров на телефоне (ТЗ), последней строкой на десктопе. */}
+            {profile.provider && (
+              <p className="col-span-2 max-w-[32.5rem] border-l-2 border-accent-text pl-4 text-small text-ink-2 lg:order-3">
+                {profile.provider}
+              </p>
+            )}
             <p className="col-span-2 flex items-start gap-2.5 font-hand text-ink-2 italic">
               <span aria-hidden="true" className="text-[3rem] leading-[0.8] text-accent">
                 «
@@ -168,12 +174,6 @@ export function Profile({ profile }: { profile: ProfileData }) {
                 {`${REVIEWS_LINK} · ${profile.reviewCount}`}
                 <Icon name="arrow-right" size={18} />
               </Link>
-            )}
-
-            {profile.provider && (
-              <p className="col-span-2 max-w-[32.5rem] border-l-2 border-accent-text pl-4 text-small text-ink-2 lg:order-2">
-                {profile.provider}
-              </p>
             )}
           </div>
         </div>
