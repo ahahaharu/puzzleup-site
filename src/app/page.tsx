@@ -10,6 +10,8 @@ import {
   type Site,
   type Tutor,
 } from '@/content';
+import { About } from '@/features/home/about/About';
+import { aboutTutors } from '@/features/home/about/cards';
 import { Faq } from '@/features/home/faq/Faq';
 import { faqItems } from '@/features/home/faq/items';
 import { Hero } from '@/features/home/hero/Hero';
@@ -62,6 +64,7 @@ export default async function HomePage() {
       <Subjects subjects={subjectCards(subjects, tutors)} />
       <Prices prices={site.prices} rows={priceRows(tutors, subjects)} />
       <Faq items={faqItems(getFaq(), tutors, subjects)} />
+      <About text={site.about} tutors={aboutTutors(tutors, subjects)} />
     </SiteShell>
   );
 }

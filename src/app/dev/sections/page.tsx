@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { SiteShell } from '@/components/layout/SiteShell';
+import { About } from '@/features/home/about/About';
 import { FIXTURE_REVIEW_COLUMNS } from '@/features/home/reviews/fixtures';
 import { Reviews } from '@/features/home/reviews/Reviews';
 import type { SubjectCardData } from '@/features/home/subjects/cards';
@@ -44,6 +45,11 @@ export default function SectionsShowcasePage() {
       {[2, 3, 4, 5].map((count) => (
         <Subjects key={count} id={`subjects-${count}`} subjects={subjects(count)} />
       ))}
+      {/* Три и более репетитора – вместо карточек одна кнопка. */}
+      <About
+        text="PuzzleUp – общий сайт независимых репетиторов. PuzzleUp не организация, не юрлицо и не ИП."
+        tutors={[]}
+      />
     </SiteShell>
   );
 }
