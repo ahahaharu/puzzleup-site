@@ -24,6 +24,8 @@ type SiteShellProps = {
   cta?: Cta;
   /** Нижняя панель: кнопка Telegram и блоки, по которым она появляется и прячется. */
   bottomBar?: {
+    /** Своя кнопка панели – с `entry=bottom_bar`; по умолчанию – та же, что в шапке. */
+    cta?: Cta;
     telegram?: { value: string; nameDative: string };
     showAfter: string;
     hideWhenVisible: string;
@@ -76,7 +78,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         {...footerTexts(site, tutors)}
       />
       <BottomBar
-        cta={action}
+        cta={bottomBar?.cta ?? action}
         telegram={bottomBar?.telegram}
         showAfter={bottomBar?.showAfter ?? 'top'}
         hideWhenVisible={bottomBar?.hideWhenVisible ?? 'tutors'}
