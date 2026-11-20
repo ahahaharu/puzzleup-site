@@ -197,6 +197,20 @@ export const siteSchema = z.strictObject({
   }),
   /** Кто технически ведёт сайт – строка «Сайт ведёт» в подвале. */
   siteOperatorTutorId: z.string(),
+  /**
+   * Пример итога пробного занятия в блоке «Как это работает» (ТЗ главной, блок 3): сообщение
+   * репетитора `tutorId`. Подписи «Уверенно», «Подтянуть», «Начнём с» – в компоненте.
+   */
+  trialExample: z
+    .strictObject({
+      tutorId: z.string(),
+      intro: text,
+      strong: text,
+      improve: text,
+      startWith: text,
+      offer: text,
+    })
+    .optional(),
 });
 
 export type Site = z.infer<typeof siteSchema>;

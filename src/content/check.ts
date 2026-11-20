@@ -285,6 +285,15 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
     report('content/site.json', 'siteOperatorTutorId', `tutor «${operator.id}» is archived`);
   }
 
+  const example = site.trialExample;
+  if (example && !tutorById.has(example.tutorId)) {
+    report(
+      'content/site.json',
+      'trialExample.tutorId',
+      `tutor «${example.tutorId}» does not exist`,
+    );
+  }
+
   for (const slug of REQUIRED_LEGAL) {
     if (!legal.some((doc) => doc.slug === slug)) {
       report(`content/legal/${slug}.mdx`, '', 'file is missing');
