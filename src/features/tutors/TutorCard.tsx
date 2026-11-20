@@ -90,7 +90,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
           </p>
           {/* Golos 600 17 px на всех ширинах – из ТЗ; роль text-body на телефоне – 16 px. */}
           <p className="text-[1.0625rem] font-semibold text-ink">
-            {tutor.price} {CURRENCY}{' '}
+            {`${tutor.price}\u00a0${CURRENCY}`}{' '}
             <span className="font-normal text-ink-muted">· {LESSON_LENGTH}</span>
           </p>
 

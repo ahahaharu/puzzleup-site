@@ -26,6 +26,6 @@ describe('plural', () => {
 
 describe('pluralize', () => {
   it('puts the number before the word', () => {
-    expect(pluralize(12, REVIEWS)).toBe('12 отзывов');
+    expect(pluralize(12, REVIEWS)).toBe('12\u00a0отзывов');
   });
 });

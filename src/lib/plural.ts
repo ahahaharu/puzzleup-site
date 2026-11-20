@@ -10,7 +10,7 @@ export function plural(count: number, [one, few, many]: readonly [string, string
   return many;
 }
 
-/** Число и слово: «12 отзывов». */
+/** Число и слово через неразрывный пробел: «12 отзывов». */
 export function pluralize(count: number, forms: readonly [string, string, string]): string {
-  return `${count} ${plural(count, forms)}`;
+  return `${count}\u00a0${plural(count, forms)}`;
 }

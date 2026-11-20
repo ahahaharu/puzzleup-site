@@ -10,17 +10,17 @@ import {
 
 describe('gradesLabel', () => {
   it('shows a range or a single grade', () => {
-    expect(gradesLabel(5, 9)).toBe('5–9 класс');
-    expect(gradesLabel(9, 9)).toBe('9 класс');
+    expect(gradesLabel(5, 9)).toBe('5–9\u00a0класс');
+    expect(gradesLabel(9, 9)).toBe('9\u00a0класс');
   });
 });
 
 describe('experienceLabel', () => {
   it.each([
-    [2025, 'Стаж 1 год'],
-    [2024, 'Стаж 2 года'],
-    [2021, 'Стаж 5 лет'],
-    [2005, 'Стаж 21 год'],
+    [2025, 'Стаж 1\u00a0год'],
+    [2024, 'Стаж 2\u00a0года'],
+    [2021, 'Стаж 5\u00a0лет'],
+    [2005, 'Стаж 21\u00a0год'],
     [2026, 'Стаж меньше года'],
   ])('since %i → %s', (since, label) => {
     expect(experienceLabel(since, 2026)).toBe(label);
@@ -82,11 +82,11 @@ describe('toTutorCardData', () => {
 
   it('lists only active subjects with grades', () => {
     expect(card.subjectIds).toEqual(['math', 'chemistry']);
-    expect(card.subjectLines).toEqual(['Математика · 5–9 класс', 'Химия · 8 класс']);
+    expect(card.subjectLines).toEqual(['Математика · 5–9\u00a0класс', 'Химия · 8\u00a0класс']);
   });
 
   it('joins experience and education into one line', () => {
-    expect(card.credentials).toBe('Стаж 4 года · Учреждение образования');
+    expect(card.credentials).toBe('Стаж 4\u00a0года · Учреждение образования');
   });
 
   it('takes the current availability and review count from the context', () => {
