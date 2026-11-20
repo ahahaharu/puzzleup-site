@@ -109,7 +109,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 
 - В `next.config.ts` включены `cacheComponents: true`, `partialPrefetching: true` (ADR-020), `output: 'standalone'` и `poweredByHeader: false`.
 - Главная и `/tutors/[slug]` должны оставаться статическими. Проверять через `ensureStatic` (Next 16.4) и вывод `next build`.
-- `/tutors/[slug]`: `generateStaticParams` по всем файлам `content/tutors`, включая ушедших; `dynamicParams = false`.
+- `/tutors/[slug]`: `generateStaticParams` по всем файлам `content/tutors`, включая ушедших; неизвестный slug – `notFound()`, `ensureStatic = 'navigation'` (ADR-045).
 - Фильтр по предметам на главной – клиентский компонент, который читает `?subject=` через `useSearchParams` внутри `<Suspense>`. Статическая оболочка показывает всех репетиторов, так что без JS виден полный список.
 - **Статус занятости.** Читается функцией с `'use cache'`, `cacheTag('availability')` и `cacheLife('max')`. Бот после `/status` вызывает инвалидацию тега. Открытый момент, который решается прототипом в первой же фиче про статус:
   - при сборке в CI базы нет – функция должна вернуть начальное значение из `availability` в MDX;

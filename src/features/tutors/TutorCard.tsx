@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { MessengerButtons } from '@/components/ui/MessengerButtons';
 import { PhotoTape } from '@/components/ui/PhotoTape';
+import type { Entry } from '@/lib/entry';
 import { pluralize } from '@/lib/plural';
 import { aboutName } from '@/lib/text';
 import { tutorLeadUrl, tutorUrl } from '@/lib/urls';
@@ -29,13 +30,15 @@ type TutorCardProps = {
   tutor: TutorCardData;
   /** Наклон фото, ±1,5°: соседние карточки наклонены в разные стороны, как в макете. */
   tilt?: number;
+  /** Откуда кнопка записи ведёт в форму: блок репетиторов главной или «Другие репетиторы». */
+  entry?: Entry;
 };
 
 // Ссылки под кнопками – строки от 44 px, как в подвале.
 const TEXT_LINK =
   'inline-flex min-h-11 items-center text-small underline underline-offset-4 hover:no-underline';
 
-export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
+export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardProps) {
   const about = aboutName(tutor.namePrepositional);
   const page = tutorUrl(tutor.slug);
   const full = tutor.availability === 'full';
@@ -96,7 +99,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
 
           {/* Кнопки прижаты к низу: в ряду сетки они стоят на одной линии у карточек разной высоты. */}
           <div className="mt-auto flex flex-col gap-2.5">
-            <Button href={tutorLeadUrl(tutor.slug, { entry: 'tutors' })} size="md" fullWidth>
+            <Button href={tutorLeadUrl(tutor.slug, { entry })} size="md" fullWidth>
               {full ? (
                 <span>
                   {WAITLIST_LABEL}

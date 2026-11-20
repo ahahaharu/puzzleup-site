@@ -1,0 +1,52 @@
+import { MDXContent } from '@content-collections/mdx/react';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
+import { SiteShell } from '@/components/layout/SiteShell';
+import { getPublishedReviews, getSite, getSubjects, getTutorBySlug, getTutors } from '@/content';
+import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
+import { tutorShell } from '@/features/tutor-page/shell';
+import { TutorPage } from '@/features/tutor-page/TutorPage';
+import { currentYear } from '@/features/tutors/current-year';
+
+// Страница репетитора – ТЗ страницы репетитора. Статическая: по странице на каждый файл
+// `content/tutors`, включая ушедших (раздел 6). Неизвестный адрес – 404 через `notFound()`:
+// с Cache Components `dynamicParams = false` не поддерживается. `ensureStatic = 'navigation'`
+// держит страницу целиком статической и не отдаёт неизвестному адресу оболочку с кодом 200.
+
+export const ensureStatic = 'navigation';
+
+export function generateStaticParams() {
+  return getTutors().map((tutor) => ({ slug: tutor.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<'/tutors/[slug]'>): Promise<Metadata> {
+  const tutor = getTutorBySlug((await params).slug);
+  if (!tutor) return {};
+  const meta = tutorMetadata(tutor, getSubjects(), await currentYear());
+  return {
+    title: meta.title,
+    description: meta.description,
+    // Ушедший скрыт от поисковиков, ссылки с его страницы остаются (раздел 6, «Мета-теги»).
+    robots: meta.noindex ? { index: false, follow: true } : { index: true, follow: true },
+  };
+}
+
+export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>) {
+  const tutor = getTutorBySlug((await params).slug);
+  if (!tutor) notFound();
+
+  const data = tutorPageData(tutor, {
+    site: getSite(),
+    subjects: getSubjects(),
+    tutors: getTutors(),
+    reviews: getPublishedReviews(),
+    year: await currentYear(),
+  });
+
+  return (
+    <SiteShell {...tutorShell(tutor)}>
+      <TutorPage data={data} aboutText={<MDXContent code={tutor.mdx} />} />
+    </SiteShell>
+  );
+}

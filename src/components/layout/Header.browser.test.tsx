@@ -5,10 +5,10 @@ import { page } from 'vitest/browser';
 import { CTA, HOURS_LINE, LINKS, TUTORS } from './fixtures';
 import { Header } from './Header';
 
-function Page({ spy = true }: { spy?: boolean }) {
+function Page({ spy = true, cta = CTA }: { spy?: boolean; cta?: typeof CTA }) {
   return (
     <>
-      <Header links={LINKS} spy={spy} cta={CTA} menu={{ tutors: TUTORS, hoursLine: HOURS_LINE }} />
+      <Header links={LINKS} spy={spy} cta={cta} menu={{ tutors: TUTORS, hoursLine: HOURS_LINE }} />
       <main>
         {['top', 'tutors', 'situations', 'how', 'prices'].map((id) => (
           <section key={id} id={id} style={{ height: 1200 }}>
@@ -96,5 +96,27 @@ describe('Header', () => {
     await expect
       .element(screen.getByRole('link', { name: 'Как это работает' }))
       .not.toHaveAttribute('aria-current');
+  });
+
+  it('shows a short label that is a part of the full one on a phone', async () => {
+    const screen = await render(
+      <Page cta={{ label: 'Встать в лист ожидания', short: 'Лист ожидания', href: '#lead' }} />,
+    );
+    const cta = screen.getByRole('link', { name: 'Встать в лист ожидания' });
+
+    await expect.element(cta).toBeVisible();
+    // Видна короткая подпись, полная – только для дикторов.
+    // sr-only браузер считает видимым – отличаем по ширине (у sr-only она 1 px).
+    const visible = [...cta.element().querySelectorAll('span span')].filter(
+      (span) => span.getBoundingClientRect().width > 1,
+    );
+    expect(visible.map((span) => span.textContent)).toEqual(['Лист ожидания']);
+    expect(visible[0]?.getAttribute('aria-hidden')).toBe('true');
+    // Кнопка меню не заходит в поле страницы (16 px) и не выталкивается за экран.
+    for (const width of [360, 390]) {
+      await page.viewport(width, 740);
+      const menu = screen.getByRole('button', { name: 'Меню' }).element();
+      expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(width - 16);
+    }
   });
 });

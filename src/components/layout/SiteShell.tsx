@@ -6,6 +6,7 @@ import { BottomBar } from './BottomBar';
 import { Footer } from './Footer';
 import { Header, type Cta } from './Header';
 import { navData, navLinks } from './nav';
+import { SamePageLinks } from './SamePageLinks';
 import { MAIN_ID, SkipLink } from './SkipLink';
 import { footerTexts, listedTutors, responseHoursLine } from './texts';
 
@@ -15,7 +16,7 @@ import { footerTexts, listedTutors, responseHoursLine } from './texts';
 /** Документы подвала по порядку ТЗ (блок 10); страница без файла в content/legal не выводится. */
 const DOCUMENTS = ['privacy', 'cookies'] as const;
 
-type SiteShellProps = {
+export type SiteShellProps = {
   children: ReactNode;
   /** Главная: пункты навигации – якоря этой страницы, подсвечивается текущий блок. */
   home?: boolean;
@@ -23,6 +24,8 @@ type SiteShellProps = {
   cta?: Cta;
   /** Нижняя панель: кнопка Telegram и блоки, по которым она появляется и прячется. */
   bottomBar?: {
+    /** Своя кнопка панели – с `entry=bottom_bar`; по умолчанию – та же, что в шапке. */
+    cta?: Cta;
     telegram?: { value: string; nameDative: string };
     showAfter: string;
     hideWhenVisible: string;
@@ -75,11 +78,12 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         {...footerTexts(site, tutors)}
       />
       <BottomBar
-        cta={action}
+        cta={bottomBar?.cta ?? action}
         telegram={bottomBar?.telegram}
         showAfter={bottomBar?.showAfter ?? 'top'}
         hideWhenVisible={bottomBar?.hideWhenVisible ?? 'tutors'}
       />
+      <SamePageLinks />
     </>
   );
 }

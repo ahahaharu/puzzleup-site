@@ -49,8 +49,12 @@ export const tutorSchema = z.strictObject({
   id: z.string().regex(/^t-[a-z0-9]+(?:-[a-z0-9]+)*$/, '`t-<slug>`'),
   slug,
   name: text,
+  /** «Условия Андрея», «Сейчас у Андрея нет свободного времени». */
+  nameGenitive: text,
   nameDative: text,
   namePrepositional: text,
+  /** «он ответит», «посмотрите его страницу» – «Как начать», плашка ушедшего, подсказка о классе. */
+  pronoun: z.enum(['он', 'она']),
   fullName: orPlaceholder(text),
   // Без кавычек YAML прочитает УНП числом – просим строку, а не молча приводим.
   unp: orPlaceholder(

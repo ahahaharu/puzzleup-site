@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { telegramUrl, tutorLeadUrl, tutorUrl, viberUrl } from './urls';
+import { leadAnchor, telegramUrl, tutorLeadUrl, tutorUrl, viberUrl } from './urls';
 
 describe('telegramUrl', () => {
   it.each([
@@ -42,5 +42,17 @@ describe('tutorLeadUrl', () => {
     expect(tutorLeadUrl('maxim', { entry: 'subjects', subject: 'math', goal: 'ct' })).toBe(
       '/tutors/maxim?entry=subjects&subject=math&goal=ct#lead',
     );
+  });
+
+  it('adds the grade when given', () => {
+    expect(tutorLeadUrl('maxim', { entry: 'tutor_more', grade: 10 })).toBe(
+      '/tutors/maxim?entry=tutor_more&grade=10#lead',
+    );
+  });
+});
+
+describe('leadAnchor', () => {
+  it('links to the form of the same page with the entry point', () => {
+    expect(leadAnchor('tutor_profile')).toBe('?entry=tutor_profile#lead');
   });
 });

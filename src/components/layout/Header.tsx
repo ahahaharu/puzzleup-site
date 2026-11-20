@@ -11,9 +11,9 @@ import type { NavLink } from './nav';
 // Шапка – ТЗ главной, блок 0; макеты D-1-hero, M-0-1-hero, X-header-d, X-header-m.
 
 /**
- * Основная кнопка шапки: «Выбрать репетитора», на странице репетитора – «Записаться к Андрею».
- * На телефоне видно только начало подписи (`short`), остальное – скрытым текстом: доступное имя
- * то же.
+ * Основная кнопка шапки: «Выбрать репетитора», на странице репетитора – «Записаться к Андрею»
+ * или «Встать в лист ожидания». На телефоне видна короткая подпись (`short`) – начало подписи
+ * или её часть («Лист ожидания»); доступное имя – полная подпись.
  */
 export type Cta = { label: string; short: string; href: string };
 
@@ -26,8 +26,19 @@ type HeaderProps = {
 };
 
 function CtaLabel({ label, short }: Cta) {
+  if (!label.toLowerCase().includes(short.toLowerCase())) {
+    throw new Error(`Short label «${short}» must be a part of the label «${label}»`);
+  }
   if (!label.startsWith(short)) {
-    throw new Error(`Short label «${short}» must start the label «${label}»`);
+    // Видимая подпись входит в доступное имя (WCAG 2.5.3), полная подпись – для дикторов.
+    return (
+      <span>
+        <span aria-hidden="true" className="md:hidden">
+          {short}
+        </span>
+        <span className="max-md:sr-only">{label}</span>
+      </span>
+    );
   }
   // Одним элементом: в inline-flex кнопке пробел в начале отдельного элемента схлопнулся бы.
   return (
@@ -38,14 +49,21 @@ function CtaLabel({ label, short }: Cta) {
   );
 }
 
+// «Записаться» – самая длинная короткая подпись, с которой шапка помещается в 360 px вместе со словом
+// логотипа.
+const SHORT_LABEL_FITS = 'Записаться'.length;
+
 export function Header({ links, spy, cta, menu }: HeaderProps) {
+  // С подписью длиннее («Лист ожидания») до 400 px остаётся только деталь логотипа, слово – для дикторов.
+  const narrowLogo = cta.short.length > SHORT_LABEL_FITS ? 'max-[25rem]:sr-only' : undefined;
+
   return (
     <HeaderFrame>
       {/* 64 px до 1024 px, дальше 88 – из ТЗ; после прокрутки содержимое опускается к центру 72 px. */}
       <div className="page-container flex h-16 items-center justify-between gap-3 transition-transform duration-200 ease-out lg:h-22 lg:group-data-scrolled/header:translate-y-2">
         <Link href="/" className="inline-flex min-h-11 flex-none items-center rounded-button">
           <span className="lg:hidden">
-            <Logo size={26} />
+            <Logo size={26} wordClassName={narrowLogo} />
           </span>
           <span className="hidden lg:inline">
             <Logo size={32} wordSize={22} />

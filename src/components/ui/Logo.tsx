@@ -18,12 +18,14 @@ type LogoProps = {
   /** `paper` – на тёмном фоне. */
   tone?: 'ink' | 'paper';
   className?: string;
+  /** Классы слова – например, скрыть его визуально на узком экране (имя ссылки остаётся). */
+  wordClassName?: string | undefined;
 };
 
 type LogoStyle = CSSProperties & Record<'--logo-word' | '--logo-gap', string>;
 
 /** Слово «PuzzleUp» – текст, поэтому ссылка с логотипом получает доступное имя без aria-label. */
-export function Logo({ size = 26, wordSize, tone = 'ink', className }: LogoProps) {
+export function Logo({ size = 26, wordSize, tone = 'ink', className, wordClassName }: LogoProps) {
   // Пропорции холста (ds/Logo): слово – 0,73 стороны детали, зазор – 0,46; слово не мельче 14 px.
   const style: LogoStyle =
     wordSize !== undefined
@@ -40,7 +42,12 @@ export function Logo({ size = 26, wordSize, tone = 'ink', className }: LogoProps
       )}
     >
       <PuzzlePiece size={size} className="text-accent" />
-      <span className="font-display text-[max(0.875rem,var(--logo-word))] leading-none font-bold tracking-[-0.01em] whitespace-nowrap">
+      <span
+        className={cn(
+          'font-display text-[max(0.875rem,var(--logo-word))] leading-none font-bold tracking-[-0.01em] whitespace-nowrap',
+          wordClassName,
+        )}
+      >
         PuzzleUp
       </span>
     </span>
