@@ -50,3 +50,20 @@ describe('checkText: typography', () => {
     );
   });
 });
+
+describe('checkText: ranges, «ё» and no-break spaces', () => {
+  it.each([
+    ['Математика · 5 – 9 класс', '5 – 9'],
+    ['Еще одно занятие', 'Еще'],
+    ['Ребенок понял тему', 'Ребенок'],
+    ['Все равно непонятно', 'Все равно'],
+    ['Пробное – 0 BYN', '0 BYN'],
+    ['Заявка № 12', '№ '],
+  ])('flags «%s»', (text, expected) => {
+    expect(matches(text)).toEqual([expected]);
+  });
+
+  it('allows a tight range, «ё» and no-break spaces', () => {
+    expect(checkText('Ещё 5–9 класс, ребёнок, учёба, всё равно, 40 BYN, № 12')).toEqual([]);
+  });
+});
