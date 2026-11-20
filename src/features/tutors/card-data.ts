@@ -4,6 +4,8 @@ import { pluralize } from '@/lib/plural';
 import { capitalize } from '@/lib/text';
 import { tutorPhotoUrl } from '@/lib/urls';
 
+import { gradesRange } from './grades';
+
 // Данные карточки репетитора – ТЗ главной, блок 5 «Карточка репетитора»; та же карточка стоит
 // в блоке «Другие репетиторы» страницы репетитора (раздел 4, блок 7).
 
@@ -60,7 +62,7 @@ type CardContext = {
 
 /** «5–9 класс», «9 класс»; диапазон и слово не разрываются (после тире – невидимая связка U+2060). */
 export function gradesLabel(from: number, to: number): string {
-  return from === to ? `${from}\u00a0класс` : `${from}–\u2060${to}\u00a0класс`;
+  return `${gradesRange({ from, to })}\u00a0класс`;
 }
 
 /**

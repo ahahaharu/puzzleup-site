@@ -5,7 +5,7 @@ import { getLegal, getPublishedReviews, getSite, getSubjects, getTutors } from '
 import { BottomBar } from './BottomBar';
 import { Footer } from './Footer';
 import { Header, type Cta } from './Header';
-import { navLinks } from './nav';
+import { navData, navLinks } from './nav';
 import { MAIN_ID, SkipLink } from './SkipLink';
 import { footerTexts, listedTutors, responseHoursLine } from './texts';
 
@@ -33,10 +33,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
   const site = getSite();
   const tutors = listedTutors(getTutors());
   const links = navLinks(
-    {
-      hasSubjects: getSubjects().some((subject) => subject.status === 'active'),
-      hasReviews: getPublishedReviews().length > 0,
-    },
+    navData({ subjects: getSubjects(), tutors, reviews: getPublishedReviews() }),
     { onHome: home },
   );
   const action = cta ?? {

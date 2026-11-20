@@ -162,6 +162,22 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('requires an existing tutor in the trial example', () => {
+    const site = raw().site;
+    const trialExample = {
+      tutorId: 't-anna',
+      intro: 'Итог:',
+      strong: 'дроби',
+      improve: 'степени',
+      startWith: 'уравнений',
+      offer: 'Подойдёт?',
+    };
+    const data = { ...Object(site.data), trialExample };
+    expect(messages(raw({ site: { ...site, data } }))).toEqual([
+      'content/site.json › trialExample.tutorId: tutor «t-anna» does not exist',
+    ]);
+  });
+
   it('rejects response hours that end before they start', () => {
     const site = raw().site;
     const data = {
