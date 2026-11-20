@@ -29,9 +29,17 @@ export function SamePageLinks() {
       if (url.pathname !== window.location.pathname || !block) return;
 
       event.preventDefault();
-      window.history.pushState(window.history.state, '', url);
+      // Повторный клик по той же ссылке не плодит одинаковые записи в истории.
+      if (url.href === window.location.href) {
+        window.history.replaceState(window.history.state, '', url);
+      } else {
+        window.history.pushState(window.history.state, '', url);
+      }
       // Плавность и отступ под шапку – из CSS (`scroll-behavior`, `scroll-padding-top` у html).
       block.scrollIntoView();
+      // Как у обычного якоря, следующий Tab ведёт по блоку, а не дальше по месту ссылки.
+      if (!block.hasAttribute('tabindex')) block.tabIndex = -1;
+      block.focus({ preventScroll: true });
     }
 
     document.addEventListener('click', onClick);

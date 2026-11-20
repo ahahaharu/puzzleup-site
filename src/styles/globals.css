@@ -169,6 +169,12 @@
     outline-offset: 2px;
   }
 
+  /* Блок, куда скрипт перенёс фокус после перехода по якорю (SamePageLinks), кольца не получает:
+     Tab в него не попадает, фокус только задаёт начало обхода. */
+  section[tabindex='-1']:focus-visible {
+    outline: none;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
