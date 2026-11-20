@@ -33,7 +33,7 @@ describe('Prices', () => {
     await expect.element(screen.getByRole('heading', { level: 2, name: 'Цены' })).toBeVisible();
     await expect.element(screen.getByText('Цену назначает каждый репетитор сам')).toBeVisible();
     await expect.element(screen.getByText(PRICES.trial.caption)).toBeVisible();
-    await expect.element(screen.getByText('45', { exact: true })).toBeVisible();
+    await expect.element(screen.getByText(/^45 BYN$/)).toBeVisible();
     const tutor = screen.getByRole('link', { name: 'Максим · 5–11 класс' });
     await expect.element(tutor).toHaveAttribute('href', '/tutors/maxim');
     expect(tutor.element().getBoundingClientRect().height).toBeGreaterThanOrEqual(44);

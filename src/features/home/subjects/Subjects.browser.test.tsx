@@ -36,7 +36,7 @@ describe('Subjects', () => {
     const screen = await render(<Subjects subjects={[subject('math')]} />);
 
     await expect.element(screen.getByRole('heading', { level: 2, name: 'Предметы' })).toBeVisible();
-    const tutor = screen.getByRole('link', { name: /^Андрей/ });
+    const tutor = screen.getByRole('link', { name: 'Андрей · 5–9 класс' });
     await expect.element(tutor).toHaveAttribute('href', '/tutors/andrei');
     expect(tutor.element().getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     await expect

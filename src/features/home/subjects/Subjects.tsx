@@ -77,8 +77,7 @@ function SubjectCard({ subject }: { subject: SubjectCardData }) {
               href={tutor.href}
               className="inline-flex min-h-11 items-center gap-1.5 text-field font-semibold text-ink no-underline hover:underline"
             >
-              {tutor.name}
-              <span className="font-normal text-ink-muted">· {tutor.grades}</span>
+              {tutor.name} <span className="font-normal text-ink-muted">· {tutor.grades}</span>
               <Icon name="arrow-right" size={18} />
             </Link>
           ))}
