@@ -27,6 +27,8 @@ type MessengerButtonsProps = {
   tone?: 'light' | 'dark';
   size?: ButtonSize;
   className?: string;
+  /** Классы самих кнопок – например, высота по ширине окна. */
+  buttonClassName?: string;
 };
 
 // Ширина решается по самой паре (container query), а не по окну: пара стоит и в узкой колонке
@@ -69,6 +71,7 @@ export function MessengerButtons({
   tone = 'light',
   size = 'md',
   className,
+  buttonClassName,
   telegram,
   viber,
   nameDative,
@@ -97,6 +100,7 @@ export function MessengerButtons({
             size={size}
             icon={icon}
             fullWidth
+            className={buttonClassName}
           >
             <Label label={label} nameDative={nameDative} title={title} />
           </Button>

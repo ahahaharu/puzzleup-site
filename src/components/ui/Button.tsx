@@ -38,7 +38,7 @@ type CommonProps = {
   fullWidth?: boolean;
   /** Иконка слева от подписи, 20 px. */
   icon?: IconName;
-  className?: string;
+  className?: string | undefined;
   children: ReactNode;
 };
 
