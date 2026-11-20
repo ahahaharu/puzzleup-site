@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Review } from '@/content';
-import { formatReviewDate } from '@/features/reviews/card-data';
 
 import { pickReview, reviewColumns } from './columns';
 
@@ -52,13 +51,6 @@ describe('pickReview', () => {
       'b',
     );
     expect(pickReview([])).toBeUndefined();
-  });
-});
-
-describe('formatReviewDate', () => {
-  it('writes the month in words without «г.»', () => {
-    expect(formatReviewDate('2026-10-12')).toBe('12 октября 2026');
-    expect(formatReviewDate('2026-01-01')).toBe('1 января 2026');
   });
 });
 

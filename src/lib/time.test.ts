@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { minskYear, shortTime } from './time';
+import { formatLongDate, minskYear, shortTime } from './time';
 
 describe('minskYear', () => {
   it('uses Minsk time at the year boundary', () => {
@@ -17,5 +17,12 @@ describe('shortTime', () => {
   it('drops the leading zero of the hour', () => {
     expect(shortTime('09:00')).toBe('9:00');
     expect(shortTime('22:00')).toBe('22:00');
+  });
+});
+
+describe('formatLongDate', () => {
+  it('writes the month in words without «г.»', () => {
+    expect(formatLongDate('2026-10-12')).toBe('12 октября 2026');
+    expect(formatLongDate('2026-01-01')).toBe('1 января 2026');
   });
 });
