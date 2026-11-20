@@ -6,6 +6,7 @@ import { BottomBar } from './BottomBar';
 import { Footer } from './Footer';
 import { Header, type Cta } from './Header';
 import { navData, navLinks } from './nav';
+import { SamePageLinks } from './SamePageLinks';
 import { MAIN_ID, SkipLink } from './SkipLink';
 import { footerTexts, listedTutors, responseHoursLine } from './texts';
 
@@ -80,6 +81,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         showAfter={bottomBar?.showAfter ?? 'top'}
         hideWhenVisible={bottomBar?.hideWhenVisible ?? 'tutors'}
       />
+      <SamePageLinks />
     </>
   );
 }

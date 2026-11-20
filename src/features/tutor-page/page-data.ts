@@ -16,7 +16,7 @@ import type { Availability } from '@/lib/availability';
 import { GOAL_LABELS } from '@/lib/goal';
 import { capitalize, joinWithAnd } from '@/lib/text';
 import { shortTime } from '@/lib/time';
-import { tutorLeadUrl, tutorPhotoUrl, tutorUrl } from '@/lib/urls';
+import { leadAnchor, tutorLeadUrl, tutorPhotoUrl, tutorUrl } from '@/lib/urls';
 
 import {
   alternativeLabel,
@@ -155,10 +155,10 @@ export function profileData(tutor: Tutor, context: ProfileContext): ProfileData 
     status === 'archived'
       ? { label: CHOOSE_TUTOR_CTA, href: '/#tutors' }
       : status === 'full'
-        ? { label: WAITLIST_CTA, href: tutorLeadUrl(tutor.slug, { entry: 'tutor_full' }) }
+        ? { label: WAITLIST_CTA, href: leadAnchor('tutor_full') }
         : {
             label: leadLabel(tutor.nameDative),
-            href: tutorLeadUrl(tutor.slug, { entry: 'tutor_profile' }),
+            href: leadAnchor('tutor_profile'),
           };
 
   return {

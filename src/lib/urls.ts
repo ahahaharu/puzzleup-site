@@ -48,6 +48,14 @@ export function tutorLeadUrl(slug: string, { entry, subject, goal, grade }: Lead
   return `${tutorUrl(slug)}?${params.toString()}#lead`;
 }
 
+/**
+ * Форма этой же страницы репетитора: `?entry=tutor_profile#lead`. Относительная ссылка – обычная
+ * `<a>`, её обрабатывает `SamePageLinks` (src/components/layout).
+ */
+export function leadAnchor(entry: Entry): string {
+  return `?${new URLSearchParams({ entry }).toString()}#lead`;
+}
+
 /** Исходник фото репетитора из `public/tutors/` – его размеры и форматы делает next/image. */
 export function tutorPhotoUrl(fileName: string): string {
   return `/tutors/${encodeURIComponent(fileName)}`;

@@ -8,11 +8,14 @@ import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
 import { currentYear } from '@/features/tutors/current-year';
 import { leadLabel } from '@/features/tutors/texts';
-import { tutorLeadUrl } from '@/lib/urls';
+import { leadAnchor } from '@/lib/urls';
 
 // Страница репетитора – ТЗ страницы репетитора. Статическая: по странице на каждый файл
 // `content/tutors`, включая ушедших (раздел 6). Неизвестный адрес – 404 через `notFound()`:
-// с Cache Components `dynamicParams = false` не поддерживается.
+// с Cache Components `dynamicParams = false` не поддерживается. `ensureStatic = 'navigation'`
+// держит страницу целиком статической и не отдаёт неизвестному адресу оболочку с кодом 200.
+
+export const ensureStatic = 'navigation';
 
 export function generateStaticParams() {
   return getTutors().map((tutor) => ({ slug: tutor.slug }));
@@ -49,7 +52,7 @@ export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>
         cta: {
           label: leadLabel(tutor.nameDative),
           short: 'Записаться',
-          href: tutorLeadUrl(tutor.slug, { entry: 'header' }),
+          href: leadAnchor('header'),
         },
         bottomBar: {
           telegram: { value: tutor.telegram, nameDative: tutor.nameDative },

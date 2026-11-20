@@ -17,6 +17,8 @@ import {
   otherTutors,
   profileData,
   sharedSubjects,
+  tutorMetadata,
+  tutorPageData,
   tutorReviews,
 } from './page-data';
 
@@ -86,7 +88,7 @@ describe('profileData', () => {
     );
     expect(data.cta).toEqual({
       label: 'Записаться к Игорю',
-      href: '/tutors/igor?entry=tutor_profile#lead',
+      href: '?entry=tutor_profile#lead',
     });
     expect(data.alternative).toBeUndefined();
     expect(data.archivedNotice).toBeUndefined();
@@ -104,7 +106,7 @@ describe('profileData', () => {
     expect(data.status).toBe('full');
     expect(data.cta).toEqual({
       label: 'Встать в лист ожидания',
-      href: '/tutors/anna?entry=tutor_full#lead',
+      href: '?entry=tutor_full#lead',
     });
     expect(data.alternative).toEqual({ label: 'Ещё на сайте: Игорь', href: '/tutors/igor' });
   });
@@ -223,5 +225,74 @@ describe('gradeHint', () => {
     expect(gradeHint(ninth, 5, [ninth], SUBJECTS)?.text).toBe(
       'Анна занимается с 9 классом. 5 класс можно обсудить на пробном занятии.',
     );
+  });
+});
+
+describe('tutorPageData', () => {
+  const context = {
+    site: FIXTURE_SITE,
+    subjects: SUBJECTS,
+    tutors: TUTORS,
+    reviews: [fixtureReview('one'), fixtureReview('other', { tutorId: 't-igor' })],
+    year: 2026,
+  };
+
+  it('keeps the regular order and fills every block', () => {
+    const data = tutorPageData(FIXTURE_ANNA, context);
+    expect(data.moreFirst).toBe(false);
+    expect(data.reviews.title).toBe('Отзывы об Анне · 1');
+    expect(data.outside.paragraphs).toEqual(['Собираю пазлы.', 'В школе не любила дроби.']);
+    expect(data.how).toBeDefined();
+    expect(data.lead?.waitlist).toBeUndefined();
+    expect(data.more).toMatchObject({
+      title: 'Ещё на сайте по математике',
+      lead: 'Другой независимый репетитор – со своей ценой и условиями.',
+    });
+    expect(data.more?.tutors.map((tutor) => [tutor.slug, tutor.reviewCount])).toEqual([
+      ['igor', 1],
+    ]);
+  });
+
+  it('raises the other tutors under the profile when full', () => {
+    const data = tutorPageData({ ...FIXTURE_ANNA, availability: 'full' }, context);
+    expect(data.moreFirst).toBe(true);
+    expect(data.lead?.waitlist).toBeDefined();
+  });
+
+  it('drops the steps and the form of an archived tutor', () => {
+    const data = tutorPageData({ ...FIXTURE_ANNA, archived: true }, context);
+    expect(data.moreFirst).toBe(true);
+    expect(data.how).toBeUndefined();
+    expect(data.lead).toBeUndefined();
+  });
+
+  it('has no other tutors block without a shared subject and no outside block without notes', () => {
+    const data = tutorPageData(
+      { ...FIXTURE_VERA, hobby: undefined, personalNote: undefined },
+      { ...context, tutors: [FIXTURE_ANNA, FIXTURE_VERA] },
+    );
+    expect(data.more).toBeUndefined();
+    expect(data.outside.paragraphs).toEqual([]);
+  });
+});
+
+describe('tutorMetadata', () => {
+  it('builds the title and description from the template', () => {
+    expect(tutorMetadata(FIXTURE_IGOR, SUBJECTS, 2026)).toEqual({
+      title: 'Игорь – репетитор по математике и по физике онлайн, 5–11 класс | PuzzleUp',
+      description:
+        'Игорь – репетитор по математике и по физике для 5–11 классов. Стаж 6 лет. Онлайн, 40 BYN за 60 минут, пробное занятие бесплатно.',
+      noindex: false,
+    });
+  });
+
+  it('prefers the own description and hides an archived tutor', () => {
+    const meta = tutorMetadata(
+      { ...FIXTURE_ANNA, seoDescription: 'Своё описание.', archived: true },
+      SUBJECTS,
+      2026,
+    );
+    expect(meta.description).toBe('Своё описание.');
+    expect(meta.noindex).toBe(true);
   });
 });
