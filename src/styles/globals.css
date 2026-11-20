@@ -2,6 +2,12 @@
 @import 'tailwindcss' source('..');
 
 /*
+ * С JavaScript – пара к встроенному `noscript:`. Запасная разметка до гидратации прячет то, что
+ * без скрипта не работает, только когда скрипт есть (блок «Репетиторы», ADR-043).
+ */
+@custom-variant scripting (@media (scripting: enabled));
+
+/*
  * Токены дизайн-системы «Тетрадь» – docs/design-system.md.
  * Стандартные палитра, шкала размеров текста, шрифты и брейкпоинты Tailwind отключены (ADR-025):
  * в коде доступны только значения ДС.
@@ -112,10 +118,17 @@
    */
   --animate-piece-land: piece-land 600ms ease-out both;
   --animate-piece-fade: piece-fade 600ms ease-out both;
+  /* Смена карточек после выбора вкладки фильтра – появление за 150 мс. */
+  --animate-fade-in: fade-in 150ms ease-out both;
 
   @keyframes piece-land {
     from {
       transform: translate(16px, 14px) rotate(-6deg);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
     }
   }
   @keyframes piece-fade {
