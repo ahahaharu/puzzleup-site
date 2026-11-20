@@ -39,6 +39,7 @@ export function TutorsBrowser({ items, tabs }: TutorsBrowserProps) {
   const listRef = useRef<HTMLUListElement>(null);
 
   function select(next: string | null) {
+    if (next === subject) return;
     const url = new URL(window.location.href);
     if (next === null) url.searchParams.delete('subject');
     else url.searchParams.set('subject', next);
