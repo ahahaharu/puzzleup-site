@@ -1,8 +1,10 @@
 import { SiteShell } from '@/components/layout/SiteShell';
 import { listedTutors } from '@/components/layout/texts';
-import { getPublishedReviews, getSite, getSubjects, getTutors } from '@/content';
+import { getPublishedReviews, getSite, getSituations, getSubjects, getTutors } from '@/content';
 import { Hero } from '@/features/home/hero/Hero';
 import { heroBadge } from '@/features/home/hero/hero-badge';
+import { situationCards } from '@/features/home/situations/cards';
+import { Situations } from '@/features/home/situations/Situations';
 import { Tutors } from '@/features/home/tutors/Tutors';
 import { countReviews, toTutorCardData } from '@/features/tutors/card-data';
 import { currentYear } from '@/features/tutors/current-year';
@@ -29,6 +31,7 @@ export default async function HomePage() {
     <SiteShell home>
       <Hero badge={heroBadge(subjects, tutors)} slogan={site.slogan} />
       <Tutors tutors={cards} subjects={subjects.filter((subject) => subject.status === 'active')} />
+      <Situations cards={situationCards(getSituations(), tutors)} />
     </SiteShell>
   );
 }
