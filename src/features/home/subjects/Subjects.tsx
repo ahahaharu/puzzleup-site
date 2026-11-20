@@ -85,13 +85,9 @@ function SubjectCard({ subject }: { subject: SubjectCardData }) {
         </div>
         <div className="mt-auto pt-1">
           {/* Подпись длинная – на узкой карточке переносится, а не вылезает за край. */}
-          <Button
-            href={subject.ctaHref}
-            size="md"
-            fullWidth
-            className="py-3 text-center whitespace-normal @[30rem]:w-auto"
-          >
-            {subject.ctaLabel}
+          <Button href={subject.ctaHref} size="md" fullWidth className="py-3 @[30rem]:w-auto">
+            {/* У кнопки nowrap – перенос включает обёртка, как в MessengerButtons. */}
+            <span className="text-center whitespace-normal">{subject.ctaLabel}</span>
           </Button>
         </div>
       </div>

@@ -30,7 +30,8 @@ export function Faq({ items }: FaqProps) {
           <h2 id="faq-title" className="font-display text-h2 text-ink">
             {FAQ_TITLE}
           </h2>
-          <p className="text-body text-ink-2">{FAQ_NOTE}</p>
+          {/* Строка и кнопка на телефоне – после вопросов, как в M-8: две копии, видна одна. */}
+          <p className="text-body text-ink-2 max-lg:hidden">{FAQ_NOTE}</p>
           {/* Кнопка на десктопе – под заголовком, на телефоне – после вопросов: две копии, видна одна. */}
           <Cta className="max-lg:hidden" />
         </div>
@@ -38,7 +39,8 @@ export function Faq({ items }: FaqProps) {
         <div className="col-span-full lg:col-span-8">
           {items.map((item) => (
             <details key={item.id} className="group border-t border-ink/15 last:border-b">
-              {/* Маркер браузера скрыт: вместо него «+», который при открытии поворачивается в «×». */}
+              {/* Маркер браузера скрыт: вместо него «+», который при открытии поворачивается в «×».
+                  Вопрос – Golos 600, 18 px (на телефоне 17): ТЗ. */}
               <summary className="flex cursor-pointer list-none items-start justify-between gap-5 py-5 text-[1.0625rem] leading-[1.35] font-semibold text-ink lg:text-[1.125rem] [&::-webkit-details-marker]:hidden">
                 {item.question}
                 <Icon
@@ -50,6 +52,7 @@ export function Faq({ items }: FaqProps) {
               </summary>
               <Markdown
                 source={item.answer}
+                // Ответ – 16 px, ink-2 (ТЗ), межстрочный 1,55 – макет D-8.
                 className="-mt-2 max-w-160 pb-5 text-field leading-[1.55] text-ink-2"
               />
             </details>
@@ -57,6 +60,7 @@ export function Faq({ items }: FaqProps) {
         </div>
 
         <div className="col-span-full lg:hidden">
+          <p className="mb-4 text-body text-ink-2">{FAQ_NOTE}</p>
           <Cta className="w-full md:w-auto" />
         </div>
       </div>

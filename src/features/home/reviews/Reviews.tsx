@@ -41,6 +41,7 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
               <div className="flex items-center gap-3.5">
                 <Avatar name={column.tutor.name} photo={column.tutor.photo} size={48} />
                 <div className="flex min-w-0 flex-col gap-0.5">
+                  {/* Имя в шапке колонки – Unbounded 500, 20 px: макет D-6 / M-6. */}
                   <h3 className="font-display text-[1.25rem] leading-tight font-medium text-ink">
                     {/* Зона нажатия растянута по высоте до 44 px, строка не выше заголовка. */}
                     <Link

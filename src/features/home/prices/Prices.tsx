@@ -37,6 +37,7 @@ export function Prices({ prices, rows }: PricesProps) {
               </span>
               <span className="text-[1.5rem] font-medium">{CURRENCY}</span>
             </p>
+            {/* Подписи карточек – 17 px на всех ширинах: макет D-7 / M-7. */}
             <p className="text-[1.0625rem] text-kraft">{prices.trial.caption}</p>
           </div>
 
@@ -49,15 +50,19 @@ export function Prices({ prices, rows }: PricesProps) {
                   key={row.slug}
                   className="flex items-center justify-between gap-3 border-t border-ink/12 py-1.5 lg:py-2.5"
                 >
+                  {/* Имя и классы – 17 px на десктопе, 16 на телефоне: макет D-7 / M-7. */}
                   <Link
                     href={row.href}
                     className="inline-flex min-h-11 flex-wrap items-center gap-x-1.5 text-field font-semibold text-ink no-underline hover:underline lg:text-[1.0625rem]"
                   >
                     {row.name}
+                    {/* Пробел – для имени ссылки в любом браузере; на экране промежуток даёт gap. */}
+                    {row.grades && ' '}
                     {row.grades && (
                       <span className="font-normal text-ink-muted">· {row.grades}</span>
                     )}
                   </Link>
+                  {/* Цена в строке – Unbounded 700, 28 px (на телефоне 20), валюта 16 px: макет D-7 / M-7. */}
                   <span className="font-display text-[1.25rem] font-bold tracking-[-0.02em] whitespace-nowrap text-ink lg:text-[1.75rem]">
                     {row.price}{' '}
                     <span className="text-field font-medium tracking-normal">{CURRENCY}</span>

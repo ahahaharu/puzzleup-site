@@ -94,7 +94,9 @@ export function How({ steps, example }: HowProps) {
                 <div
                   className={cn(
                     'relative flex gap-2 lg:gap-3',
-                    step.highlight && '-m-3.5 rounded-card bg-kraft p-3.5 lg:-m-5 lg:p-5',
+                    // Подложка шага сдвинута влево, правый край – внутри колонки, как в D-3 и M-3.
+                    step.highlight &&
+                      '-my-3.5 mr-1 -ml-1 rounded-card bg-kraft p-3.5 lg:-my-5 lg:mr-5 lg:-ml-5 lg:p-5',
                   )}
                 >
                   {/* Номер – оформление, порядок задаёт <ol>. 40 px на десктопе – ТЗ. */}
@@ -134,7 +136,7 @@ export function How({ steps, example }: HowProps) {
           )}
 
           <div className="col-span-full lg:col-span-7 lg:row-start-2">
-            <Button href="#tutors" fullWidth className="lg:w-auto">
+            <Button href="#tutors" fullWidth className="md:w-auto">
               {HOW_CTA}
             </Button>
           </div>

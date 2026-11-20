@@ -25,6 +25,7 @@ function TutorCard({ tutor }: { tutor: AboutTutor }) {
       <div className="flex items-center gap-3.5">
         <Avatar name={tutor.name} photo={tutor.photo} size={64} />
         <div className="flex min-w-0 flex-col gap-0.5">
+          {/* Имя – Unbounded 500, 18 px: макет D-9. */}
           <h3 className="font-display text-[1.125rem] leading-tight font-medium">
             {/* Зона нажатия растянута по высоте до 44 px, строка не выше заголовка. */}
             <Link
@@ -70,6 +71,7 @@ export function About({ text, tutors }: AboutProps) {
             >
               {ABOUT_TITLE}
             </h2>
+            {/* Текст – 18 px на десктопе (ТЗ), 16 на телефоне (M-9), межстрочный 1,6 – макет. */}
             <p className="max-w-150 text-field leading-[1.6] text-paper/85 lg:text-[1.125rem]">
               {text}
             </p>

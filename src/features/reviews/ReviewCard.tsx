@@ -4,15 +4,16 @@ import { ReviewText } from './ReviewText';
 // Карточка отзыва – ТЗ главной, блок 6 «Карточка отзыва»; макеты D-6-reviews, M-6-reviews. Лист
 // «в линейку»: фон card и линии через 32 px. Ссылки на репетитора в карточке нет – он назван рядом.
 
-// Линии – focus 20 %, как в макете; шаг совпадает с межстрочным текста.
+// Линии – токен focus 20 %, как в макете; шаг совпадает с межстрочным текста.
 const LINED =
-  'bg-card bg-[repeating-linear-gradient(transparent_0_31px,rgb(58_111_216/0.2)_31px_32px)]';
+  'bg-card bg-[repeating-linear-gradient(transparent_0_31px,color-mix(in_srgb,var(--color-focus)_20%,transparent)_31px_32px)]';
 
 export function ReviewCard({ review }: { review: ReviewCardData }) {
   return (
     <figure
       className={`flex h-full flex-col gap-3 rounded-card border border-ink/12 p-6 shadow-paper ${LINED}`}
     >
+      {/* Кавычка Spectral 64 px – ТЗ, «Карточка отзыва»; межстрочный 0,7 – из макета. */}
       <span aria-hidden="true" className="h-8.5 font-hand text-[4rem] leading-[0.7] text-accent">
         «
       </span>
