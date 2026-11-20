@@ -1,6 +1,7 @@
 // Скриншоты макета и реализации для design-reviewer.
 // pnpm tsx scripts/design-shot.ts --mock D-5-tutors --url "/" --section tutors --width 1280
 // Опции: --base http://localhost:3000 (или DESIGN_BASE_URL), --widths 360,768,1024,1440,
+// --shots (скриншоты и на --widths; без него там только цифры: переполнение и мин. кегль),
 // --reduced-motion (эмуляция prefers-reduced-motion: reduce).
 import { execSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -18,6 +19,7 @@ const { values } = parseArgs({
     width: { type: 'string', default: '1280' },
     widths: { type: 'string', default: '360,768,1024,1440' },
     base: { type: 'string', default: process.env.DESIGN_BASE_URL ?? 'http://localhost:3000' },
+    shots: { type: 'boolean', default: false },
     'reduced-motion': { type: 'boolean', default: false },
   },
 });
@@ -70,6 +72,29 @@ if (values.url) {
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
+    const scope = values.section ? `section#${values.section}` : 'body';
+    const minFont = await page
+      .locator(scope)
+      .first()
+      .evaluate((root) =>
+        Math.min(
+          ...[...root.querySelectorAll<HTMLElement>('*')]
+            .filter(
+              (node) =>
+                node.checkVisibility() &&
+                [...node.childNodes].some(
+                  (child) => child.nodeType === Node.TEXT_NODE && (child.textContent ?? '').trim(),
+                ),
+            )
+            .map((node) => Number.parseFloat(getComputedStyle(node).fontSize)),
+        ),
+      );
+    const metrics = `width ${w}: horizontal overflow ${overflow}px, min font ${minFont}px`;
+    if (w !== width && !values.shots) {
+      console.log(metrics);
+      await page.context().close();
+      continue;
+    }
     const name = `impl-${slug(values.url)}${values.section ? `-${values.section}` : ''}-${w}${values['reduced-motion'] ? '-rm' : ''}.png`;
     const out = path.join(outDir, name);
     if (values.section) {
@@ -77,7 +102,7 @@ if (values.url) {
     } else {
       await page.screenshot({ path: out, fullPage: true });
     }
-    console.log(`${out}  horizontal overflow: ${overflow}px`);
+    console.log(`${out}  ${metrics}`);
     await page.context().close();
   }
 }
