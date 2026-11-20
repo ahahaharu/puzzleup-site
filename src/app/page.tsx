@@ -20,6 +20,8 @@ import { How } from '@/features/home/how/How';
 import { howSteps } from '@/features/home/how/texts';
 import { Prices } from '@/features/home/prices/Prices';
 import { priceRows } from '@/features/home/prices/rows';
+import { reviewColumns } from '@/features/home/reviews/columns';
+import { Reviews } from '@/features/home/reviews/Reviews';
 import { situationCards } from '@/features/home/situations/cards';
 import { Situations } from '@/features/home/situations/Situations';
 import { subjectCards } from '@/features/home/subjects/cards';
@@ -39,7 +41,8 @@ export default async function HomePage() {
   const site = getSite();
   const subjects = getSubjects();
   const tutors = listedTutors(getTutors());
-  const reviews = countReviews(getPublishedReviews());
+  const published = getPublishedReviews();
+  const reviews = countReviews(published);
   const year = await currentYear();
 
   // Статус занятости пока – начальное значение из MDX; из базы его подставит feature/availability.
@@ -62,6 +65,7 @@ export default async function HomePage() {
         example={trialExample(site.trialExample, tutors)}
       />
       <Subjects subjects={subjectCards(subjects, tutors)} />
+      <Reviews columns={reviewColumns(published, tutors, subjects)} />
       <Prices prices={site.prices} rows={priceRows(tutors, subjects)} />
       <Faq items={faqItems(getFaq(), tutors, subjects)} />
       <About text={site.about} tutors={aboutTutors(tutors, subjects)} />
