@@ -49,14 +49,21 @@ function CtaLabel({ label, short }: Cta) {
   );
 }
 
+// «Записаться» – самая длинная короткая подпись, с которой шапка помещается в 360 px вместе со словом
+// логотипа.
+const SHORT_LABEL_FITS = 'Записаться'.length;
+
 export function Header({ links, spy, cta, menu }: HeaderProps) {
+  // С подписью длиннее («Лист ожидания») до 400 px остаётся только деталь логотипа, слово – для дикторов.
+  const narrowLogo = cta.short.length > SHORT_LABEL_FITS ? 'max-[25rem]:sr-only' : undefined;
+
   return (
     <HeaderFrame>
       {/* 64 px до 1024 px, дальше 88 – из ТЗ; после прокрутки содержимое опускается к центру 72 px. */}
       <div className="page-container flex h-16 items-center justify-between gap-3 transition-transform duration-200 ease-out lg:h-22 lg:group-data-scrolled/header:translate-y-2">
         <Link href="/" className="inline-flex min-h-11 flex-none items-center rounded-button">
           <span className="lg:hidden">
-            <Logo size={26} />
+            <Logo size={26} wordClassName={narrowLogo} />
           </span>
           <span className="hidden lg:inline">
             <Logo size={32} wordSize={22} />

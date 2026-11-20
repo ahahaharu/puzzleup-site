@@ -112,6 +112,11 @@ describe('Header', () => {
     );
     expect(visible.map((span) => span.textContent)).toEqual(['Лист ожидания']);
     expect(visible[0]?.getAttribute('aria-hidden')).toBe('true');
-    expect(header().scrollWidth).toBeLessThanOrEqual(360);
+    // Кнопка меню не заходит в поле страницы (16 px) и не выталкивается за экран.
+    for (const width of [360, 390]) {
+      await page.viewport(width, 740);
+      const menu = screen.getByRole('button', { name: 'Меню' }).element();
+      expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(width - 16);
+    }
   });
 });
