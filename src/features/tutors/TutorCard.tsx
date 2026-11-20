@@ -32,7 +32,7 @@ type TutorCardProps = {
 
 // Ссылки под кнопками – строки от 44 px, как в подвале.
 const TEXT_LINK =
-  'inline-flex min-h-11 items-center text-small underline-offset-4 hover:no-underline';
+  'inline-flex min-h-11 items-center text-small underline underline-offset-4 hover:no-underline';
 
 export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
   const about = aboutName(tutor.namePrepositional);
@@ -41,7 +41,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
 
   return (
     <article className="@container h-full rounded-card border border-ink/12 bg-card">
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-3.5 p-5 @xl:grid-rows-[auto_auto_1fr] @xl:items-start @xl:gap-x-7 @xl:gap-y-2.5 @xl:p-7">
+      <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-3.5 p-5 @xl:items-start @xl:gap-x-7 @xl:gap-y-2.5 @xl:p-7">
         <Badge
           status={tutor.availability}
           className="col-span-2 justify-self-start @xl:col-span-1 @xl:col-start-2 @xl:row-start-1"
@@ -82,7 +82,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
           <p className="text-small text-ink-2">{tutor.credentials}</p>
         </div>
 
-        <div className="col-span-2 row-start-3 flex min-w-0 flex-col gap-3.5 @xl:col-span-1 @xl:col-start-2 @xl:gap-2.5">
+        <div className="col-span-2 row-start-3 flex min-w-0 flex-col gap-3.5 self-stretch @xl:col-span-1 @xl:col-start-2 @xl:gap-2.5">
           {/* Фраза о подходе – пометка от руки: Spectral Italic 18 px, межстрочный 1,35 из макета. */}
           <p className="font-hand text-hand-sm leading-[1.35] text-ink-2 italic">
             «{tutor.tagline}»
@@ -93,7 +93,8 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
             <span className="font-normal text-ink-muted">· {LESSON_LENGTH}</span>
           </p>
 
-          <div className="flex flex-col gap-2.5 @xl:mt-1.5">
+          {/* Кнопки прижаты к низу: в ряду сетки они стоят на одной линии у карточек разной высоты. */}
+          <div className="mt-auto flex flex-col gap-2.5 @xl:mt-1.5">
             <Button href={tutorLeadUrl(tutor.slug, { entry: 'tutors' })} size="md" fullWidth>
               {full ? (
                 <span>
