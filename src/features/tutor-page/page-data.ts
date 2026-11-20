@@ -1,6 +1,14 @@
 import type { Review, Site, Subject, Tutor } from '@/content';
 import { toReviewCard, type ReviewCardData } from '@/features/reviews/card-data';
-import { experienceValue, formatPrice, gradesLabel } from '@/features/tutors/card-data';
+import {
+  countReviews,
+  experienceLabel,
+  experienceValue,
+  formatPrice,
+  gradesLabel,
+  toTutorCardData,
+  type TutorCardData,
+} from '@/features/tutors/card-data';
 import { gradesRange, tutorGrades, type GradeRange } from '@/features/tutors/grades';
 import { sortByAvailability } from '@/features/tutors/sort';
 import { leadLabel } from '@/features/tutors/texts';
@@ -16,8 +24,11 @@ import {
   CHOOSE_TUTOR_CTA,
   formPrice,
   gradeHintText,
+  moreLead,
+  moreTitle,
   platformsLine,
   providerLine,
+  reviewsTitle,
   schoolLine,
   startSteps,
   termsLine,
@@ -321,5 +332,96 @@ export function gradeHint(
       label: hint.link ?? '',
       href: tutorLeadUrl(other.slug, { entry: 'tutor_more', grade }),
     },
+  };
+}
+
+// --- Страница целиком ---
+
+export type OutsideData = { paragraphs: string[] };
+
+export type MoreData = { title: string; lead: string; tutors: TutorCardData[] };
+
+export type TutorPageData = {
+  profile: ProfileData;
+  about: AboutData;
+  /** «Вне занятий»: хобби и личная деталь; пусто – блока нет. */
+  outside: OutsideData;
+  reviews: { title: string; items: ReviewCardData[] };
+  /** «Как начать» и форма – только у того, кто принимает учеников. */
+  how?: HowToStartData | undefined;
+  lead?: LeadData | undefined;
+  /** «Другие репетиторы»; нет общих предметов – блока нет. */
+  more?: MoreData | undefined;
+  /** «Мест нет» и ушедший: «Другие репетиторы» – сразу под профилем (раздел 5). */
+  moreFirst: boolean;
+};
+
+type PageContext = {
+  site: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'> & {
+    prices: { trial: Pick<Site['prices']['trial'], 'price'> };
+  };
+  subjects: readonly Subject[];
+  /** Все репетиторы, включая ушедших и текущего. */
+  tutors: readonly Tutor[];
+  /** Опубликованные отзывы обо всех репетиторах. */
+  reviews: readonly Review[];
+  year: number;
+};
+
+export function tutorPageData(tutor: Tutor, context: PageContext): TutorPageData {
+  const { site, subjects, reviews, year } = context;
+  const status = pageStatus(tutor);
+  const others = otherTutors(tutor, context.tutors, subjects);
+  const counts = countReviews(reviews);
+  const own = tutorReviews(tutor, reviews, subjects);
+
+  return {
+    profile: profileData(tutor, { subjects, others, reviewCount: own.length, year }),
+    about: aboutData(tutor, site),
+    outside: { paragraphs: [tutor.hobby, tutor.personalNote].filter((text) => text !== undefined) },
+    reviews: { title: reviewsTitle(tutor.namePrepositional, own.length), items: own },
+    how: status === 'archived' ? undefined : howToStartData(tutor, site),
+    lead: status === 'archived' ? undefined : leadData(tutor, site),
+    more:
+      others.length > 0
+        ? {
+            title: moreTitle(sharedSubjects(tutor, others, subjects)),
+            lead: moreLead(others.length),
+            tutors: others.map((other) =>
+              toTutorCardData(other, {
+                subjects,
+                // Ушедших среди других нет: `otherTutors` их отбрасывает.
+                availability: other.availability,
+                reviewCount: counts.get(other.id) ?? 0,
+                year,
+              }),
+            ),
+          }
+        : undefined,
+    moreFirst: status === 'full' || status === 'archived',
+  };
+}
+
+// --- Метатеги (раздел 6) ---
+
+export function tutorMetadata(
+  tutor: Tutor,
+  subjects: readonly Subject[],
+  year: number,
+): { title: string; description: string; noindex: boolean } {
+  const active = activeSubjects(tutor, subjects);
+  const bySubjects = joinWithAnd(active.map((subject) => subject.nameDativeWithPrep));
+  const grades = tutorGrades(tutor, subjects);
+  // Без невидимой связки из gradesRange: заголовок и описание читают поисковики.
+  const range =
+    grades && (grades.from === grades.to ? `${grades.from}` : `${grades.from}–${grades.to}`);
+  const who = [tutor.name, '–', 'репетитор', bySubjects].filter(Boolean).join(' ');
+
+  return {
+    title: `${who} онлайн${range ? `, ${range} класс` : ''} | PuzzleUp`,
+    description:
+      tutor.seoDescription ??
+      `${who}${range ? ` для ${range} классов` : ''}. ${experienceLabel(tutor.teachingSince, year).replaceAll(' ', ' ')}. Онлайн, ${formatPrice(tutor.price)} BYN за 60 минут, пробное занятие бесплатно.`,
+    noindex: tutor.archived,
   };
 }
