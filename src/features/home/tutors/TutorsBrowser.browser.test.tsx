@@ -200,3 +200,27 @@ describe('TutorsView collapsing', () => {
     expect(showAll?.checkVisibility()).toBe(false);
   });
 });
+
+describe('TutorsView fallback (before hydration and without JavaScript)', () => {
+  it('renders every card and marks script-only controls', async () => {
+    await page.viewport(1280, 900);
+    const { list, tabs } = setup(7);
+    const screen = await render(
+      <TutorsView items={list} tabs={tabs} subject={null} expanded={false} fallback />,
+    );
+
+    await expect.element(screen.getByText('Марина')).toBeInTheDocument();
+    const cards = [...screen.container.querySelectorAll('li')];
+    expect(cards).toHaveLength(7);
+    // Без скрипта (@media (scripting: none)) вкладки и кнопка скрыты, свёрнутая карточка видна.
+    expect(screen.container.querySelector('[role="group"]')?.className).toContain(
+      'noscript:hidden',
+    );
+    expect(
+      screen.getByRole('button', { name: 'Показать всех' }).element().parentElement?.className,
+    ).toContain('noscript:hidden');
+    expect(cards[6]?.className).toContain('scripting:md:hidden');
+    expect(cards[6]?.className).not.toMatch(/(^|\s)md:hidden/);
+    await page.viewport(360, 740);
+  });
+});
