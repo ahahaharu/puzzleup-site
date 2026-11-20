@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 // время гидратации, меняет адрес, но не прокручивает к якорю. Без JavaScript браузер загружает
 // страницу заново и сам переходит к якорю. С JavaScript – адрес меняется без перезагрузки
 // (`pushState` Next синхронизирует с `useSearchParams`), блок прокручивается к началу экрана.
+// Фокус переходит на блок; кольцо фокуса у него гасит правило `section[tabindex='-1']` в
+// globals.css – поэтому цель такой ссылки должна быть `<section>`.
 
 export function SamePageLinks() {
   useEffect(() => {

@@ -16,7 +16,7 @@ import { footerTexts, listedTutors, responseHoursLine } from './texts';
 /** Документы подвала по порядку ТЗ (блок 10); страница без файла в content/legal не выводится. */
 const DOCUMENTS = ['privacy', 'cookies'] as const;
 
-type SiteShellProps = {
+export type SiteShellProps = {
   children: ReactNode;
   /** Главная: пункты навигации – якоря этой страницы, подсвечивается текущий блок. */
   home?: boolean;

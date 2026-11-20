@@ -1,3 +1,4 @@
+import type { SiteShellProps } from '@/components/layout/SiteShell';
 import type { Tutor } from '@/content';
 import { leadLabel } from '@/features/tutors/texts';
 import { leadAnchor } from '@/lib/urls';
@@ -10,7 +11,7 @@ import { WAITLIST_CTA, WAITLIST_SHORT } from './texts';
 
 export function tutorShell(
   tutor: Pick<Tutor, 'archived' | 'availability' | 'nameDative' | 'telegram'>,
-) {
+): Pick<SiteShellProps, 'cta' | 'bottomBar'> {
   if (tutor.archived) {
     return { bottomBar: { showAfter: 'top', hideWhenVisible: 'more' } };
   }

@@ -105,7 +105,13 @@ describe('Header', () => {
     const cta = screen.getByRole('link', { name: 'Встать в лист ожидания' });
 
     await expect.element(cta).toBeVisible();
-    expect(cta.element().textContent).toContain('Лист ожидания');
+    // Видна короткая подпись, полная – только для дикторов.
+    // sr-only браузер считает видимым – отличаем по ширине (у sr-only она 1 px).
+    const visible = [...cta.element().querySelectorAll('span span')].filter(
+      (span) => span.getBoundingClientRect().width > 1,
+    );
+    expect(visible.map((span) => span.textContent)).toEqual(['Лист ожидания']);
+    expect(visible[0]?.getAttribute('aria-hidden')).toBe('true');
     expect(header().scrollWidth).toBeLessThanOrEqual(360);
   });
 });
