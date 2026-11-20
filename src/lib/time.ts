@@ -8,3 +8,8 @@ export const MINSK_TZ = 'Europe/Minsk';
 export function minskYear(epochMs: number): number {
   return Temporal.Instant.fromEpochMilliseconds(epochMs).toZonedDateTimeISO(MINSK_TZ).year;
 }
+
+/** «09:00» → «9:00»: часы в текстах сайта – без ведущего нуля. */
+export function shortTime(time: string): string {
+  return time.replace(/^0(?=\d:)/, '');
+}

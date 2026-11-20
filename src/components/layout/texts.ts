@@ -1,5 +1,6 @@
 import type { Site, Tutor } from '@/content';
 import { fillTemplate } from '@/lib/template';
+import { shortTime } from '@/lib/time';
 
 // Тексты подвала и меню, собранные из данных: ТЗ главной, блоки 0 и 10; docs/data-model.md, `site.json`.
 
@@ -29,12 +30,9 @@ export function footerTexts(
   };
 }
 
-/** «09:00» → «9:00». */
-const hour = (time: string) => time.replace(/^0(?=\d:)/, '');
-
 /** Строка под мессенджерами в мобильном меню. */
 export function responseHoursLine({ from, to }: Site['responseHours']): string {
-  return `Каждый репетитор отвечает сам, обычно с ${hour(from)} до ${hour(to)}`;
+  return `Каждый репетитор отвечает сам, обычно с ${shortTime(from)} до ${shortTime(to)}`;
 }
 
 /** Репетиторы в меню и подвале: без ушедших (docs/data-model.md, `archived`), по `order`. */

@@ -10,3 +10,9 @@ const VOWEL_START = /^[аиоуыэ]/i;
 export function aboutName(namePrepositional: string): string {
   return `${VOWEL_START.test(namePrepositional) ? 'об' : 'о'} ${namePrepositional}`;
 }
+
+/** Перечисление через запятую и «и» перед последним: «Google Meet и Miro», «A, B и C». */
+export function joinWithAnd(items: readonly string[]): string {
+  if (items.length < 2) return items.join('');
+  return `${items.slice(0, -1).join(', ')} и ${items.at(-1) ?? ''}`;
+}

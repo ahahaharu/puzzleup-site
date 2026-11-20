@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { aboutName, capitalize } from './text';
+import { aboutName, capitalize, joinWithAnd } from './text';
 
 describe('capitalize', () => {
   it('uppercases only the first letter', () => {
@@ -19,5 +19,14 @@ describe('aboutName', () => {
     ['Евгении', 'о Евгении'],
   ])('%s → %s', (name, phrase) => {
     expect(aboutName(name)).toBe(phrase);
+  });
+});
+
+describe('joinWithAnd', () => {
+  it('joins the last item with «и»', () => {
+    expect(joinWithAnd([])).toBe('');
+    expect(joinWithAnd(['Miro'])).toBe('Miro');
+    expect(joinWithAnd(['Google Meet', 'Miro'])).toBe('Google Meet и Miro');
+    expect(joinWithAnd(['Zoom', 'Google Meet', 'Miro'])).toBe('Zoom, Google Meet и Miro');
   });
 });
