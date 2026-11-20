@@ -16,6 +16,10 @@ type ChoiceChipProps = Omit<ComponentProps<'input'>, 'type' | 'className' | 'chi
 };
 
 // Рамка 1,5 px – из ДС, в шкале Tailwind такой ширины нет.
+/** Форма чипа выбора – общая с вкладками-фильтрами («выглядят как чипы», ТЗ главной, раздел 2). */
+export const CHOICE_CHIP_SHAPE =
+  'inline-flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-4.5 text-field font-medium whitespace-nowrap select-none';
+
 const TONES = {
   light:
     'border-ink/25 text-ink hover:border-ink/60 has-checked:border-ink has-checked:bg-ink has-checked:text-paper',
@@ -38,7 +42,8 @@ export function ChoiceChip({
   return (
     <label
       className={cn(
-        'relative inline-flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-4.5 text-field font-medium whitespace-nowrap select-none',
+        'relative',
+        CHOICE_CHIP_SHAPE,
         'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus',
         'has-disabled:cursor-not-allowed has-disabled:opacity-40',
         TONES[tone],
