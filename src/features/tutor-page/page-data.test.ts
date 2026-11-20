@@ -1,0 +1,227 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  FIXTURE_ANNA,
+  FIXTURE_IGOR,
+  FIXTURE_SITE,
+  FIXTURE_SUBJECTS,
+  FIXTURE_VERA,
+  fixtureReview,
+  fixtureTutor,
+} from './fixtures';
+import {
+  aboutData,
+  gradeHint,
+  howToStartData,
+  leadData,
+  otherTutors,
+  profileData,
+  sharedSubjects,
+  tutorReviews,
+} from './page-data';
+
+const SUBJECTS = FIXTURE_SUBJECTS;
+const TUTORS = [FIXTURE_ANNA, FIXTURE_IGOR, FIXTURE_VERA];
+
+function profile(tutor = FIXTURE_ANNA, others = otherTutors(tutor, TUTORS, SUBJECTS)) {
+  return profileData(tutor, { subjects: SUBJECTS, others, reviewCount: 2, year: 2026 });
+}
+
+describe('otherTutors', () => {
+  it('keeps tutors who share an active subject, without the current one', () => {
+    expect(otherTutors(FIXTURE_ANNA, TUTORS, SUBJECTS).map((tutor) => tutor.slug)).toEqual([
+      'igor',
+    ]);
+    expect(otherTutors(FIXTURE_IGOR, TUTORS, SUBJECTS).map((tutor) => tutor.slug)).toEqual([
+      'anna',
+      'vera',
+    ]);
+  });
+
+  it('skips archived tutors and shared hidden subjects', () => {
+    const archived = fixtureTutor('olga', { archived: true });
+    const chemist = fixtureTutor('petr', { subjects: [{ id: 'chemistry', from: 7, to: 9 }] });
+    const current = fixtureTutor('ilya', {
+      subjects: [
+        { id: 'math', from: 5, to: 9 },
+        { id: 'chemistry', from: 7, to: 9 },
+      ],
+    });
+    expect(otherTutors(current, [current, archived, chemist], SUBJECTS)).toEqual([]);
+  });
+
+  it('sorts by availability, then by order, and keeps at most three', () => {
+    const tutors = [
+      fixtureTutor('a', { availability: 'full', order: 1 }),
+      fixtureTutor('b', { availability: 'few', order: 2 }),
+      fixtureTutor('c', { availability: 'available', order: 4 }),
+      fixtureTutor('d', { availability: 'available', order: 3 }),
+    ];
+    expect(otherTutors(FIXTURE_IGOR, tutors, SUBJECTS).map((tutor) => tutor.slug)).toEqual([
+      'd',
+      'c',
+      'b',
+    ]);
+  });
+});
+
+describe('sharedSubjects', () => {
+  it('lists the subjects the current tutor shares with the others', () => {
+    expect(sharedSubjects(FIXTURE_IGOR, [FIXTURE_ANNA], SUBJECTS)).toBe('по математике');
+    expect(sharedSubjects(FIXTURE_IGOR, [FIXTURE_ANNA, FIXTURE_VERA], SUBJECTS)).toBe(
+      'по математике и по физике',
+    );
+  });
+});
+
+describe('profileData', () => {
+  it('builds the heading, facts and the provider line', () => {
+    const data = profile(FIXTURE_IGOR);
+    expect(data.subtitle).toBe('репетитор по математике и по физике');
+    expect(data.subjectLines).toEqual(['Математика · 5–⁠11 класс', 'Физика · 7–⁠11 класс']);
+    expect(data.experience).toBe('6\u00a0лет');
+    expect(data.formula).toBe('a² + b² = c²');
+    expect(data.provider).toBe(
+      'Услуги оказывает Примерова Анна Ивановна, плательщик налога на профессиональный доход, УНП 000000000. Оплата занятий – напрямую репетитору.',
+    );
+    expect(data.cta).toEqual({
+      label: 'Записаться к Игорю',
+      href: '/tutors/igor?entry=tutor_profile#lead',
+    });
+    expect(data.alternative).toBeUndefined();
+    expect(data.archivedNotice).toBeUndefined();
+  });
+
+  it('shows only active subjects; without them the subtitle is just «репетитор»', () => {
+    const data = profile(fixtureTutor('x', { subjects: [{ id: 'chemistry', from: 7, to: 9 }] }));
+    expect(data.subtitle).toBe('репетитор');
+    expect(data.subjectLines).toEqual([]);
+    expect(data.formula).toBeUndefined();
+  });
+
+  it('turns the button into the waitlist and offers another tutor when full', () => {
+    const data = profile(fixtureTutor('anna', { availability: 'full' }));
+    expect(data.status).toBe('full');
+    expect(data.cta).toEqual({
+      label: 'Встать в лист ожидания',
+      href: '/tutors/anna?entry=tutor_full#lead',
+    });
+    expect(data.alternative).toEqual({ label: 'Ещё на сайте: Игорь', href: '/tutors/igor' });
+  });
+
+  it('has no alternative button when nobody else teaches the subject', () => {
+    expect(profile(fixtureTutor('anna', { availability: 'full' }), []).alternative).toBeUndefined();
+  });
+
+  it('points an archived page to the other tutor and drops the provider line', () => {
+    const data = profile(fixtureTutor('anna', { archived: true }));
+    expect(data.status).toBe('archived');
+    expect(data.cta).toEqual({ label: 'Выбрать репетитора', href: '/#tutors' });
+    expect(data.provider).toBeUndefined();
+    expect(data.archivedNotice).toEqual({
+      text: 'Анна больше не принимает новых учеников. По математике на сайте есть Игорь – ',
+      link: { label: 'посмотрите его страницу', href: '/tutors/igor' },
+    });
+  });
+
+  it('keeps only the first sentence of the archived notice without another tutor', () => {
+    expect(profile(fixtureTutor('anna', { archived: true }), []).archivedNotice).toEqual({
+      text: 'Анна больше не принимает новых учеников.',
+    });
+  });
+});
+
+describe('aboutData', () => {
+  it('labels the goals and lists the default platforms', () => {
+    expect(aboutData(FIXTURE_IGOR, FIXTURE_SITE)).toEqual({
+      goals: ['Подтянуть оценки', 'Экзамен после 9 класса', 'ЦТ и ЦЭ'],
+      platforms: 'Занятия – Google Meet и Miro',
+    });
+  });
+
+  it('uses the tutor’s own platforms', () => {
+    expect(aboutData({ ...FIXTURE_ANNA, platforms: ['Zoom'] }, FIXTURE_SITE).platforms).toBe(
+      'Занятия – Zoom',
+    );
+  });
+});
+
+describe('tutorReviews', () => {
+  it('keeps the tutor’s reviews, newest first', () => {
+    const reviews = [
+      fixtureReview('old', { date: '2026-09-01' }),
+      fixtureReview('other', { tutorId: 't-igor' }),
+      fixtureReview('new', { date: '2026-10-15' }),
+    ];
+    expect(tutorReviews(FIXTURE_ANNA, reviews, SUBJECTS).map((review) => review.id)).toEqual([
+      'new',
+      'old',
+    ]);
+  });
+});
+
+describe('howToStartData', () => {
+  it('fills the steps from the tutor and site data', () => {
+    const data = howToStartData(FIXTURE_IGOR, FIXTURE_SITE);
+    expect(data.steps.map((step) => step.text)).toEqual([
+      'Оставьте заявку или напишите Игорю в мессенджер – он ответит с 9:00 до 22:00.',
+      '30 минут онлайн, бесплатно. Игорь познакомится с ребёнком и найдёт пробелы. Итог пришлёт сообщением.',
+      '40 BYN за 60 минут, в Google Meet и Miro. Оплата – переводом напрямую репетитору.',
+    ]);
+    expect(data.terms).toBe(
+      'Условия Игоря: перенос без списания – если предупредить не позже чем за 6 часов',
+    );
+    expect(data.school).toBe(
+      'Перед первым занятием Игорь попросит подтвердить, что ребёнок учится в школе (справка или дневник).',
+    );
+  });
+
+  it('uses the pronoun and the tutor’s own terms', () => {
+    const data = howToStartData({ ...FIXTURE_ANNA, terms: 'свои условия' }, FIXTURE_SITE);
+    expect(data.steps[0]?.text).toContain('– она ответит');
+    expect(data.terms).toBe('Условия Анны: свои условия');
+  });
+});
+
+describe('leadData', () => {
+  it('adds the waitlist notice only when the tutor is full', () => {
+    expect(leadData(FIXTURE_ANNA, FIXTURE_SITE).waitlist).toBeUndefined();
+    expect(leadData(FIXTURE_ANNA, FIXTURE_SITE).price).toBe('30 мин · 0 BYN');
+    expect(leadData({ ...FIXTURE_ANNA, availability: 'full' }, FIXTURE_SITE).waitlist).toBe(
+      'Сейчас у Анны нет свободного времени. Оставьте заявку в лист ожидания – Анна напишет, как только место освободится.',
+    );
+  });
+});
+
+describe('gradeHint', () => {
+  it('stays silent for a grade the tutor teaches', () => {
+    expect(gradeHint(FIXTURE_ANNA, 7, TUTORS, SUBJECTS)).toBeNull();
+  });
+
+  it('points to another tutor’s form with the same grade', () => {
+    expect(gradeHint(FIXTURE_ANNA, 10, TUTORS, SUBJECTS)).toEqual({
+      text: 'Анна занимается с 5–⁠9 классами. С 10–⁠11 классом работает Игорь – ',
+      link: { label: 'его страница', href: '/tutors/igor?entry=tutor_more&grade=10#lead' },
+    });
+  });
+
+  it('counts the other tutor’s grades below the tutor’s range', () => {
+    const senior = fixtureTutor('senior', { subjects: [{ id: 'math', from: 8, to: 11 }] });
+    expect(gradeHint(senior, 6, TUTORS, SUBJECTS)?.text).toBe(
+      'Анна занимается с 8–⁠11 классами. С 5–⁠7 классом работает Анна – ',
+    );
+  });
+
+  it('suggests the trial lesson when nobody teaches the grade', () => {
+    expect(gradeHint(FIXTURE_ANNA, 10, [FIXTURE_ANNA, FIXTURE_VERA], SUBJECTS)).toEqual({
+      text: 'Анна занимается с 5–⁠9 классами. 10 класс можно обсудить на пробном занятии.',
+    });
+  });
+
+  it('uses the singular for a single grade', () => {
+    const ninth = fixtureTutor('ninth', { subjects: [{ id: 'math', from: 9, to: 9 }] });
+    expect(gradeHint(ninth, 5, [ninth], SUBJECTS)?.text).toBe(
+      'Анна занимается с 9 классом. 5 класс можно обсудить на пробном занятии.',
+    );
+  });
+});

@@ -66,14 +66,19 @@ export function gradesLabel(from: number, to: number): string {
 }
 
 /**
- * Стаж из года начала преподавания (ТЗ страницы репетитора, раздел 2, `teachingSince`).
- * Пока год – заглушка, строка как в макете: «Стаж [N] лет».
+ * Стаж из года начала преподавания (ТЗ страницы репетитора, раздел 2, `teachingSince`): «4 года».
+ * Пока год – заглушка, значение как в макете: «[N] лет».
  */
-export function experienceLabel(teachingSince: number | string, year: number): string {
-  if (typeof teachingSince !== 'number') return 'Стаж [N] лет';
+export function experienceValue(teachingSince: number | string, year: number): string {
+  if (typeof teachingSince !== 'number') return '[N] лет';
   const years = year - teachingSince;
-  if (years < 1) return 'Стаж меньше года';
-  return `Стаж ${pluralize(years, ['год', 'года', 'лет'])}`;
+  if (years < 1) return 'меньше года';
+  return pluralize(years, ['год', 'года', 'лет']);
+}
+
+/** «Стаж 4 года» – строка карточки. */
+export function experienceLabel(teachingSince: number | string, year: number): string {
+  return `Стаж ${experienceValue(teachingSince, year)}`;
 }
 
 const PRICE = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });

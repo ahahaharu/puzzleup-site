@@ -43,4 +43,10 @@ describe('tutorLeadUrl', () => {
       '/tutors/maxim?entry=subjects&subject=math&goal=ct#lead',
     );
   });
+
+  it('adds the grade when given', () => {
+    expect(tutorLeadUrl('maxim', { entry: 'tutor_more', grade: 10 })).toBe(
+      '/tutors/maxim?entry=tutor_more&grade=10#lead',
+    );
+  });
 });

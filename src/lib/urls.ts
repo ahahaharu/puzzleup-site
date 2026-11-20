@@ -32,16 +32,19 @@ type LeadContext = {
   entry: Entry;
   subject?: string | undefined;
   goal?: Goal | undefined;
+  /** Класс – из подсказки формы о классе другого репетитора (ТЗ страницы репетитора, блок 6). */
+  grade?: number | undefined;
 };
 
 /**
  * Форма на странице репетитора с контекстом в адресе: `/tutors/andrei?entry=tutors#lead`
  * (ТЗ главной, раздел 3: параметры `subject`, `goal`, `entry`; репетитор задан самой страницей).
  */
-export function tutorLeadUrl(slug: string, { entry, subject, goal }: LeadContext): string {
+export function tutorLeadUrl(slug: string, { entry, subject, goal, grade }: LeadContext): string {
   const params = new URLSearchParams({ entry });
   if (subject) params.set('subject', subject);
   if (goal) params.set('goal', goal);
+  if (grade !== undefined) params.set('grade', String(grade));
   return `${tutorUrl(slug)}?${params.toString()}#lead`;
 }
 
