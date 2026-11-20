@@ -15,6 +15,8 @@ import { How } from '@/features/home/how/How';
 import { howSteps } from '@/features/home/how/texts';
 import { situationCards } from '@/features/home/situations/cards';
 import { Situations } from '@/features/home/situations/Situations';
+import { subjectCards } from '@/features/home/subjects/cards';
+import { Subjects } from '@/features/home/subjects/Subjects';
 import { Tutors } from '@/features/home/tutors/Tutors';
 import { countReviews, toTutorCardData } from '@/features/tutors/card-data';
 import { currentYear } from '@/features/tutors/current-year';
@@ -52,6 +54,7 @@ export default async function HomePage() {
         steps={howSteps({ responseHours: site.responseHours, platforms: site.defaultPlatforms })}
         example={trialExample(site.trialExample, tutors)}
       />
+      <Subjects subjects={subjectCards(subjects, tutors)} />
     </SiteShell>
   );
 }
