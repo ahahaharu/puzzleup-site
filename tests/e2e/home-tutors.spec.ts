@@ -18,7 +18,7 @@ test('the block shows every tutor card with a way to sign up', async ({ page }) 
   for (const card of await cards.all()) {
     await expect(card.getByRole('heading', { level: 3 })).toBeVisible();
     await expect(card.getByText(/Есть свободное время|Последние места|Мест нет/)).toBeVisible();
-    await expect(card.getByText(/^\d+(,\d+)? BYN · 60 минут$/)).toBeVisible();
+    await expect(card.getByText(/^\d+(,\d+)?\sBYN · 60\sминут$/)).toBeVisible();
     await expect(
       card.getByRole('link', { name: /^(Записаться к|В лист ожидания к) / }),
     ).toHaveAttribute('href', /^\/tutors\/[a-z0-9-]+\?entry=tutors#lead$/);
