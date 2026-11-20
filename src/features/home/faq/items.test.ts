@@ -25,6 +25,18 @@ describe('tutorsGradesText', () => {
 });
 
 describe('faqItems', () => {
+  it('drops a question whose placeholder has nothing to show', () => {
+    const items = faqItems(
+      [
+        { id: 'grades', question: 'С какими классами?', answer: '{tutorsGrades}.' },
+        { id: 'other', question: 'Вопрос?', answer: 'Ответ.' },
+      ],
+      [{ name: 'Игорь', subjects: [{ id: 'physics', from: 7, to: 11 }] }],
+      SUBJECTS,
+    );
+    expect(items.map((item) => item.id)).toEqual(['other']);
+  });
+
   it('fills the placeholders and keeps other answers as they are', () => {
     const items = faqItems(
       [
