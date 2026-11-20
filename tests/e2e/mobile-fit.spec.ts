@@ -1,17 +1,19 @@
 import { expect, test, type Page } from '@playwright/test';
 
 // Адаптив для всех страниц разом (CLAUDE.md, «Интерфейс»): на 360 px нет горизонтальной
-// прокрутки и текста мельче 14 px. Страницы репетиторов – из ссылок главной, не из списка.
+// прокрутки и текста мельче 14 px. Страницы репетиторов и политик – из ссылок главной, не из списка.
 test.skip(({ javaScriptEnabled }) => !javaScriptEnabled, 'needs JavaScript to read styles');
 
 async function pages(page: Page): Promise<string[]> {
   await page.goto('/');
-  const tutors = await page
-    .locator('a[href^="/tutors/"]')
+  // Страницы репетиторов и документы из подвала (политики).
+  const linked = await page
+    .locator('a[href^="/tutors/"], #footer-documents ~ * a')
     .evaluateAll((links) =>
       links.map((link) => new URL(link.getAttribute('href') ?? '', location.href).pathname),
     );
-  return ['/', ...new Set(tutors)];
+  // Страница 404 по ссылкам не найти – её адрес задан явно.
+  return ['/', ...new Set(linked), '/no-such-page'];
 }
 
 for (const width of [360, 768, 1024, 1440]) {

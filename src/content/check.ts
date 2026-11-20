@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 
+import { markdownHeadings } from '@/lib/headings';
 import { templateKeys } from '@/lib/template';
 
 import { findPlaceholders } from './placeholder';
@@ -298,6 +299,27 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
     if (!legal.some((doc) => doc.slug === slug)) {
       report(`content/legal/${slug}.mdx`, '', 'file is missing');
     }
+  }
+  for (const doc of legal) {
+    checkLegalHeadings(doc, report);
+  }
+}
+
+// Разметка в заголовке попала бы в оглавление знаками `**`, а якорь H2 считается из текста.
+const HEADING_MARKUP = /[*_`[\]<>{}\\]/;
+
+/** Оглавление и якоря политики строятся из заголовков H2 (ТЗ страницы репетитора, раздел 7). */
+function checkLegalHeadings(doc: LegalDoc, report: Report) {
+  const seen = new Set<string>();
+  for (const { id, title } of markdownHeadings(doc.content)) {
+    if (HEADING_MARKUP.test(title)) {
+      report(doc.file, 'content', `heading «${title}» must be plain text`);
+    } else if (!id) {
+      report(doc.file, 'content', `heading «${title}» needs letters or digits for its anchor`);
+    } else if (seen.has(id)) {
+      report(doc.file, 'content', `heading «${title}» repeats the anchor #${id}`);
+    }
+    seen.add(id);
   }
 }
 

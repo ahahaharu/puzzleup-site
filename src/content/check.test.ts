@@ -326,6 +326,28 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('requires plain, distinct policy headings for the table of contents', () => {
+    const privacy: SourceFile = {
+      file: 'content/legal/privacy.mdx',
+      data: {
+        title: 'Политика',
+        effectiveDate: '2026-01-01',
+        content: [
+          '## 1. Общие положения',
+          '## 2. **Важное**',
+          '## 3. – «»',
+          '## 4. Общие положения',
+        ].join('\n\n'),
+      },
+    };
+    const base = raw();
+    expect(messages(raw({ legal: [privacy, ...base.legal.slice(1)] }))).toEqual([
+      'content/legal/privacy.mdx › content: heading «2. **Важное**» must be plain text',
+      'content/legal/privacy.mdx › content: heading «3. – «»» needs letters or digits for its anchor',
+      'content/legal/privacy.mdx › content: heading «4. Общие положения» repeats the anchor #obshchie-polozheniya',
+    ]);
+  });
+
   it('allows only known template placeholders', () => {
     const faq = [{ id: 'q', question: 'Вопрос {tutorsGrades}?', answer: '{tutorsGrade}.' }];
     expect(messages(raw({ faq: { file: 'content/faq.json', data: faq } }))).toEqual([

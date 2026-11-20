@@ -1,6 +1,12 @@
 import 'server-only';
 
-import { formatIssues, validateContent, type LegalDoc, type Tutor } from './check';
+import {
+  formatIssues,
+  validateContent,
+  type LegalDoc,
+  type REQUIRED_LEGAL,
+  type Tutor,
+} from './check';
 import { readContent } from './raw';
 
 /**
@@ -11,6 +17,8 @@ import { readContent } from './raw';
 
 export type TutorEntry = Tutor & { mdx: string };
 export type LegalEntry = LegalDoc & { mdx: string };
+/** Обязательные политики: `privacy`, `cookies`. */
+export type LegalSlug = (typeof REQUIRED_LEGAL)[number];
 
 const { raw, mdx } = readContent();
 const result = validateContent(raw);

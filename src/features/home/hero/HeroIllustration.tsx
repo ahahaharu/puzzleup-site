@@ -1,5 +1,11 @@
 import { useId } from 'react';
 
+import {
+  BOTTOM_LEFT_PIECE,
+  BOTTOM_RIGHT_PIECE,
+  TOP_LEFT_PIECE,
+  TOP_RIGHT_PIECE,
+} from '@/components/ui/puzzle-square';
 import { cn } from '@/lib/cn';
 
 // Иллюстрация первого экрана: квадрат из четырёх деталей пазла из разных тетрадей (ТЗ главной,
@@ -12,16 +18,6 @@ import { cn } from '@/lib/cn';
 
 export const HERO_ILLUSTRATION_LABEL =
   'Пазл из кусочков разных тетрадей: теорема Пифагора в клетку, парабола на миллиметровке, задача на скорость в линейку и круг с формулой длины окружности, который встаёт на место';
-
-/** Четвёртая деталь: правый нижний угол квадрата с пазами слева и сверху. */
-const ACCENT_PIECE =
-  'M210,210 L282,210 C278,198 284,184 300,184 C316,184 322,198 318,210 L390,210 L390,380 A10,10 0 0 1 380,390 L210,390 L210,318 C198,322 184,316 184,300 C184,284 198,278 210,282 Z';
-const CELL_PIECE =
-  'M30,40 A10,10 0 0 1 40,30 L210,30 L210,102 C222,98 236,104 236,120 C236,136 222,142 210,138 L210,210 L138,210 C142,222 136,236 120,236 C104,236 98,222 102,210 L30,210 Z';
-const MM_PIECE =
-  'M210,30 L380,30 A10,10 0 0 1 390,40 L390,210 L318,210 C322,198 316,184 300,184 C284,184 278,198 282,210 L210,210 L210,138 C222,142 236,136 236,120 C236,104 222,98 210,102 Z';
-const LINED_PIECE =
-  'M30,210 L102,210 C98,222 104,236 120,236 C136,236 142,222 138,210 L210,210 L210,282 C198,278 184,284 184,300 C184,316 198,322 210,318 L210,390 L40,390 A10,10 0 0 1 30,380 Z';
 
 // Цвет тени – стилем: атрибут flood-color не принимает var(), а утилиты для него в Tailwind нет.
 const INK = { floodColor: 'var(--color-ink)' };
@@ -81,16 +77,16 @@ export function HeroIllustration({ className }: { className?: string }) {
       {/* Пустое место, куда встаёт акцентная деталь. Гаснет к концу анимации: пунктир выходит
           за контур и иначе виден рваной каймой вокруг вставшей детали. */}
       <path
-        d={ACCENT_PIECE}
+        d={BOTTOM_RIGHT_PIECE}
         strokeOpacity="0.4"
         strokeDasharray="5 4"
         className="animate-piece-fade fill-kraft-shadow stroke-ink stroke-[1.6] opacity-0 md:stroke-[1.2]"
       />
 
       <g filter={`url(#${ref('paper')})`}>
-        <path d={CELL_PIECE} fill={`url(#${ref('cell')})`} />
-        <path d={MM_PIECE} fill={`url(#${ref('mm')})`} />
-        <path d={LINED_PIECE} fill={`url(#${ref('lined')})`} />
+        <path d={TOP_LEFT_PIECE} fill={`url(#${ref('cell')})`} />
+        <path d={TOP_RIGHT_PIECE} fill={`url(#${ref('mm')})`} />
+        <path d={BOTTOM_LEFT_PIECE} fill={`url(#${ref('lined')})`} />
       </g>
 
       <g className="font-hand italic">
@@ -164,11 +160,11 @@ export function HeroIllustration({ className }: { className?: string }) {
         {/* Акцентная деталь: круг и длина окружности. Летит с тенью и встаёт на место. */}
         <g className="origin-center animate-piece-land transform-fill">
           <path
-            d={ACCENT_PIECE}
+            d={BOTTOM_RIGHT_PIECE}
             filter={`url(#${ref('flying')})`}
             className="animate-piece-fade fill-accent opacity-0"
           />
-          <path d={ACCENT_PIECE} filter={`url(#${ref('paper')})`} className="fill-accent" />
+          <path d={BOTTOM_RIGHT_PIECE} filter={`url(#${ref('paper')})`} className="fill-accent" />
           <g
             fill="none"
             strokeLinejoin="round"
