@@ -58,9 +58,9 @@ type CardContext = {
   year: number;
 };
 
-/** «5–9 класс», «9 класс»; число и слово не разрываются. */
+/** «5–9 класс», «9 класс»; диапазон и слово не разрываются (после тире – невидимая связка U+2060). */
 export function gradesLabel(from: number, to: number): string {
-  return from === to ? `${from}\u00a0класс` : `${from}–${to}\u00a0класс`;
+  return from === to ? `${from}\u00a0класс` : `${from}–\u2060${to}\u00a0класс`;
 }
 
 /**

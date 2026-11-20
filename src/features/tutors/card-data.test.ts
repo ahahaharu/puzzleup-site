@@ -10,7 +10,7 @@ import {
 
 describe('gradesLabel', () => {
   it('shows a range or a single grade', () => {
-    expect(gradesLabel(5, 9)).toBe('5–9\u00a0класс');
+    expect(gradesLabel(5, 9)).toBe('5–\u20609\u00a0класс');
     expect(gradesLabel(9, 9)).toBe('9\u00a0класс');
   });
 });
@@ -82,7 +82,10 @@ describe('toTutorCardData', () => {
 
   it('lists only active subjects with grades', () => {
     expect(card.subjectIds).toEqual(['math', 'chemistry']);
-    expect(card.subjectLines).toEqual(['Математика · 5–9\u00a0класс', 'Химия · 8\u00a0класс']);
+    expect(card.subjectLines).toEqual([
+      'Математика · 5–\u20609\u00a0класс',
+      'Химия · 8\u00a0класс',
+    ]);
   });
 
   it('joins experience and education into one line', () => {
