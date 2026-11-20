@@ -22,7 +22,7 @@ describe('aboutTutors', () => {
       name: 'Андрей',
       nameDative: 'Андрею',
       photo: undefined,
-      meta: '5–⁠9 класс · 40 BYN',
+      meta: '5–\u20609\u00a0класс · 40\u00a0BYN',
       href: '/tutors/andrei',
       leadHref: '/tutors/andrei?entry=about#lead',
       telegram: 'andrei_tutor',

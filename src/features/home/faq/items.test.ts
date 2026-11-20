@@ -11,7 +11,7 @@ const TUTORS = [
 describe('tutorsGradesText', () => {
   it('lists every tutor with their grades', () => {
     expect(tutorsGradesText(TUTORS, SUBJECTS)).toBe(
-      'Андрей – с 5–⁠9 классом, Максим – с 5–⁠11 классом',
+      'Андрей – с 5–\u20609\u00a0классом, Максим – с 5–\u206011\u00a0классом',
     );
   });
 
@@ -20,7 +20,7 @@ describe('tutorsGradesText', () => {
       { name: 'Анна', subjects: [{ id: 'math', from: 9, to: 9 }] },
       { name: 'Игорь', subjects: [{ id: 'physics', from: 7, to: 11 }] },
     ];
-    expect(tutorsGradesText(tutors, SUBJECTS)).toBe('Анна – с 9 классом');
+    expect(tutorsGradesText(tutors, SUBJECTS)).toBe('Анна – с 9\u00a0классом');
   });
 });
 
@@ -47,7 +47,7 @@ describe('faqItems', () => {
       SUBJECTS,
     );
     expect(items.map((item) => item.answer)).toEqual([
-      'Андрей – с 5–⁠9 классом, Максим – с 5–⁠11 классом.',
+      'Андрей – с 5–\u20609\u00a0классом, Максим – с 5–\u206011\u00a0классом.',
       'Ответ.',
     ]);
   });

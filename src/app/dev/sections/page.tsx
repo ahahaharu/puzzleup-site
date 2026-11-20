@@ -23,7 +23,7 @@ const subjects = (count: number): SubjectCardData[] =>
   NAMES.slice(0, count).map((title, index) => ({
     id: `subject-${index + 1}`,
     title,
-    grades: '5–11 класс',
+    grades: '5–11\u00a0класс',
     topics: ['Тема первая', 'тема вторая', 'тема третья', 'ЦТ и ЦЭ'],
     formula: 'x² − 5x + 6 = 0',
     paper: PAPERS[index % PAPERS.length] ?? 'cell',

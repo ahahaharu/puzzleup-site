@@ -15,7 +15,7 @@ export function tutorsGradesText(
   return tutors
     .flatMap((tutor) => {
       const grades = tutorGrades(tutor, subjects);
-      return grades ? [`${tutor.name} – с ${gradesRange(grades)} классом`] : [];
+      return grades ? [`${tutor.name} – с ${gradesRange(grades)}\u00a0классом`] : [];
     })
     .join(', ');
 }

@@ -1,6 +1,6 @@
 import type { Subject, Tutor } from '@/content';
-import { formatPrice } from '@/features/tutors/card-data';
-import { gradesRange, tutorGrades } from '@/features/tutors/grades';
+import { formatPrice, gradesLabel } from '@/features/tutors/card-data';
+import { tutorGrades } from '@/features/tutors/grades';
 import { CURRENCY } from '@/features/tutors/texts';
 import { tutorLeadUrl, tutorPhotoUrl, tutorUrl } from '@/lib/urls';
 
@@ -36,13 +36,13 @@ export function aboutTutors(
   if (tutors.length > ABOUT_CARDS_LIMIT) return [];
   return tutors.map((tutor) => {
     const grades = tutorGrades(tutor, subjects);
-    const price = `${formatPrice(tutor.price)} ${CURRENCY}`;
+    const price = `${formatPrice(tutor.price)}\u00a0${CURRENCY}`;
     return {
       slug: tutor.slug,
       name: tutor.name,
       nameDative: tutor.nameDative,
       photo: tutor.photo === undefined ? undefined : tutorPhotoUrl(tutor.photo),
-      meta: grades ? `${gradesRange(grades)} класс · ${price}` : price,
+      meta: grades ? `${gradesLabel(grades.from, grades.to)} · ${price}` : price,
       href: tutorUrl(tutor.slug),
       leadHref: tutorLeadUrl(tutor.slug, { entry: 'about' }),
       telegram: tutor.telegram,

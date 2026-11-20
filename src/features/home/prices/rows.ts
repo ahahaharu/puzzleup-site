@@ -1,6 +1,6 @@
 import type { Subject, Tutor } from '@/content';
-import { formatPrice } from '@/features/tutors/card-data';
-import { gradesRange, tutorGrades } from '@/features/tutors/grades';
+import { formatPrice, gradesLabel } from '@/features/tutors/card-data';
+import { tutorGrades } from '@/features/tutors/grades';
 import { tutorUrl } from '@/lib/urls';
 
 // Строки карточки «Занятие» – ТЗ главной, блок 7: на каждого репетитора своя цена из `price`.
@@ -28,7 +28,7 @@ export function priceRows(
     return {
       slug: tutor.slug,
       name: tutor.name,
-      grades: grades ? `${gradesRange(grades)} класс` : undefined,
+      grades: grades ? gradesLabel(grades.from, grades.to) : undefined,
       price: formatPrice(tutor.price),
       href: tutorUrl(tutor.slug),
     };

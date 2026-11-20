@@ -76,7 +76,7 @@ describe('reviewColumns', () => {
 
     expect(columns.map((column) => column.tutor.name)).toEqual(['Андрей', 'Максим']);
     expect(columns[0]).toMatchObject({
-      meta: 'Математика · 5–⁠9 класс · 2 отзыва',
+      meta: 'Математика · 5–\u20609\u00a0класс · 2\u00a0отзыва',
       allLabel: 'Все отзывы об Андрее',
       allHref: '/tutors/andrei#reviews',
       review: {

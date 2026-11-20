@@ -17,11 +17,17 @@ describe('priceRows', () => {
       SUBJECTS,
     );
     expect(rows).toEqual([
-      { slug: 'andrei', name: 'Андрей', grades: '5–⁠9 класс', price: '40', href: '/tutors/andrei' },
+      {
+        slug: 'andrei',
+        name: 'Андрей',
+        grades: '5–\u20609\u00a0класс',
+        price: '40',
+        href: '/tutors/andrei',
+      },
       {
         slug: 'maxim',
         name: 'Максим',
-        grades: '5–⁠11 класс',
+        grades: '5–\u206011\u00a0класс',
         price: '37,5',
         href: '/tutors/maxim',
       },

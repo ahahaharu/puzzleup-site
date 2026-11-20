@@ -21,7 +21,7 @@ const DRAFTS = [
 export const FIXTURE_REVIEW_COLUMNS: ReviewColumn[] = DRAFTS.map(
   ([name, prepositional, about, text], index) => ({
     tutor: { slug: `example-${index + 1}`, name, href: `/tutors/example-${index + 1}` },
-    meta: `Математика · 5–9 класс · ${index + 3} отзыва`,
+    meta: `Математика · 5–9\u00a0класс · ${index + 3}\u00a0отзыва`,
     review: {
       id: `review-${index + 1}`,
       signature: 'Ольга, мама ученика 7 класса',
