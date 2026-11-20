@@ -1,51 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { currentSection } from './active-section';
 import type { NavLink } from './nav';
 import { NavAnchor } from './NavAnchor';
+import { useActiveSection } from './use-active-section';
 
 // Навигация шапки на десктопе – ТЗ главной, раздел 3 и блок 0; макет X-header-d.
-
-/**
- * Линия, до которой должен дойти верх блока, – отступ якорей `scroll-padding-top` (высота шапки):
- * после перехода по пункту подсвечен именно он.
- */
-function probeLine() {
-  return parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) + 1;
-}
-
-function useActiveSection(enabled: boolean) {
-  const [active, setActive] = useState<string>();
-
-  useEffect(() => {
-    if (!enabled) return;
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      const sections = Array.from(
-        document.querySelectorAll<HTMLElement>('main section[id]'),
-        (section) => ({ id: section.id, top: section.getBoundingClientRect().top }),
-      );
-      setActive(currentSection(sections, probeLine()));
-    };
-    const schedule = () => {
-      frame ||= requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-    };
-  }, [enabled]);
-
-  return active;
-}
 
 type HeaderNavProps = {
   links: readonly NavLink[];
@@ -54,7 +13,7 @@ type HeaderNavProps = {
 };
 
 export function HeaderNav({ links, spy }: HeaderNavProps) {
-  const active = useActiveSection(spy);
+  const active = useActiveSection(spy ? 'main section[id]' : null);
 
   return (
     <nav aria-label="Основная" className="hidden lg:block">
