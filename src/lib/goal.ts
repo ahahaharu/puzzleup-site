@@ -11,7 +11,7 @@ export type Goal = z.infer<typeof goalSchema>;
 /** Подписи целей – ТЗ главной, блок 9, поле «Цель»; те же чипы – «С чем помогаю» на странице репетитора. */
 export const GOAL_LABELS: Record<Goal, string> = {
   grades: 'Подтянуть оценки',
-  exam9: 'Экзамен после 9 класса',
+  exam9: 'Экзамен после 9\u00a0класса',
   ct: 'ЦТ и ЦЭ',
   olymp: 'Олимпиады',
 };

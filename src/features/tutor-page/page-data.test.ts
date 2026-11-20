@@ -136,7 +136,7 @@ describe('profileData', () => {
 describe('aboutData', () => {
   it('labels the goals and lists the default platforms', () => {
     expect(aboutData(FIXTURE_IGOR, FIXTURE_SITE)).toEqual({
-      goals: ['Подтянуть оценки', 'Экзамен после 9 класса', 'ЦТ и ЦЭ'],
+      goals: ['Подтянуть оценки', 'Экзамен после 9\u00a0класса', 'ЦТ и ЦЭ'],
       platforms: 'Занятия – Google Meet и Miro',
     });
   });
@@ -171,7 +171,7 @@ describe('howToStartData', () => {
       '40 BYN за 60 минут, в Google Meet и Miro. Оплата – переводом напрямую репетитору.',
     ]);
     expect(data.terms).toBe(
-      'Условия Игоря: перенос без списания – если предупредить не позже чем за 6 часов',
+      'Условия Игоря: перенос без списания – если предупредить не позже чем за 6 часов.',
     );
     expect(data.school).toBe(
       'Перед первым занятием Игорь попросит подтвердить, что ребёнок учится в школе (справка или дневник).',
@@ -181,7 +181,10 @@ describe('howToStartData', () => {
   it('uses the pronoun and the tutor’s own terms', () => {
     const data = howToStartData({ ...FIXTURE_ANNA, terms: 'свои условия' }, FIXTURE_SITE);
     expect(data.steps[0]?.text).toContain('– она ответит');
-    expect(data.terms).toBe('Условия Анны: свои условия');
+    expect(data.terms).toBe('Условия Анны: свои условия.');
+    expect(howToStartData({ ...FIXTURE_ANNA, terms: 'с точкой.' }, FIXTURE_SITE).terms).toBe(
+      'Условия Анны: с точкой.',
+    );
   });
 });
 

@@ -115,8 +115,9 @@ export function startSteps({
   ];
 }
 
+/** Условия – самостоятельное предложение рядом со строкой о школе: точка в конце, если её нет. */
 export const termsLine = (nameGenitive: string, terms: string) =>
-  `Условия ${nameGenitive}: ${terms}`;
+  `Условия ${nameGenitive}: ${terms}${/[.!?]$/.test(terms) ? '' : '.'}`;
 
 export const schoolLine = (name: string) =>
   `Перед первым занятием ${name} попросит подтвердить, что ребёнок учится в школе (справка или дневник).`;
