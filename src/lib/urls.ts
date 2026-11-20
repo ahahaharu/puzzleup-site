@@ -44,3 +44,8 @@ export function tutorLeadUrl(slug: string, { entry, subject, goal }: LeadContext
   if (goal) params.set('goal', goal);
   return `${tutorUrl(slug)}?${params.toString()}#lead`;
 }
+
+/** Исходник фото репетитора из `public/tutors/` – его размеры и форматы делает next/image. */
+export function tutorPhotoUrl(fileName: string): string {
+  return `/tutors/${encodeURIComponent(fileName)}`;
+}
