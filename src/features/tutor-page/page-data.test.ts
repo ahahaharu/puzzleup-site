@@ -257,7 +257,7 @@ describe('tutorPageData', () => {
   it('keeps the regular order and fills every block', () => {
     const data = tutorPageData(FIXTURE_ANNA, context);
     expect(data.moreFirst).toBe(false);
-    expect(data.reviews.title).toBe('Отзывы об Анне · 1');
+    expect(data.reviews.title).toBe('Отзывы об Анне\u00a0·\u00a01');
     expect(data.outside.paragraphs).toEqual(['Собираю пазлы.', 'В школе не любила дроби.']);
     expect(data.how).toBeDefined();
     expect(data.lead?.waitlist).toBeUndefined();

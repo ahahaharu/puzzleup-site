@@ -33,6 +33,7 @@ export function LeadSection({ lead, children }: LeadSectionProps) {
           <ol className="flex flex-col gap-3.5">
             {leadPoints(lead.name).map((point, index) => (
               <li key={point} className="flex items-baseline gap-3.5">
+                {/* Номер 22 px и пункт 17 px – из макета T-6-form. */}
                 <span
                   aria-hidden="true"
                   className="font-hand text-[1.375rem] text-accent-text italic"
@@ -62,9 +63,8 @@ export function LeadSection({ lead, children }: LeadSectionProps) {
           />
           <div className="flex flex-col gap-5">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <h3 className="font-display text-[1.375rem] leading-tight font-medium">
-                {FORM_TITLE}
-              </h3>
+              <h3 className="font-display text-h3">{FORM_TITLE}</h3>
+              {/* Spectral Italic 18 px – ТЗ главной, блок 9. */}
               <p className="font-hand text-[1.125rem] text-accent-light italic">{lead.price}</p>
             </div>
             {/* Репетитор задан страницей, снять его нельзя (ТЗ главной, блок 9, поля формы). */}

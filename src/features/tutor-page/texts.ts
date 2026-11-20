@@ -71,7 +71,7 @@ export const OUTSIDE_TITLE = 'Вне занятий';
 // --- 4. Отзывы ---
 
 export const reviewsTitle = (namePrepositional: string, count: number) =>
-  `Отзывы ${aboutName(namePrepositional)} · ${count}`;
+  `Отзывы ${aboutName(namePrepositional)}\u00a0·\u00a0${count}`;
 export const SHOW_MORE = 'Показать ещё';
 
 // --- 5. Как начать ---
@@ -135,7 +135,7 @@ export const leadPoints = (name: string) => [
 export const leadMessengers = (nameDative: string) =>
   `Не хотите заполнять форму? Напишите ${nameDative}`;
 
-export const FORM_TITLE = 'Недостающая деталь – здесь';
+export const FORM_TITLE = 'Недостающая деталь\u00a0–\u00a0здесь';
 
 /** «30 мин · 0 BYN» – цена пробного занятия из `site.json`. */
 export const formPrice = (trialPrice: string) => `30${NBSP}мин · ${trialPrice}${NBSP}BYN`;

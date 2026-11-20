@@ -25,7 +25,7 @@ export function Outside({ outside }: { outside: OutsideData }) {
             viewBox="0 0 120 120"
             aria-hidden="true"
             focusable="false"
-            className="absolute top-5 right-7 size-16 rotate-8 text-ink/45"
+            className="absolute top-3 right-7 size-16 rotate-8 text-ink/45 lg:top-5"
           >
             <path
               d={PUZZLE_PIECE_PATH}
@@ -37,11 +37,12 @@ export function Outside({ outside }: { outside: OutsideData }) {
           </svg>
           <h2
             id="outside-title"
-            className="mb-3 font-hand text-[1.625rem] leading-9 text-ink italic"
+            className="mb-3 pr-16 font-hand text-[1.625rem] leading-9 text-ink italic"
           >
             {OUTSIDE_TITLE}
           </h2>
-          <div className="flex flex-col gap-3 pr-14 font-hand text-[1.125rem] leading-9 text-ink-2 italic lg:pr-16 lg:text-[1.25rem]">
+          {/* Заголовок 26 px, текст 18 / 20 px – из ТЗ; набросок стоит над первой строкой, отступ справа – только у заголовка. */}
+          <div className="flex flex-col gap-3 font-hand text-[1.125rem] leading-9 text-ink-2 italic lg:text-[1.25rem]">
             {outside.paragraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}

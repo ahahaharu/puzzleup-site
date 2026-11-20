@@ -29,6 +29,7 @@ export function HowToStart({ how }: { how: HowToStartData }) {
                 />
               )}
               <h3 className="font-display text-h3 text-ink">{step.title}</h3>
+              {/* 17 px и межстрочный 1,55 – из макета T-5-how. */}
               <p className="text-[1.0625rem] leading-[1.55] text-ink-2">{step.text}</p>
             </li>
           ))}

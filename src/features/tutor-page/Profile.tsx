@@ -104,7 +104,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
               </ul>
             )}
 
-            <dl className="col-span-2 grid grid-cols-2 gap-x-8 lg:flex lg:gap-x-10">
+            <dl className="col-span-2 flex gap-x-8 lg:gap-x-10">
               {[
                 [FACT_EXPERIENCE, profile.experience],
                 [FACT_EDUCATION, profile.education],
@@ -150,6 +150,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
               </p>
             )}
             <p className="col-span-2 flex items-start gap-2.5 font-hand text-ink-2 italic">
+              {/* Кавычка Spectral 48 px и межстрочный 0,8 – из макета T-1-profile. */}
               <span aria-hidden="true" className="text-[3rem] leading-[0.8] text-accent">
                 «
               </span>
@@ -158,6 +159,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
 
             {!archived && (
               <p className="col-span-2 flex flex-col gap-0.5">
+                {/* Цена – Golos 600 20 px, из макета T-1-profile. */}
                 <span className="text-[1.25rem] font-semibold text-ink">
                   {`${profile.price} ${CURRENCY}`}{' '}
                   <span className="font-normal text-ink-muted">· {LESSON_LENGTH}</span>
@@ -183,8 +185,12 @@ export function Profile({ profile }: { profile: ProfileData }) {
         // Одна пометка на полях – формула предмета; от 1280 px, где справа от текста есть поле.
         <MarginNote
           size="sm"
-          opacity={0.3}
-          className="absolute top-37.5 right-16 -z-10 -rotate-4 max-xl:hidden"
+          opacity={0.35}
+          className={cn(
+            'absolute right-16 -z-10 -rotate-4 max-xl:hidden',
+            // Под плашкой ушедшего – ниже, чтобы не уйти под неё.
+            profile.archivedNotice ? 'top-72' : 'top-37.5',
+          )}
         >
           {profile.formula}
         </MarginNote>

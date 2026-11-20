@@ -6,6 +6,7 @@ import { cn } from '@/lib/cn';
 // Плашка на kraft – ушедший репетитор над профилем и лист ожидания над формой (ТЗ страницы
 // репетитора, раздел 5); макеты T-S-archived, T-S-formfull, TM-S-*.
 
+// Текст 16 px на телефоне и 18 px на десктопе – из макетов T-S-archived и TM-S-archived.
 export function Notice({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div

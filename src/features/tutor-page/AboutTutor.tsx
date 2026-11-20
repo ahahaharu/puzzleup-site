@@ -30,9 +30,7 @@ export function AboutTutor({ about, children }: AboutTutorProps) {
         <div className="col-span-full lg:col-span-4">
           {/* Отступ сверху – под сжатой шапкой 72 px. */}
           <div className="rounded-card border border-ink/12 bg-card p-5 shadow-paper lg:sticky lg:top-28 lg:p-6">
-            <h3 className="font-display text-[1.1875rem] leading-tight font-medium text-ink lg:text-[1.25rem]">
-              {HELPS_TITLE}
-            </h3>
+            <h3 className="font-display text-h3 text-ink">{HELPS_TITLE}</h3>
             <ul className="mt-4 flex flex-wrap gap-2">
               {about.goals.map((goal) => (
                 <li
