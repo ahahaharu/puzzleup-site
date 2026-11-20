@@ -26,6 +26,7 @@ const NO_GUARANTEES = 'no guarantees of results';
 
 const WORDING: readonly Rule[] = [
   { pattern: word('мы'), message: 'the site never speaks as «мы»' },
+  { pattern: word('(?:нас|нам|нами)'), message: 'the site never speaks as «мы»' },
   {
     pattern: forms('наш', ['', 'а', 'е', 'и', 'его', 'ей', 'ему', 'им', 'ими', 'ем', 'у', 'их']),
     message: 'the site never speaks as «наш»',
