@@ -13,6 +13,8 @@ import { Hero } from '@/features/home/hero/Hero';
 import { heroBadge } from '@/features/home/hero/hero-badge';
 import { How } from '@/features/home/how/How';
 import { howSteps } from '@/features/home/how/texts';
+import { Prices } from '@/features/home/prices/Prices';
+import { priceRows } from '@/features/home/prices/rows';
 import { situationCards } from '@/features/home/situations/cards';
 import { Situations } from '@/features/home/situations/Situations';
 import { subjectCards } from '@/features/home/subjects/cards';
@@ -55,6 +57,7 @@ export default async function HomePage() {
         example={trialExample(site.trialExample, tutors)}
       />
       <Subjects subjects={subjectCards(subjects, tutors)} />
+      <Prices prices={site.prices} rows={priceRows(tutors, subjects)} />
     </SiteShell>
   );
 }
