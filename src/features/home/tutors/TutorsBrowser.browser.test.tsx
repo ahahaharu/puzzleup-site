@@ -3,6 +3,7 @@ import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
 
 import { FIXTURE_SUBJECTS, FIXTURE_TUTORS } from '@/features/tutors/fixtures';
+import { TutorCard } from '@/features/tutors/TutorCard';
 
 import { filterTabs } from './filter';
 import { TutorsBrowser } from './TutorsBrowser';
@@ -140,6 +141,23 @@ describe('TutorsBrowser', () => {
     // Карточка – 85 % ширины экрана.
     const card = box.querySelector('li');
     expect(card?.getBoundingClientRect().width).toBeCloseTo(window.innerWidth * 0.85, 0);
+  });
+
+  it('scrolls the ribbon of real cards without scrolling the page sideways', async () => {
+    const list = FIXTURE_TUTORS.slice(0, 3).map((tutor) => ({
+      id: tutor.id,
+      subjectIds: tutor.subjectIds,
+      card: <TutorCard tutor={tutor} />,
+    }));
+    const screen = await render(
+      <div className="page-container">
+        <TutorsBrowser items={list} tabs={filterTabs(FIXTURE_SUBJECTS, list)} />
+      </div>,
+    );
+
+    await expect.element(screen.getByRole('region', { name: 'Репетиторы' })).toBeVisible();
+    // Абсолютные детали карточек (скотч, скрытый текст) не выходят за обрезку ленты.
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(window.innerWidth);
   });
 
   it('stacks one or two cards in a column without a ribbon', async () => {

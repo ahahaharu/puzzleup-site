@@ -118,8 +118,10 @@ export function TutorsView({
         aria-label={ribbon ? LIST_LABEL : undefined}
         tabIndex={ribbon ? 0 : undefined}
         className={cn(
+          // relative – обрезка ленты держит и абсолютные детали карточек (скотч, скрытый текст),
+          // иначе они растягивают страницу вбок.
           layout === 'grid' &&
-            '-mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 md:mx-0 md:overflow-visible md:px-0',
+            'relative -mx-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 md:mx-0 md:overflow-visible md:px-0',
           tabs.length > 0 ? 'mt-6 lg:mt-8' : 'mt-6 lg:mt-10',
         )}
       >
