@@ -10,6 +10,8 @@ import { EFFECTIVE_FROM, TOC_TITLE } from './texts';
 // текста до 720 px, фон paper без клетки – клетка мешает читать. Оглавление на десктопе – слева
 // и закреплено, на телефоне – свёрнутый `<details>` над текстом. Без разделов оглавления нет.
 
+export const LEGAL_TITLE_ID = 'legal-title';
+
 type LegalPageProps = {
   title: string;
   /** «1 декабря 2026» или заглушка `[дата]`; `dateTime` – только у настоящей даты. */
@@ -23,7 +25,7 @@ export function LegalPage({ title, effectiveDate, headings, children }: LegalPag
   const hasToc = headings.length > 0;
 
   return (
-    <section id="legal" aria-labelledby="legal-title" className="bg-paper">
+    <section id="legal" aria-labelledby={LEGAL_TITLE_ID} className="bg-paper">
       <div className="page-container py-8 lg:flex lg:justify-center lg:gap-16 lg:py-16">
         {hasToc && (
           <aside className="hidden w-60 flex-none lg:block">
@@ -49,7 +51,7 @@ export function LegalPage({ title, effectiveDate, headings, children }: LegalPag
           )}
           {/* H1 – Unbounded 700, 40 px, на телефоне 30 px (макет). */}
           <h1
-            id="legal-title"
+            id={LEGAL_TITLE_ID}
             className="font-display text-[1.875rem] leading-[1.1] font-bold tracking-[-0.02em] text-ink lg:text-[2.5rem]"
           >
             {title}

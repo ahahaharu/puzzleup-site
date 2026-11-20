@@ -3,16 +3,14 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { SiteShell } from '@/components/layout/SiteShell';
-import { getLegal } from '@/content';
+import { getLegal, type LegalSlug } from '@/content';
 
-import { LegalPage } from './LegalPage';
+import { LEGAL_TITLE_ID, LegalPage } from './LegalPage';
 import { legalPageData } from './page-data';
 import { legalComponents } from './prose';
 
 // Маршруты `/privacy` и `/cookies` – один шаблон (ТЗ страницы репетитора, раздел 7). Страницы
 // статические и индексируются; файлы политик обязательны (`content:check`).
-
-export type LegalSlug = 'privacy' | 'cookies';
 
 export function legalMetadata(slug: LegalSlug): Metadata {
   const doc = getLegal(slug);
@@ -25,7 +23,8 @@ export function LegalRoute({ slug }: { slug: LegalSlug }) {
   const data = legalPageData(doc);
 
   return (
-    <SiteShell>
+    // Нижняя панель – когда заголовок ушёл вверх, как после первого экрана главной.
+    <SiteShell bottomBar={{ showAfter: LEGAL_TITLE_ID, hideWhenVisible: LEGAL_TITLE_ID }}>
       <LegalPage {...data}>
         <MDXContent code={doc.mdx} components={legalComponents} />
       </LegalPage>

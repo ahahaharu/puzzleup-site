@@ -9,7 +9,7 @@ type LegalSource = { title: string; effectiveDate: string; content: string };
 
 export type LegalPageData = {
   title: string;
-  effectiveDate: { label: string; dateTime?: string };
+  effectiveDate: { label: string; dateTime?: string | undefined };
   headings: Heading[];
 };
 
