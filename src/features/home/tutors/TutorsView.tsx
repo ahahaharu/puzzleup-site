@@ -3,6 +3,7 @@
 import type { ReactNode, RefObject } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { CHOICE_CHIP_SHAPE } from '@/components/ui/ChoiceChip';
 import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/cn';
 
@@ -33,9 +34,11 @@ type TutorsViewProps = {
   listRef?: RefObject<HTMLUListElement | null>;
 };
 
-// Чип выбора из ДС (ChoiceChip): 44 px, рамка 1,5 px ink 25 %, выбранный – заливка ink и галочка.
-const TAB =
-  'inline-flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] border-ink/25 px-4.5 text-field font-medium whitespace-nowrap text-ink select-none hover:border-ink/60 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper';
+// Вкладка выглядит как чип выбора из ДС: выбранная – заливка ink и галочка.
+const TAB = cn(
+  CHOICE_CHIP_SHAPE,
+  'border-ink/25 text-ink hover:border-ink/60 aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper',
+);
 
 const LIST: Record<TutorsLayout, string> = {
   single: 'page-grid gap-y-4',
