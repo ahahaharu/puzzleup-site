@@ -86,6 +86,7 @@ describe('TutorCard', () => {
 
   it.each([
     [328, 92],
+    [560, 170],
     [720, 170],
   ])('in a %i px card the photo is %i px wide', async (width, photo) => {
     const screen = await render(

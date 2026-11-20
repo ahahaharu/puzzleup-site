@@ -47,11 +47,11 @@ const LIST: Record<TutorsLayout, string> = {
   grid: 'flex gap-4 md:page-grid md:gap-y-6 xl:gap-y-8',
 };
 
-// Две карточки – по 5 колонок по центру (ДС, раздел 9), одна – 8 колонок по центру.
+// Две карточки – по 6 колонок на всю ширину, с фото слева, как в макете D-5 (ADR-043); одна – 8 колонок по центру.
 // Три в ряд – с 1280 px: на 1024–1279 пара мессенджеров не помещается в треть строки (ADR-043).
 const ITEM: Record<TutorsLayout, string> = {
   single: 'col-span-full lg:col-span-8 lg:col-start-3',
-  pair: 'col-span-full md:col-span-4 lg:col-span-5 lg:first:col-start-2',
+  pair: 'col-span-full md:col-span-4 lg:col-span-6',
   // Карточка ленты – 85 % ширины экрана, край следующей виден (ТЗ, «Телефон»).
   grid: 'w-[85vw] flex-none snap-start md:col-span-4 md:w-auto lg:col-span-6 xl:col-span-4',
 };

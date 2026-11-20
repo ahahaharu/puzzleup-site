@@ -22,7 +22,8 @@ import {
 // Раскладку карточка выбирает по своей ширине (container query), а не по окну: она стоит и в узкой
 // колонке сетки, и одна на всю ширину блока.
 // - Узкая (M-5): плашка, ниже фото 92 px рядом с именем, остальное – под ними во всю ширину.
-// - Широкая, от 576 px (D-5): фото 170 px слева, плашка, имя и остальное – колонкой справа.
+// - Широкая, от 544 px (D-5): фото 170 px слева, плашка, имя и остальное – колонкой справа. Порог – чтобы
+//   пара карточек по 6 колонок на 1280 (560 px) была широкой, как в макете.
 
 type TutorCardProps = {
   tutor: TutorCardData;
@@ -41,10 +42,10 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
 
   return (
     <article className="@container h-full rounded-card border border-ink/12 bg-card">
-      <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-3.5 p-5 @xl:items-start @xl:gap-x-7 @xl:gap-y-2.5 @xl:p-7">
+      <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-3.5 p-5 @[34rem]:items-start @[34rem]:gap-x-7 @[34rem]:gap-y-2.5 @[34rem]:p-7">
         <Badge
           status={tutor.availability}
-          className="col-span-2 justify-self-start @xl:col-span-1 @xl:col-start-2 @xl:row-start-1"
+          className="col-span-2 justify-self-start @[34rem]:col-span-1 @[34rem]:col-start-2 @[34rem]:row-start-1"
         />
 
         {/* Фото ведёт туда же, куда имя рядом: от дикторов и клавиатуры скрыто, чтобы не было двух
@@ -53,18 +54,18 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
           href={page}
           tabIndex={-1}
           aria-hidden="true"
-          className="col-start-1 row-start-2 block @xl:row-span-3 @xl:row-start-1"
+          className="col-start-1 row-start-2 block @[34rem]:row-span-3 @[34rem]:row-start-1"
         >
           <PhotoTape
             name={tutor.name}
             photo={tutor.photo ? { src: tutor.photo, alt: '' } : undefined}
             tilt={tilt}
             sizes="170px"
-            className="w-23 @xl:w-42.5"
+            className="w-23 @[34rem]:w-42.5"
           />
         </Link>
 
-        <div className="col-start-2 row-start-2 flex min-w-0 flex-col gap-1.5 @xl:gap-2.5">
+        <div className="col-start-2 row-start-2 flex min-w-0 flex-col gap-1.5 @[34rem]:gap-2.5">
           <h3 className="font-display text-h3 text-ink">
             {/* Зона нажатия растянута по высоте до 44 px, строка при этом не выше заголовка. */}
             <Link
@@ -82,7 +83,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
           <p className="text-small text-ink-2">{tutor.credentials}</p>
         </div>
 
-        <div className="col-span-2 row-start-3 flex min-w-0 flex-col gap-3.5 self-stretch @xl:col-span-1 @xl:col-start-2 @xl:gap-2.5">
+        <div className="col-span-2 row-start-3 flex min-w-0 flex-col gap-3.5 self-stretch @[34rem]:col-span-1 @[34rem]:col-start-2 @[34rem]:gap-2.5">
           {/* Фраза о подходе – пометка от руки: Spectral Italic 18 px, межстрочный 1,35 из макета. */}
           <p className="font-hand text-hand-sm leading-[1.35] text-ink-2 italic">
             «{tutor.tagline}»
@@ -94,7 +95,7 @@ export function TutorCard({ tutor, tilt = -1.5 }: TutorCardProps) {
           </p>
 
           {/* Кнопки прижаты к низу: в ряду сетки они стоят на одной линии у карточек разной высоты. */}
-          <div className="mt-auto flex flex-col gap-2.5 @xl:mt-1.5">
+          <div className="mt-auto flex flex-col gap-2.5">
             <Button href={tutorLeadUrl(tutor.slug, { entry: 'tutors' })} size="md" fullWidth>
               {full ? (
                 <span>
