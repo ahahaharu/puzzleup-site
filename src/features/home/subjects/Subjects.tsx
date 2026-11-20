@@ -12,7 +12,11 @@ import { SUBJECTS_LEAD, SUBJECTS_TITLE, TAUGHT_BY } from './texts';
 // Колонки зависят от числа предметов, карточка – от своей ширины (container query): широкая, от
 // 768 px, – «кусок тетради» слева 360 px (D-4, один предмет на десктопе), узкая – сверху.
 
-type SubjectsProps = { subjects: readonly SubjectCardData[] };
+type SubjectsProps = {
+  /** Якорь блока; другой – только на витрине /dev/sections, где блоков несколько. */
+  id?: string;
+  subjects: readonly SubjectCardData[];
+};
 
 // Минимальная ширина карточки – 320 px (ТЗ): три в ряд – только от 1280, на 768–1279 – по две.
 const COLUMNS = { 1: '', 2: 'md:grid-cols-2', 3: 'md:grid-cols-2 xl:grid-cols-3' } as const;
@@ -95,14 +99,14 @@ function SubjectCard({ subject }: { subject: SubjectCardData }) {
   );
 }
 
-export function Subjects({ subjects }: SubjectsProps) {
+export function Subjects({ subjects, id = 'subjects' }: SubjectsProps) {
   // Блок без данных не выводится.
   if (subjects.length === 0) return null;
 
   return (
-    <section id="subjects" aria-labelledby="subjects-title" className="paper-page">
+    <section id={id} aria-labelledby={`${id}-title`} className="paper-page">
       <div className="page-container py-14 lg:py-24">
-        <SectionHead id="subjects-title" title={SUBJECTS_TITLE} lead={SUBJECTS_LEAD} />
+        <SectionHead id={`${id}-title`} title={SUBJECTS_TITLE} lead={SUBJECTS_LEAD} />
         <ul
           className={cn(
             'mt-6 grid gap-4 md:gap-6 lg:mt-10 xl:gap-8',
