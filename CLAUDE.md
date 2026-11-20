@@ -8,7 +8,7 @@
 
 Порядок приоритета при расхождениях:
 
-1. `docs/spec/home.md` и `docs/spec/tutor-page.md` – ТЗ. Тексты, юридические формулировки и поведение берутся отсюда дословно.
+1. `docs/spec/home/` и `docs/spec/tutor-page/` – ТЗ, по файлу на раздел (индекс – `README.md` в папке). Тексты, юридические формулировки и поведение берутся отсюда дословно.
 2. `docs/design-system.md` – токены, типографика, компоненты.
 3. `docs/design/` – макеты (HTML-выгрузка холста Claude Design), только визуал. Тексты в макетах местами устарели. **Перед вёрсткой любого блока открой его файлы `D-*`/`M-*` или `T-*`/`TM-*`** – см. `docs/design/README.md`.
 4. `docs/architecture.md`, `docs/data-model.md`, `docs/decisions.md` – как устроен код и почему.
@@ -59,7 +59,7 @@ pnpm worker:dev       # воркер outbox и cron (нужна база)
 pnpm db:up            # Postgres в Docker для разработки
 pnpm db:generate      # сгенерировать миграцию из схемы Drizzle
 pnpm db:migrate       # применить миграции
-pnpm lint             # ESLint
+pnpm lint             # ESLint + lint:copy (тексты в src/)
 pnpm format           # Prettier
 pnpm typecheck        # tsc --noEmit
 pnpm test             # Vitest: юнит и компоненты
@@ -75,7 +75,7 @@ pnpm build            # production-сборка
 
 - **Git flow.** `main` – production, `develop` – staging. Работа – только в `feature/<kebab-name>` от `develop`. Релиз – `release/x.y.z` от `develop` → merge в `main` с тегом `vx.y.z` → back-merge в `develop`. Срочные правки – `hotfix/<name>` от `main`.
 - Никогда не коммить и не пушить напрямую в `main` и `develop`. Не делай force push в общие ветки.
-- **Коммиты** – Conventional Commits на английском, повелительное наклонение, до 72 символов в заголовке: `feat(leads): add phone validation for BY mobile codes`. Типы: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `build`, `perf`, `style`. Скоупы – имена модулей: `ui`, `layout`, `home`, `tutor-page`, `content`, `lead-form`, `leads`, `outbox`, `bot`, `sheets`, `availability`, `db`, `seo`, `legal`, `analytics`, `infra`, `deps`, плюс `decisions` для журнала решений. Список проверяет commitlint (`commitlint.config.ts`).
+- **Коммиты** – Conventional Commits на английском, повелительное наклонение, до 72 символов в заголовке: `feat(leads): add phone validation for BY mobile codes`. Типы: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `ci`, `build`, `perf`, `style`. Скоупы – имена модулей, список в `commitlint.config.ts`.
 - Коммиты маленькие и атомарные: одна логическая правка – один коммит. Перед коммитом: `pnpm lint && pnpm typecheck && pnpm test`.
 - PR в `develop` – squash merge, описание по шаблону из `docs/conventions.md`.
 - Перед началом фичи: прочитай нужные разделы ТЗ, составь план, назови файлы, которые затронешь. После – проверь Definition of Done из `docs/roadmap.md`.
@@ -85,34 +85,6 @@ pnpm build            # production-сборка
 
 ## Команды и агенты
 
-- `/feature <пункт> [auto]` – полный цикл пункта роадмапа: ветка → план (без `auto` – остановка на согласование) → реализация с коммитами → проверка агентами → push → PR в `develop`. PR не мёрджится.
-- `/review` – независимая проверка текущей ветки агентами со сводным отчётом. Запускать в новой сессии.
-- `/handoff` – сохранить прогресс в описание PR перед `/clear`. Продолжение – тем же `/feature <пункт>`.
+`/feature <пункт> [auto]` – пункт роадмапа от ветки до PR (без `auto` – стоп после плана), `/review` – независимая проверка ветки в новой сессии, `/handoff` – сохранить прогресс в PR перед `/clear`. Агенты (`.claude/agents/`: `spec-reviewer`, `copy-checker`, `design-reviewer`) код не правят; когда какого звать – в `.claude/skills/feature/SKILL.md`.
 
-Агенты (`.claude/agents/`) код приложения не правят. Тесты пишет основная сессия, полный прогон проверок – CI:
-
-| Агент | Когда |
-|---|---|
-| `spec-reviewer` | после реализации, всегда – соответствие ТЗ, архитектуре, DoD, ПД |
-| `copy-checker` | менялись тексты, контент, метатеги, тексты бота |
-| `design-reviewer` | только при изменении внешнего вида (новый блок, раскладка, стили, токены) – скриншоты макета и реализации на 390/1280, адаптив 360–1440 |
-
-## Где что лежит
-
-```
-content/            контент сайта: tutors/*.mdx, reviews.json, subjects.json, situations.json, faq.json, site.json, legal/*.mdx
-docs/               ТЗ (spec/), макеты (design/), архитектура, модель данных, дизайн-система, решения, план
-src/app/            маршруты Next.js (страницы, Route Handlers, sitemap, robots, OG)
-src/components/     ui/ – базовые компоненты ДС, layout/ – шапка, подвал, меню, панель, cookie-баннер
-src/features/       блоки страниц и клиентская логика по фичам (home, tutor-page, lead-form)
-src/server/         серверный код: db, leads, outbox, bot, sheets, availability (только с 'server-only')
-src/lib/            чистые утилиты без побочных эффектов: время по Минску, телефон, UTM, URL-билдеры
-src/styles/         globals.css с @theme-токенами и утилитами бумаги
-worker/             точка входа процесса воркера (outbox + cron)
-tests/e2e/          Playwright
-docker/             Dockerfile, compose.*.yml, Caddyfile
-```
-
-## Тесты – что обязательно
-
-Обязательно покрыто тестами: схемы контента и ссылки между файлами, валидация формы, сервис заявок (транзакция заявка + согласие + outbox), воркер outbox (повторы, backoff, dead letter), форматирование сообщений бота, команды бота, маппинг строки Google Таблицы (порядок столбцов A–Q), логика времени по Минску (часы ответа, напоминания, текст «Спасибо»), удаление по сроку хранения, сортировка репетиторов по статусу, сборка бейджа H1 из данных. E2E: отправка формы с JS и без JS, ошибки формы, 429, фильтр, переходы, 404, axe без нарушений.
+Структура репозитория – `docs/architecture.md`, раздел 3. Обязательные тесты – `docs/conventions.md`, «Тесты».

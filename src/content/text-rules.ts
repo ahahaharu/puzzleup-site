@@ -26,6 +26,7 @@ const NO_GUARANTEES = 'no guarantees of results';
 
 const WORDING: readonly Rule[] = [
   { pattern: word('мы'), message: 'the site never speaks as «мы»' },
+  { pattern: word('(?:нас|нам|нами)'), message: 'the site never speaks as «мы»' },
   {
     pattern: forms('наш', ['', 'а', 'е', 'и', 'его', 'ей', 'ему', 'им', 'ими', 'ем', 'у', 'их']),
     message: 'the site never speaks as «наш»',
@@ -58,6 +59,14 @@ const TYPOGRAPHY: readonly Rule[] = [
   { pattern: /(?<=\S)[ \t]+-[ \t]+/g, message: 'hyphen used as a dash, use «–» (en dash)' },
   { pattern: /—/g, message: 'em dash, use «–» (en dash)' },
   { pattern: /"/g, message: 'straight quotes, use «»' },
+  { pattern: /\d[ \t]+[–-][ \t]+\d/g, message: 'range with spaces, use «5–9»' },
+  {
+    // Только слова, где «е» вместо «ё» однозначна; остальное – copy-checker.
+    pattern: word('(?:еще|ее|ребен\\p{L}*|учеб(?:а|е|у|ой)|все\\s+равно)'),
+    message: 'use «ё»',
+  },
+  { pattern: /\d BYN/g, message: 'no-break space before BYN' },
+  { pattern: /№ (?=\d)/g, message: 'no-break space after №' },
 ];
 
 export type TextViolation = { kind: 'wording' | 'typography'; match: string; message: string };

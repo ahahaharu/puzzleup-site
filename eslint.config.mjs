@@ -19,6 +19,12 @@ const layerImports = (forbidden) => ({
   ],
 });
 
+// `bg-[#fff]`, `text-[rgb(…)]`, `border-[color:…]` – цвет мимо токенов.
+const ARBITRARY_COLOR = /-\[(?:#|(?:rgba?|hsla?|oklch|oklab|lab|lch|color-mix)\(|color:)/;
+// `text-xs`, `text-[13px]`, `text-[0.8rem]` – меньше 14 px.
+const SMALL_TEXT =
+  /(?:^|[\s:])text-(?:xs|\[(?:\d|1[0-3])(?:\.\d+)?px\]|\[0?\.(?:[0-7]\d*|8(?:[0-6]\d*)?|87[0-4]\d*)r?em\])(?=$|\s)/;
+
 export default defineConfig([
   globalIgnores([
     '.next/**',
@@ -47,6 +53,26 @@ export default defineConfig([
       '@typescript-eslint/no-unused-vars': ['warn', { ignoreRestSiblings: true }],
       // `as` – только с eslint-disable и комментарием-обоснованием (docs/conventions.md, «Код»).
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+    },
+  },
+  {
+    // Токены ДС (docs/design-system.md): цвет – только из @theme, текст – не мельче 14 px.
+    // Произвольные размеры и отступы из макета допустимы, цвет в обход токенов – нет.
+    files: ['src/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...['Literal[value=REGEX]', 'TemplateElement[value.raw=REGEX]'].flatMap((selector) => [
+          {
+            selector: selector.replace('REGEX', String(ARBITRARY_COLOR)),
+            message: 'Use a color token from @theme instead of an arbitrary color value.',
+          },
+          {
+            selector: selector.replace('REGEX', String(SMALL_TEXT)),
+            message: 'Text must not be smaller than 14 px (CLAUDE.md, «Интерфейс»).',
+          },
+        ]),
+      ],
     },
   },
   {

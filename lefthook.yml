@@ -1,4 +1,8 @@
 # Хуки git. Ставятся автоматически при `pnpm install` (скрипт prepare).
+# Вывод – только сводка и ошибки: полный лог каждого хука лишний и в терминале, и у агента.
+output:
+  - summary
+  - failure
 pre-commit:
   parallel: true
   jobs:
@@ -13,6 +17,9 @@ pre-commit:
     - name: content
       glob: 'content/**'
       run: pnpm content:check
+    - name: copy
+      glob: 'src/**/*.{ts,tsx}'
+      run: pnpm lint:copy
 
 commit-msg:
   jobs:

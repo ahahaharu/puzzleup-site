@@ -45,8 +45,8 @@ Git-хуки: `pre-commit` – gitleaks, ESLint и Prettier по изменён�
 ## Документация
 
 - [CLAUDE.md](CLAUDE.md) – правила проекта (для людей и Claude Code)
-- [docs/spec/home.md](docs/spec/home.md) – ТЗ главной страницы
-- [docs/spec/tutor-page.md](docs/spec/tutor-page.md) – ТЗ страницы репетитора
+- [docs/spec/home/](docs/spec/home/README.md) – ТЗ главной страницы
+- [docs/spec/tutor-page/](docs/spec/tutor-page/README.md) – ТЗ страницы репетитора
 - [docs/architecture.md](docs/architecture.md) – архитектура и инфраструктура
 - [docs/data-model.md](docs/data-model.md) – контент, база, Google Таблица
 - [docs/design-system.md](docs/design-system.md) – дизайн-система «Тетрадь»
