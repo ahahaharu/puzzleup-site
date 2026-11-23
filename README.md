@@ -20,6 +20,7 @@ PuzzleUp – общий сайт независимых репетиторов. 
 pnpm install                   # заодно ставит git-хуки (lefthook)
 pnpm exec playwright install   # браузеры для E2E
 cp .env.example .env.local     # заполнить значения
+pnpm db:up && pnpm db:migrate  # Postgres в Docker, миграции и начальные статусы занятости
 pnpm dev                       # http://localhost:3000
 ```
 
@@ -32,13 +33,17 @@ pnpm start          # запуск собранного standalone-сервер�
 pnpm lint           # ESLint
 pnpm format         # Prettier
 pnpm typecheck      # типы маршрутов + tsc --noEmit
-pnpm test           # Vitest: юнит-тесты
+pnpm test           # Vitest: юнит и компоненты
+pnpm test:int       # Vitest: интеграционные с Postgres в Testcontainers (нужен Docker)
 pnpm e2e            # Playwright: собирает и запускает приложение сам
+pnpm db:up          # Postgres 18 для разработки (docker/compose.dev.yml); db:down – остановить
+pnpm db:generate    # миграция из изменений схемы src/server/db/schema
+pnpm db:migrate     # применить миграции и записать статус занятости новых репетиторов
 ```
 
 Остальные команды из `CLAUDE.md` появляются в фичах, где они впервые нужны (`docs/roadmap.md`).
 
-CI (`.github/workflows/ci.yml`) на каждый PR в `develop` и `main`: Prettier, ESLint, типы, юнит-тесты, сборка, Playwright, gitleaks по всей истории и `pnpm audit`. Без зелёных `checks` и `build-e2e` PR не сливается.
+CI (`.github/workflows/ci.yml`) на каждый PR в `develop` и `main`: Prettier, ESLint, типы, юнит- и интеграционные тесты, сборка, Playwright, gitleaks по всей истории и `pnpm audit`. Без зелёных `checks` и `build-e2e` PR не сливается.
 
 Git-хуки: `pre-commit` – gitleaks, ESLint и Prettier по изменённым файлам; `commit-msg` – commitlint (Conventional Commits, `docs/conventions.md`); `pre-push` – typecheck и тесты.
 
