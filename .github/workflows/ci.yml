@@ -1,5 +1,5 @@
 # Проверки на каждый PR и push в develop и main (docs/architecture.md, раздел 9).
-# content:check, integration, Postgres service и Lighthouse CI добавляются в фичах,
+# Postgres service для E2E и Lighthouse CI добавляются в фичах,
 # где они впервые нужны (docs/roadmap.md).
 name: CI
 
@@ -27,7 +27,7 @@ jobs:
   checks:
     name: checks
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -41,6 +41,8 @@ jobs:
       # Компонентные тесты (*.browser.test.tsx) идут в Vitest Browser Mode на Chromium.
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test
+      # Интеграционные тесты с Postgres в Testcontainers: Docker на раннере уже есть.
+      - run: pnpm test:int
 
   build-e2e:
     name: build-e2e
