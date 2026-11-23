@@ -1,0 +1,25 @@
+# Postgres для разработки: `pnpm db:up` / `pnpm db:down`. Только localhost, учётные данные –
+# заведомо локальные, те же, что в .env.example. Production – compose.prod.yml (фича 4.3).
+name: puzzleup-dev
+
+services:
+  postgres:
+    # Та же мажорная версия, что в тестах (tests/setup/db-global.ts) и на сервере.
+    image: postgres:18.7-alpine
+    environment:
+      POSTGRES_USER: puzzleup
+      POSTGRES_PASSWORD: puzzleup
+      POSTGRES_DB: puzzleup
+    ports:
+      - 127.0.0.1:5432:5432
+    volumes:
+      # С Postgres 18 том монтируется на уровень выше data: в нём каталог версии (18/docker).
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U puzzleup -d puzzleup]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  postgres:

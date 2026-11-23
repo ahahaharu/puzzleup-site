@@ -74,12 +74,12 @@
 │  │  └─ tutors/               TutorCard, сортировка, availability
 │  ├─ content/                 загрузчик (index.ts, server-only), схемы, перекрёстные проверки и правила текстов
 │  ├─ server/                  только серверный код, каждый index.ts начинается с import 'server-only'
-│  │  ├─ db/                   client.ts, schema/*.ts, migrations/
+│  │  ├─ db/                   client.ts, schema/*.ts, migrations/, migrate.ts (миграции + начальные статусы)
 │  │  ├─ leads/                domain.ts (типы, статусы), service.ts, repository.ts
 │  │  ├─ outbox/               enqueue.ts, worker.ts, handlers/*.ts, backoff.ts
 │  │  ├─ bot/                  bot.ts, commands/*.ts, keyboards.ts, format.ts, auth.ts
 │  │  ├─ sheets/               client.ts, row.ts (маппинг A–Q)
-│  │  ├─ availability/         repository.ts, cache.ts (cacheTag)
+│  │  ├─ availability/         seed.ts, repository.ts, cache.ts (cacheTag)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
 │  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
@@ -87,11 +87,13 @@
 │  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), entry.ts (Zod-тип `entry`), cn.ts (склейка классов)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
-├─ tests/e2e/
+├─ tests/e2e/                 сценарии Playwright
+├─ tests/setup/               настройки Vitest, Testcontainers – db-global.ts, db.ts
 ├─ docker/Dockerfile, compose.dev.yml, compose.prod.yml, Caddyfile
 ├─ .github/workflows/ci.yml, deploy.yml
 ├─ content-collections.ts     только чтение и компиляция MDX
 ├─ scripts/content-check.ts   `pnpm content:check [--strict]`
+├─ scripts/db-migrate.ts      `pnpm db:migrate`
 ├─ drizzle.config.ts
 └─ CLAUDE.md
 ```

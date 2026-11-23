@@ -3,6 +3,13 @@ onlyBuiltDependencies:
   - esbuild
   - lefthook
 
+# Нативные необязательные сборки зависимостей Testcontainers (ssh2, protobufjs): Docker доступен
+# локально через сокет, SSH-транспорт и ускоренный protobuf не нужны.
+ignoredBuiltDependencies:
+  - cpu-features
+  - protobufjs
+  - ssh2
+
 # Версии фиксируются точно: обновления приходят через Dependabot отдельными PR.
 savePrefix: ''
 

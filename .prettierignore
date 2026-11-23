@@ -9,3 +9,5 @@ test-results/
 .vitest/
 next-env.d.ts
 .content-collections/
+# Миграции и снимки схемы генерирует drizzle-kit: правка формата сломала бы сверку снимков.
+src/server/db/migrations/

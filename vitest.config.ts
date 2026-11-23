@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
-// Два проекта (docs/conventions.md, «Тесты»): юнит в Node и компоненты в настоящем Chromium.
-// Компонентный тест – `*.browser.test.tsx` рядом с компонентом.
+// Проекты (docs/conventions.md, «Тесты»): юнит в Node, компоненты в настоящем Chromium,
+// интеграционные с Postgres в Testcontainers (`pnpm test:int`, нужен Docker).
+// Компонентный тест – `*.browser.test.tsx`, интеграционный – `*.int.test.ts` рядом с кодом.
 export default defineConfig({
   resolve: {
     alias: {
@@ -24,6 +25,26 @@ export default defineConfig({
           include: ['src/**/*.test.{ts,tsx}'],
           exclude: ['**/*.int.test.ts', '**/*.browser.test.tsx', 'node_modules/**'],
           globalSetup: ['./tests/setup/content.ts'],
+        },
+      },
+      {
+        extends: true,
+        resolve: {
+          alias: {
+            // Вне Next модуль `server-only` бросает исключение; пустая версия – та, что Next
+            // берёт для серверного кода (условие react-server).
+            'server-only': fileURLToPath(
+              new URL('./node_modules/server-only/empty.js', import.meta.url),
+            ),
+          },
+        },
+        test: {
+          name: 'int',
+          environment: 'node',
+          include: ['src/**/*.int.test.ts'],
+          globalSetup: ['./tests/setup/db-global.ts'],
+          // Первый запуск скачивает образ Postgres.
+          hookTimeout: 120_000,
         },
       },
       {

@@ -10,9 +10,19 @@ const envSchema = z
   .object({
     APP_ENV: z.enum(['local', 'staging', 'production']).default('local'),
     SITE_URL: z.url({ protocol: /^https?$/ }).optional(),
+    DATABASE_URL: z.url({ protocol: /^postgres(?:ql)?$/ }).optional(),
   })
   .transform((raw, ctx) => {
     if (raw.APP_ENV !== 'local') {
+      // Локально сайт работает и без базы: она нужна только форме и статусу занятости.
+      if (raw.DATABASE_URL === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['DATABASE_URL'],
+          message: `DATABASE_URL is required when APP_ENV=${raw.APP_ENV}`,
+        });
+        return z.NEVER;
+      }
       if (raw.SITE_URL === undefined) {
         ctx.addIssue({
           code: 'custom',
@@ -33,6 +43,7 @@ const envSchema = z
     return {
       APP_ENV: raw.APP_ENV,
       SITE_URL: (raw.SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, ''),
+      ...(raw.DATABASE_URL === undefined ? {} : { DATABASE_URL: raw.DATABASE_URL }),
     };
   });
 

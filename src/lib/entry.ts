@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Откуда на сайте пришёл родитель – docs/data-model.md, `Entry`; ТЗ главной, раздел 8
  * («Значения entry – фиксированный список»). Параметр `entry` в адресе формы, столбец H Таблицы.
  */
-export const entrySchema = z.enum([
+export const ENTRIES = [
   'hero',
   'header',
   'bottom_bar',
@@ -19,6 +19,8 @@ export const entrySchema = z.enum([
   'tutor_full',
   '404',
   'direct',
-]);
+] as const;
+
+export const entrySchema = z.enum(ENTRIES);
 
 export type Entry = z.infer<typeof entrySchema>;
