@@ -159,16 +159,16 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 | `parent_name` | text null | ПД; null у `/add` |
 | `phone` | text null | ПД, хранится в E.164: `+375291234567` |
 | `contact_method` | ContactMethod null | |
-| `grade` | smallint | 5–11 |
-| `subjects` | text[] | |
+| `grade` | smallint | 5–11; база проверяет только 1–11, диапазон предмета – форма |
+| `subjects` | text[] | хотя бы один |
 | `goal` | Goal null | |
-| `contact_time` | ContactTime[] | |
+| `contact_time` | ContactTime[] | пустой массив по умолчанию |
 | `comment` | text null | ПД, до 1000 символов |
-| `entry` | Entry | |
-| `landing_path` | text | путь страницы с формой |
+| `entry` | Entry null | null у `/add` (ADR-048) |
+| `landing_path` | text null | путь страницы с формой; null у `/add` |
 | `utm_source` … `utm_content` | text null | пять колонок; у `/add` в `utm_source` – ReferralChannel |
 | `availability_at_submit` | Availability null | |
-| `status` | LeadStatus | |
+| `status` | LeadStatus | `new` по умолчанию |
 | `status_changed_at` | timestamptz | от него считается срок хранения |
 | `status_changed_by` | text null | tutorId |
 | `rejection_reason` | RejectionReason null | |
@@ -179,13 +179,17 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 
 Индексы: `(status, created_at)` для напоминаний, `(status_changed_at)` для удаления.
 
+Ограничения (CHECK): у заявки с `source = 'form'` заполнены `parent_name`, `phone`, `contact_method`, `entry`, `landing_path`; `phone` – E.164; `comment` – до 1000 символов. Это последний рубеж, правила для родителя – в Zod-схеме формы.
+
+Перечисления – `pgEnum` из Zod-схем `src/lib` (`goal.ts`, `availability.ts`, `entry.ts`, `lead.ts`). Новое значение – `pnpm db:generate` (миграция `ALTER TYPE … ADD VALUE`), удаление и переименование – только миграцией, написанной вручную.
+
 ### `consents`
 
 `id`, `lead_id` FK → `leads` on delete cascade, `given_at`, `consent_version` (из `site.json`), `consent_text_sha256`. IP и user agent не храним.
 
 ### `lead_events`
 
-Журнал изменений для аудита: `id`, `lead_id` FK cascade, `at`, `type` (`created`, `status_changed`), `from_status`, `to_status`, `actor` (tutorId или `system`).
+Журнал изменений для аудита: `id`, `lead_id` FK cascade, `at`, `type` (`created`, `status_changed`), `from_status` (null у `created`), `to_status`, `actor` (tutorId или `system`).
 
 ### `outbox`
 
@@ -201,15 +205,15 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 | `last_error` | text null – без ПД |
 | `created_at`, `done_at` | timestamptz |
 
-Индекс: `(status, run_at)`. Триггер `pg_notify('outbox', id)` на вставку.
+Индекс: `(status, run_at)`. Триггер `pg_notify('outbox', id)` на вставку – миграция `0001_outbox_notify.sql`, написанная вручную.
 
 ### `tutor_availability`
 
-`tutor_id` PK, `status` Availability, `updated_at`, `updated_by`. При первом старте заполняется из MDX (`availability`) для репетиторов, которых ещё нет в таблице.
+`tutor_id` PK, `status` Availability, `updated_at`, `updated_by` (tutorId или `system`). Заполняется из MDX (`availability`) для репетиторов, которых ещё нет в таблице, при каждом `pnpm db:migrate` (`src/server/availability/seed.ts`); записанный статус не перезаписывается.
 
 ### `bot_dialogs`
 
-Состояние пошаговых диалогов `/add` и выбора причины отказа: `chat_id`, `user_id`, `kind`, `step`, `data` jsonb, `expires_at` (30 минут).
+Состояние пошаговых диалогов `/add` и выбора причины отказа: `chat_id`, `user_id`, `kind`, `step`, `data` jsonb, `expires_at` (30 минут). Ключ – `(chat_id, user_id)`: один активный диалог пользователя в чате.
 
 ### Удаление по сроку
 
