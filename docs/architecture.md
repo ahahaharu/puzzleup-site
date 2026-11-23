@@ -87,7 +87,8 @@
 │  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), entry.ts (Zod-тип `entry`), cn.ts (склейка классов)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
-├─ tests/e2e/, tests/setup/  E2E; общие настройки Vitest (Testcontainers – db-global.ts, db.ts)
+├─ tests/e2e/                 сценарии Playwright
+├─ tests/setup/               настройки Vitest, Testcontainers – db-global.ts, db.ts
 ├─ docker/Dockerfile, compose.dev.yml, compose.prod.yml, Caddyfile
 ├─ .github/workflows/ci.yml, deploy.yml
 ├─ content-collections.ts     только чтение и компиляция MDX
