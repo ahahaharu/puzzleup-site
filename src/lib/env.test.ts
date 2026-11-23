@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { EnvError, parseEnv } from './env';
 
+// Выдуманные учётные данные: только для проверки разбора.
+const DB = 'postgres://localhost:5432/puzzleup';
+
 describe('parseEnv', () => {
   it('defaults to local with localhost URL', () => {
     expect(parseEnv({})).toEqual({ APP_ENV: 'local', SITE_URL: 'http://localhost:3000' });
@@ -15,19 +18,48 @@ describe('parseEnv', () => {
   });
 
   it('accepts production with SITE_URL and strips trailing slash', () => {
-    expect(parseEnv({ APP_ENV: 'production', SITE_URL: 'https://puzzle-up.by/' })).toEqual({
+    expect(
+      parseEnv({ APP_ENV: 'production', SITE_URL: 'https://puzzle-up.by/', DATABASE_URL: DB }),
+    ).toEqual({
       APP_ENV: 'production',
       SITE_URL: 'https://puzzle-up.by',
+      DATABASE_URL: DB,
     });
   });
 
   it.each(['staging', 'production'])('requires SITE_URL when APP_ENV=%s', (appEnv) => {
-    expect(() => parseEnv({ APP_ENV: appEnv })).toThrow(/SITE_URL is required/);
+    expect(() => parseEnv({ APP_ENV: appEnv, DATABASE_URL: DB })).toThrow(/SITE_URL is required/);
   });
 
   it.each(['staging', 'production'])('requires https SITE_URL when APP_ENV=%s', (appEnv) => {
-    expect(() => parseEnv({ APP_ENV: appEnv, SITE_URL: 'http://puzzle-up.by' })).toThrow(
-      /must use https/,
+    expect(() =>
+      parseEnv({ APP_ENV: appEnv, SITE_URL: 'http://puzzle-up.by', DATABASE_URL: DB }),
+    ).toThrow(/must use https/);
+  });
+
+  it.each(['staging', 'production'])('requires DATABASE_URL when APP_ENV=%s', (appEnv) => {
+    expect(() => parseEnv({ APP_ENV: appEnv, SITE_URL: 'https://puzzle-up.by' })).toThrow(
+      /DATABASE_URL is required/,
+    );
+  });
+
+  it('keeps DATABASE_URL optional locally', () => {
+    expect(parseEnv({})).not.toHaveProperty('DATABASE_URL');
+    expect(parseEnv({ DATABASE_URL: 'postgresql://localhost/puzzleup' }).DATABASE_URL).toBe(
+      'postgresql://localhost/puzzleup',
+    );
+  });
+
+  it.each(['mysql://localhost/puzzleup', 'localhost:5432'])(
+    'rejects non-Postgres DATABASE_URL %s',
+    (url) => {
+      expect(() => parseEnv({ DATABASE_URL: url })).toThrow(/DATABASE_URL/);
+    },
+  );
+
+  it('does not leak the database password into the error message', () => {
+    expect(() => parseEnv({ DATABASE_URL: 'mysql://app:secret-pass@db/x' })).toThrow(
+      expect.objectContaining({ message: expect.not.stringContaining('secret-pass') }),
     );
   });
 
