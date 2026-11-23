@@ -5,10 +5,19 @@ import { resolve } from 'node:path';
 
 import { createBuilder } from '@content-collections/core';
 
+import { EnvError, parseEnv } from '@/lib/env';
 import { migrateDb } from '@/server/db/migrate';
 
-const url = process.env.DATABASE_URL;
-if (url === undefined || url === '') {
+// Та же проверка окружения, что у приложения (src/lib/env.ts): в сообщении нет значений.
+let url: string | undefined;
+try {
+  url = parseEnv(process.env).DATABASE_URL;
+} catch (error) {
+  if (!(error instanceof EnvError)) throw error;
+  console.error(error.message);
+  process.exit(1);
+}
+if (url === undefined) {
   console.error('DATABASE_URL is not set: see .env.example, local Postgres – `pnpm db:up`');
   process.exit(1);
 }
