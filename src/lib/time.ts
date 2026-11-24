@@ -28,3 +28,23 @@ export function formatLongDate(isoDate: string): string {
     .map((part) => part.value)
     .join(' ');
 }
+
+/** Часы для доменной логики: в тестах подменяются (docs/conventions.md, «Время»). */
+export type Clock = { now(): number };
+
+export const systemClock: Clock = { now: () => Date.now() };
+
+const minutesOf = (time: string) => {
+  const [hours = 0, minutes = 0] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+/**
+ * Момент `epochMs` – в часах ответа по Минску: «09:00»–«22:00» из `site.json`, начало включительно,
+ * конец – нет (ТЗ главной, блок 9, экран «Спасибо»: с 22:00 до 9:00 – ночной текст).
+ */
+export function isWithinHours(epochMs: number, hours: { from: string; to: string }): boolean {
+  const time = Temporal.Instant.fromEpochMilliseconds(epochMs).toZonedDateTimeISO(MINSK_TZ);
+  const now = time.hour * 60 + time.minute;
+  return now >= minutesOf(hours.from) && now < minutesOf(hours.to);
+}
