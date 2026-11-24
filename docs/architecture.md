@@ -77,7 +77,7 @@
 │  │  ├─ db/                   client.ts, schema/*.ts, migrations/, migrate.ts (миграции + начальные статусы)
 │  │  ├─ leads/                domain.ts (типы, статусы), service.ts, repository.ts
 │  │  ├─ outbox/               enqueue.ts, worker.ts, handlers/*.ts, backoff.ts
-│  │  ├─ bot/                  bot.ts (апдейты), webhook.ts, auth.ts, callback.ts, format.ts (тексты и кнопки), port.ts + telegram-api.ts (grammY), dialogs.ts, commands/*.ts
+│  │  ├─ bot/                  bot.ts (апдейты), update.ts (схема апдейта), deps.ts, webhook.ts, auth.ts, directory.ts (данные контента), callback.ts, format.ts (тексты и кнопки), port.ts + telegram-api.ts (grammY), dialogs.ts, commands/*.ts, fixtures.ts (тесты)
 │  │  ├─ sheets/               client.ts, row.ts (маппинг A–Q)
 │  │  ├─ availability/         seed.ts, repository.ts, cache.ts (cacheTag)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
