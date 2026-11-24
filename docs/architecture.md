@@ -122,9 +122,9 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 
 ## 5. Заявка: путь от формы до чата
 
-1. `LeadForm` (клиентский компонент с Conform) рендерится в серверном компоненте страницы репетитора. Скрытые поля: `tutorId`, `entry`, `utm_*`, `landing`, honeypot `website`. UTM при первом заходе сохраняются в `sessionStorage` (`src/lib/utm.ts`) и подставляются в форму на любой странице. Без JS UTM теряются – это допустимо.
+1. `LeadForm` (клиентский компонент с Conform) рендерится в серверном компоненте страницы репетитора. Скрытые поля: `tutorId`, `entry`, `landing`, honeypot `website`. UTM при первом заходе сохраняются в `sessionStorage` (`src/lib/utm.ts`, `UtmCapture` в `SiteShell`) на любой странице и добавляются к данным формы при отправке. Без JS сервер берёт `entry` и UTM из `Referer` своего сайта (ADR-049).
 2. Server Action `submitLead` (`src/features/lead-form/action.ts`):
-   1. Проверка Origin.
+   1. Проверка Origin: совпадает с `SITE_URL`.
    2. Rate limit по IP: 5 заявок за 10 минут. IP берётся из `X-Forwarded-For`, который выставляет Caddy. Превышение – ошибка 429 с текстом из ТЗ.
    3. Заполненный honeypot – тихий «успех» без записи.
    4. Валидация той же Zod-схемой, что на клиенте.
