@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatDateTime, formatLongDate, isWithinHours, minskYear, shortTime } from './time';
+import {
+  formatDateTime,
+  formatLongDate,
+  isWithinHours,
+  minskYear,
+  msUntilMinskTime,
+  shortTime,
+} from './time';
 
 describe('minskYear', () => {
   it('uses Minsk time at the year boundary', () => {
@@ -53,5 +60,24 @@ describe('formatDateTime', () => {
 
   it('uses the Minsk date after 21:00 UTC', () => {
     expect(formatDateTime(Date.parse('2026-12-31T21:30:00Z'))).toBe('1 января, 00:30');
+  });
+});
+
+describe('msUntilMinskTime', () => {
+  const minutes = (ms: number) => ms / 60_000;
+
+  it('waits until today when the time is ahead', () => {
+    // 00:30 UTC – 03:30 в Минске.
+    expect(minutes(msUntilMinskTime('03:30', Date.parse('2026-11-24T00:00:00Z')))).toBe(30);
+  });
+
+  it('waits until tomorrow when the time has passed or is now', () => {
+    expect(minutes(msUntilMinskTime('03:30', Date.parse('2026-11-24T00:30:00Z')))).toBe(24 * 60);
+    expect(minutes(msUntilMinskTime('03:30', Date.parse('2026-11-24T12:00:00Z')))).toBe(12.5 * 60);
+  });
+
+  it('counts across the Minsk midnight', () => {
+    // 21:00 UTC – 00:00 в Минске следующего дня.
+    expect(minutes(msUntilMinskTime('03:30', Date.parse('2026-12-31T21:00:00Z')))).toBe(210);
   });
 });

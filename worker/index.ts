@@ -3,11 +3,12 @@
 // Обработчик интеграции подключается, только если она настроена: локально без бота или
 // Таблицы задания их типа ждут в очереди.
 import { EnvError, parseEnv, type Env } from '@/lib/env';
-import { systemClock } from '@/lib/time';
+import { msUntilMinskTime, systemClock } from '@/lib/time';
 import { contentDirectory } from '@/server/bot/directory';
 import { createTelegramApi } from '@/server/bot/telegram-api';
 import { createDb } from '@/server/db/client';
 import { enqueueReminders } from '@/server/jobs/reminders';
+import { deleteExpiredLeads, deleteOldOutboxJobs } from '@/server/jobs/retention';
 import { startScheduler, type ScheduledJob } from '@/server/jobs/scheduler';
 import { sheetsHandlers } from '@/server/outbox/handlers/sheets';
 import { telegramHandlers } from '@/server/outbox/handlers/telegram';
@@ -39,7 +40,27 @@ db.$client.on('error', (error) => log('pool_error', { code: errorCode(error) }))
 
 const directory = contentDirectory();
 const handlers: OutboxHandlers = {};
-const jobs: ScheduledJob[] = [];
+// Удаление по сроку – всегда, без условий на интеграции. Первый запуск – при старте: если воркер
+// стоял в 03:30, заявки не задержатся в базе дольше срока.
+const nightly = () => msUntilMinskTime('03:30', systemClock.now());
+const jobs: ScheduledJob[] = [
+  {
+    name: 'retention',
+    waitMs: nightly,
+    run: async () => {
+      const leads = await deleteExpiredLeads(db, systemClock);
+      if (leads > 0) log('retention', { leads: String(leads) });
+    },
+  },
+  {
+    name: 'outbox-cleanup',
+    waitMs: nightly,
+    run: async () => {
+      const deleted = await deleteOldOutboxJobs(db, systemClock);
+      if (deleted > 0) log('outbox_cleanup', { jobs: String(deleted) });
+    },
+  },
+];
 if (env.telegram) {
   Object.assign(
     handlers,
@@ -54,7 +75,7 @@ if (env.telegram) {
   // Без бота напоминания копились бы в очереди и пришли бы разом, когда его включат.
   jobs.push({
     name: 'reminders',
-    everyMs: 60_000,
+    waitMs: 60_000,
     run: () => enqueueReminders(db, systemClock, directory.responseHours),
   });
 }

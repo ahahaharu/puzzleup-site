@@ -37,6 +37,7 @@ const config: UserConfig = {
         'bot',
         'sheets',
         'availability',
+        'retention',
         'db',
         'seo',
         'legal',

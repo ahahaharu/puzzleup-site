@@ -217,7 +217,7 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 
 ### Удаление по сроку
 
-Ежедневно: `DELETE FROM leads WHERE status_changed_at < now() - interval '6 months'` – каскадом удаляются `consents` и `lead_events`. Задания outbox на удалённые заявки помечаются `done` с пометкой `lead_deleted`.
+Ежедневно (`src/server/jobs/retention.ts`): `DELETE FROM leads WHERE status_changed_at < now() - interval '6 months'` – каскадом удаляются `consents` и `lead_events`. Задания outbox на удалённые заявки в статусах `pending` и `dead` помечаются `done` с `last_error = 'lead_deleted'`; `processing` закрывает сам обработчик – заявки уже нет. Выполненные задания outbox удаляются через 30 дней после `done_at`.
 
 ## 4. Google Таблица – лист «Заявки»
 

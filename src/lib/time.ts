@@ -65,3 +65,14 @@ export function formatDateTime(epochMs: number): string {
   );
   return `${parts.day} ${parts.month}, ${parts.hour}:${parts.minute}`;
 }
+
+/**
+ * Миллисекунды от `epochMs` до ближайшего `time` («03:30») по Минску, строго в будущем: ровно
+ * в 03:30 следующий запуск – через сутки. Ежедневные задания воркера (docs/architecture.md, раздел 7).
+ */
+export function msUntilMinskTime(time: string, epochMs: number): number {
+  const now = Temporal.Instant.fromEpochMilliseconds(epochMs).toZonedDateTimeISO(MINSK_TZ);
+  let next = now.withPlainTime(Temporal.PlainTime.from(time));
+  if (next.epochMilliseconds <= epochMs) next = next.add({ days: 1 });
+  return next.epochMilliseconds - epochMs;
+}
