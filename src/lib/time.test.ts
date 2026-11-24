@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatLongDate, minskYear, shortTime } from './time';
+import { formatLongDate, isWithinHours, minskYear, shortTime } from './time';
 
 describe('minskYear', () => {
   it('uses Minsk time at the year boundary', () => {
@@ -24,5 +24,23 @@ describe('formatLongDate', () => {
   it('writes the month in words without «г.»', () => {
     expect(formatLongDate('2026-10-12')).toBe('12 октября 2026');
     expect(formatLongDate('2026-01-01')).toBe('1 января 2026');
+  });
+});
+
+describe('isWithinHours', () => {
+  const hours = { from: '09:00', to: '22:00' };
+
+  it('uses Minsk time (UTC+3)', () => {
+    expect(isWithinHours(Date.parse('2026-11-24T05:59:59Z'), hours)).toBe(false);
+    expect(isWithinHours(Date.parse('2026-11-24T06:00:00Z'), hours)).toBe(true);
+  });
+
+  it('includes the start and excludes the end', () => {
+    expect(isWithinHours(Date.parse('2026-11-24T18:59:00Z'), hours)).toBe(true);
+    expect(isWithinHours(Date.parse('2026-11-24T19:00:00Z'), hours)).toBe(false);
+  });
+
+  it('treats the night after midnight as outside the hours', () => {
+    expect(isWithinHours(Date.parse('2026-11-24T23:30:00Z'), hours)).toBe(false);
   });
 });

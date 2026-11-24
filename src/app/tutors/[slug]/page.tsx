@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 
 import { SiteShell } from '@/components/layout/SiteShell';
 import { getPublishedReviews, getSite, getSubjects, getTutorBySlug, getTutors } from '@/content';
+import { leadFormData } from '@/features/lead-form/form-data';
+import { LeadForm } from '@/features/lead-form/LeadForm';
 import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
 import { tutorShell } from '@/features/tutor-page/shell';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
@@ -36,17 +38,24 @@ export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>
   const tutor = getTutorBySlug((await params).slug);
   if (!tutor) notFound();
 
+  const site = getSite();
+  const subjects = getSubjects();
+  const tutors = getTutors();
   const data = tutorPageData(tutor, {
-    site: getSite(),
-    subjects: getSubjects(),
-    tutors: getTutors(),
+    site,
+    subjects,
+    tutors,
     reviews: getPublishedReviews(),
     year: await currentYear(),
   });
 
   return (
     <SiteShell {...tutorShell(tutor)}>
-      <TutorPage data={data} aboutText={<MDXContent code={tutor.mdx} />} />
+      <TutorPage
+        data={data}
+        aboutText={<MDXContent code={tutor.mdx} />}
+        form={<LeadForm data={leadFormData(tutor, { site, subjects, tutors })} />}
+      />
     </SiteShell>
   );
 }

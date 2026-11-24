@@ -1,6 +1,5 @@
 # Проверки на каждый PR и push в develop и main (docs/architecture.md, раздел 9).
-# Postgres service для E2E и Lighthouse CI добавляются в фичах,
-# где они впервые нужны (docs/roadmap.md).
+# Lighthouse CI добавляется в фиче, где он впервые нужен (docs/roadmap.md).
 name: CI
 
 on:
@@ -48,6 +47,24 @@ jobs:
     name: build-e2e
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    # Форма заявки пишет в базу: E2E идут против Postgres с миграциями. Пароль – тестовый,
+    # база живёт только на время job.
+    services:
+      postgres:
+        image: postgres:18.7-alpine
+        env:
+          POSTGRES_USER: puzzleup
+          POSTGRES_PASSWORD: puzzleup
+          POSTGRES_DB: puzzleup
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U puzzleup"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://puzzleup:puzzleup@localhost:5432/puzzleup
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -61,7 +78,8 @@ jobs:
           restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
       - run: pnpm build
       - run: pnpm exec playwright install --with-deps chromium webkit
-      # Заглушка: пока только smoke-тест; сценарии формы, axe и Lighthouse – в своих фичах.
+      - run: pnpm db:migrate
+      # axe и Lighthouse – в своих фичах (docs/roadmap.md, 4.4).
       - run: pnpm e2e
       # Артефакт публичный, как и репозиторий: в тестах только выдуманные данные (CLAUDE.md, ПД).
       - if: failure()

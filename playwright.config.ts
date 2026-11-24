@@ -25,5 +25,7 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    // Проверка Origin в Server Action сравнивает с SITE_URL; база – из DATABASE_URL окружения.
+    env: { SITE_URL: baseURL },
   },
 });

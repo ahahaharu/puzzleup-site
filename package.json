@@ -28,6 +28,8 @@
     "prepare": "lefthook install"
   },
   "dependencies": {
+    "@conform-to/react": "1.21.3",
+    "@conform-to/zod": "1.21.3",
     "@content-collections/mdx": "0.2.2",
     "drizzle-orm": "0.45.4",
     "next": "16.4.6",
