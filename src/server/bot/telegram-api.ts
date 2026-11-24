@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { Api, GrammyError, HttpError } from 'grammy';
 import type { InlineKeyboardMarkup } from 'grammy/types';
+import { Api, GrammyError, HttpError } from 'grammy/web';
 
 import {
   TelegramApiError,

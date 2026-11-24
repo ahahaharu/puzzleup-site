@@ -1,7 +1,7 @@
 // `pnpm bot:set-webhook`: регистрирует вебхук бота `${SITE_URL}/api/telegram` с секретом из
 // окружения и меню команд (docs/architecture.md, раздел 6). Запускается для каждого окружения
 // с его переменными; повторный запуск безопасен.
-import { Api, GrammyError } from 'grammy';
+import { Api, GrammyError } from 'grammy/web';
 
 import { EnvError, parseEnv } from '@/lib/env';
 import { BOT_COMMANDS } from '@/server/bot/format';
