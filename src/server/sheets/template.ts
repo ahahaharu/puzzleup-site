@@ -7,11 +7,11 @@ import {
   REFERRAL_CHANNEL_LABELS,
   REJECTION_REASON_LABELS,
 } from '@/lib/labels';
-import { referralChannelSchema } from '@/lib/lead';
+import { leadStatusSchema, referralChannelSchema, type LeadStatus } from '@/lib/lead';
 import { MINSK_TZ } from '@/lib/time';
 
 import { LEADS_SHEET } from './port';
-import { LAST_COLUMN, LEAD_COLUMNS } from './row';
+import { DATE_FORMAT, DATE_TIME_FORMAT, LAST_COLUMN, LEAD_COLUMNS } from './row';
 
 // Шаблон Таблицы (docs/data-model.md, раздел 4; ADR-052): запросы `spreadsheets.batchUpdate`,
 // которые `pnpm sheets:setup` отправляет в существующую Таблицу. Повторный запуск безопасен:
@@ -34,7 +34,13 @@ export const LEADS_PROTECTION = 'puzzleup:leads';
 
 /** Листы Таблицы до запуска: из `spreadsheets.get`. */
 export type SpreadsheetMeta = {
-  sheets: readonly { sheetId: number; title: string; protections: readonly string[] }[];
+  sheets: readonly {
+    sheetId: number;
+    title: string;
+    protections: readonly string[];
+    /** Сколько правил условного форматирования на листе. */
+    conditionalRules: number;
+  }[];
 };
 
 /** Страницы сайта для генератора ссылок: главная и страницы неушедших репетиторов. */
@@ -83,6 +89,7 @@ const MEDIUMS: readonly (readonly [string, string])[] = [
 const GUIDE_LINES = [
   'Как устроена Таблица',
   '«Заявки» – обезличенная копия заявок с сайта и из /add. Строку дописывает и обновляет сайт после каждой новой заявки и смены статуса, а находит её по номеру в столбце A.',
+  'Цвет статуса в «Заявках» показывает, на каком шаге заявка: жёлтый – новая, ждёт ответа, зелёный – ученик, серый – отказ.',
   'Имени, телефона и комментария родителя здесь нет. Не вписывайте их вручную: Таблица хранится на серверах Google.',
   'В «Заявках» не меняйте порядок столбцов и не правьте ячейки – при следующей смене статуса строка перезапишется. Сортировать и фильтровать можно.',
   'Даты – по Минску. Столбцы N и O – первый переход в статус «пробное проведено» и «ученик», Q – последняя смена статуса.',
@@ -91,31 +98,24 @@ const GUIDE_LINES = [
   '«Сводка» и «Недели» считаются формулами из «Заявок» и «Расходов», править их не нужно.',
   '«Ссылки» – генератор ссылок для рекламы. Выберите страницу, канал и тип трафика, при желании впишите кампанию и объявление – готовая ссылка появится в последнем столбце. Канал и тип трафика – латиницей строчными буквами, как в «Справочниках»: по ним считается «Сводка».',
   '«Расходы» заполняются вручную: дата, канал – тот же, что utm_source в ссылке, кампания и сумма. По ним считается цена заявки и ученика.',
-  '«Сводка», «Недели», «Справочники» и «Инструкция» пересоздаются скриптом pnpm sheets:setup – правки в этих листах пропадут. В «Заявках», «Ссылках» и «Расходах» он обновляет только заголовки.',
+  '«Сводка», «Недели», «Справочники» и «Инструкция» пересоздаются скриптом pnpm sheets:setup – правки в этих листах пропадут. В «Заявках», «Ссылках» и «Расходах» он обновляет только заголовки и оформление.',
 ];
 
-function cell(value: Value, bold: boolean) {
-  const userEnteredValue =
-    typeof value === 'number'
-      ? { numberValue: value }
-      : value === ''
-        ? undefined
-        : value.startsWith('=')
-          ? { formulaValue: value }
-          : { stringValue: value };
+function cell(value: Value) {
+  if (typeof value === 'number') return { userEnteredValue: { numberValue: value } };
+  if (value === '') return {};
   return {
-    ...(userEnteredValue && { userEnteredValue }),
-    ...(bold && { userEnteredFormat: { textFormat: { bold: true } } }),
+    userEnteredValue: value.startsWith('=') ? { formulaValue: value } : { stringValue: value },
   };
 }
 
-/** Строки с A1; первая – заголовки, жирным. Пустая строка значения очищает ячейку. */
+/** Значения с A1. Пустая строка очищает ячейку. Оформление – отдельными запросами. */
 function write(sheetId: number, rows: readonly (readonly Value[])[]): Request {
   return {
     updateCells: {
       start: { sheetId, rowIndex: 0, columnIndex: 0 },
-      rows: rows.map((row, index) => ({ values: row.map((value) => cell(value, index === 0)) })),
-      fields: 'userEnteredValue,userEnteredFormat.textFormat.bold',
+      rows: rows.map((row) => ({ values: row.map(cell) })),
+      fields: 'userEnteredValue',
     },
   };
 }
@@ -130,8 +130,18 @@ const column = (sheetId: number, letter: string) => ({
   endColumnIndex: columnIndex(letter) + 1,
 });
 
-const DATE_TIME = { type: 'DATE_TIME', pattern: 'dd.mm.yyyy hh:mm' };
-const DATE = { type: 'DATE', pattern: 'dd.mm.yyyy' };
+/** Прямоугольник: строки с 0 (`end` не включается, без него – до конца), столбцы `A:F`. */
+function area(sheetId: number, rows: readonly [number, number?], columns: string) {
+  const [from = 'A', to = from] = columns.split(':');
+  return {
+    sheetId,
+    startRowIndex: rows[0],
+    ...(rows[1] !== undefined && { endRowIndex: rows[1] }),
+    startColumnIndex: columnIndex(from),
+    endColumnIndex: columnIndex(to) + 1,
+  };
+}
+
 const MONEY = { type: 'NUMBER', pattern: '0.00' };
 const PERCENT = { type: 'PERCENT', pattern: '0%' };
 
@@ -143,6 +153,78 @@ function format(sheetId: number, letters: string, numberFormat: object): Request
       fields: 'userEnteredFormat.numberFormat',
     },
   }));
+}
+
+// Цвета – из палитры сайта (src/styles/globals.css): чернила, бумага, крафт.
+const rgb = (hex: string) => ({
+  red: Number.parseInt(hex.slice(1, 3), 16) / 255,
+  green: Number.parseInt(hex.slice(3, 5), 16) / 255,
+  blue: Number.parseInt(hex.slice(5, 7), 16) / 255,
+});
+const INK = '#1d2340';
+const WHITE = '#ffffff';
+const PAPER_ALT = '#efeae0';
+
+function paint(range: object, userEnteredFormat: object): Request {
+  return {
+    repeatCell: {
+      range,
+      cell: { userEnteredFormat },
+      fields: `userEnteredFormat(${Object.keys(userEnteredFormat).join(',')})`,
+    },
+  };
+}
+
+/** Строка заголовков: тёмная, белый жирный текст, перенос слов. */
+const header = (sheetId: number, columns: string) =>
+  paint(area(sheetId, [0, 1], columns), {
+    backgroundColor: rgb(INK),
+    textFormat: { bold: true, foregroundColor: rgb(WHITE) },
+    verticalAlignment: 'MIDDLE',
+    wrapStrategy: 'WRAP',
+  });
+
+/** Строка «Всего» под заголовком. */
+const total = (sheetId: number, columns: string) =>
+  paint(area(sheetId, [1, 2], columns), {
+    backgroundColor: rgb(PAPER_ALT),
+    textFormat: { bold: true },
+  });
+
+/** Цвет статуса: фон и текст. «Новая» ждёт ответа – самая заметная, отказ – приглушён. */
+const STATUS_COLORS: Record<LeadStatus, readonly [string, string]> = {
+  new: ['#fde3a7', '#5c4300'],
+  contacted: ['#dce8fb', '#1d3a70'],
+  no_answer: ['#fbd9c9', '#7a2e12'],
+  trial_scheduled: ['#e6ddf7', '#3e2a6e'],
+  trial_done: ['#c9def6', '#123a66'],
+  student: ['#cdebd9', '#1c5236'],
+  rejected: ['#ebe9e4', '#5f6170'],
+  waitlist: ['#f1ead6', '#5a4a1f'],
+};
+
+function statusColors(range: object): Request[] {
+  return leadStatusSchema.options.map((status, index) => {
+    const [background, foreground] = STATUS_COLORS[status];
+    return {
+      addConditionalFormatRule: {
+        index,
+        rule: {
+          ranges: [range],
+          booleanRule: {
+            condition: {
+              type: 'TEXT_EQ',
+              values: [{ userEnteredValue: LEAD_STATUS_LABELS[status] }],
+            },
+            format: {
+              backgroundColor: rgb(background),
+              textFormat: { foregroundColor: rgb(foreground), bold: status === 'student' },
+            },
+          },
+        },
+      },
+    };
+  });
 }
 
 /** Выпадающий список из столбца «Справочников»; своё значение тоже можно вписать. */
@@ -169,18 +251,28 @@ const freezeHeader = (sheetId: number): Request => ({
   },
 });
 
-const width = (sheetId: number, letter: string, pixelSize: number): Request => ({
+const dimension = (
+  sheetId: number,
+  kind: 'ROWS' | 'COLUMNS',
+  index: number,
+  pixelSize: number,
+) => ({
   updateDimensionProperties: {
-    range: {
-      sheetId,
-      dimension: 'COLUMNS',
-      startIndex: columnIndex(letter),
-      endIndex: columnIndex(letter) + 1,
-    },
+    range: { sheetId, dimension: kind, startIndex: index, endIndex: index + 1 },
     properties: { pixelSize },
     fields: 'pixelSize',
   },
 });
+
+/** Ширина столбцов в пикселях и высота строки заголовков. */
+function sizes(sheetId: number, widths: Readonly<Record<string, number>>): Request[] {
+  return [
+    dimension(sheetId, 'ROWS', 0, 40),
+    ...Object.entries(widths).map(([letter, pixels]) =>
+      dimension(sheetId, 'COLUMNS', columnIndex(letter), pixels),
+    ),
+  ];
+}
 
 /** Столбцы разной длины → строки, недостающее – пустые ячейки. */
 function table(columns: readonly (readonly Value[])[]): Value[][] {
@@ -211,23 +303,32 @@ function listsRows(input: TemplateInput): Value[][] {
   ]);
 }
 
+const empty = text('');
 const rejected = text(LEAD_STATUS_LABELS.rejected);
+
+/** QUERY без строки заголовков; пока заявок нет, вместо #N/A – пусто. */
+const query = (data: string, select: string) => `=IFNA(QUERY(${data},${text(select)},0),${empty})`;
 
 /** Сводка за всё время: по репетиторам, каналам, статусам и причинам отказа – рядом, слева направо. */
 function summaryRows(): Value[][] {
-  const group = (by: string) =>
-    `=QUERY(${sheet(LEADS_SHEET)}!A2:${LAST_COLUMN},${text(
-      `select ${by}, count(A), count(N), count(O) where A is not null group by ${by} label ${by} '', count(A) '', count(N) '', count(O) ''`,
-    )},0)`;
+  const data = `${sheet(LEADS_SHEET)}!A2:${LAST_COLUMN}`;
+  const byTutor = query(
+    data,
+    "select C, count(A), count(N), count(O) where A is not null group by C label C '', count(A) '', count(N) '', count(O) ''",
+  );
   // Пустой канал – заход без UTM-меток: подписывается, чтобы строка не выглядела потерянной.
-  const channels = `=QUERY(ARRAYFORMULA({${leads('A')},IF(${leads('I')}=${text('')},${text(NO_LABEL)},${leads('I')}),${leads('N')},${leads('O')}}),${text(
+  const byChannel = query(
+    `ARRAYFORMULA({${leads('A')},IF(${leads('I')}=${empty},${text(NO_LABEL)},${leads('I')}),${leads('N')},${leads('O')}})`,
     "select Col2, count(Col1), count(Col3), count(Col4) where Col1 is not null group by Col2 label Col2 '', count(Col1) '', count(Col3) '', count(Col4) ''",
-  )},0)`;
-  const count = (by: string, where = '') =>
-    `=QUERY(${sheet(LEADS_SHEET)}!A2:${LAST_COLUMN},${text(
-      `select ${by}, count(A) where A is not null ${where}group by ${by} label ${by} '', count(A) ''`,
-    )},0)`;
-  const empty = text('');
+  );
+  const byStatus = query(
+    data,
+    "select M, count(A) where A is not null group by M label M '', count(A) ''",
+  );
+  const byReason = query(
+    data,
+    "select P, count(A) where A is not null and P <> '' group by P label P '', count(A) ''",
+  );
   return [
     [
       'Репетитор',
@@ -274,14 +375,14 @@ function summaryRows(): Value[][] {
       '=E2',
     ],
     [
-      group('C'),
+      byTutor,
       '',
       '',
       '',
       `=ARRAYFORMULA(IF(A3:A=${empty},${empty},COUNTIFS(${leads('C')},A3:A,${leads('M')},${rejected})))`,
       `=ARRAYFORMULA(IF(A3:A=${empty},${empty},D3:D/B3:B))`,
       '',
-      channels,
+      byChannel,
       '',
       '',
       '',
@@ -289,17 +390,16 @@ function summaryRows(): Value[][] {
       `=ARRAYFORMULA(IF(H3:H=${empty},${empty},IF(L3:L=0,${empty},L3:L/I3:I)))`,
       `=ARRAYFORMULA(IF(H3:H=${empty},${empty},IF((L3:L=0)+(K3:K=0),${empty},L3:L/K3:K)))`,
       '',
-      count('M'),
+      byStatus,
       '',
       '',
-      count('P', "and P <> '' "),
+      byReason,
     ],
   ];
 }
 
 /** По неделям с понедельника, свежая – сверху: заявки по дате заявки, пробные и ученики – по своим датам. */
 function weeksRows(): Value[][] {
-  const empty = text('');
   const inWeek = (range: string) => `${range},${text('>=')}&A2:A,${range},${text('<')}&(A2:A+7)`;
   const perWeek = (formula: string) => `=ARRAYFORMULA(IF(A2:A=${empty},${empty},${formula}))`;
   return [
@@ -325,25 +425,34 @@ const LINK_HEADERS = [
 
 /** Ссылка собирается формулой в заголовке: строки ниже заполняют люди, setup их не трогает. */
 function linkFormula(): string {
-  const empty = text('');
   const param = (name: string, letter: string) =>
     `IF(${letter}2:${letter}=${empty},${empty},${text(`&${name}=`)}&ENCODEURL(${letter}2:${letter}))`;
   return `={${text('Ссылка')};ARRAYFORMULA(IF((A2:A=${empty})+(B2:B=${empty})+(C2:C=${empty}),${empty},A2:A&${text('?utm_source=')}&ENCODEURL(B2:B)&${text('&utm_medium=')}&ENCODEURL(C2:C)&${param('utm_campaign', 'D')}&${param('utm_content', 'E')}))}`;
 }
 
 /**
- * Запросы `batchUpdate`: свойства Таблицы, недостающие листы, их порядок и содержимое.
- * Единственный лист новой Таблицы («Лист1») становится «Заявками».
+ * API разбирает формулы по языку Таблицы: в русском аргументы разделяет «;». Поэтому шаблон
+ * пишется при английском языке (`templateRequests` начинается с него), а этот запрос –
+ * отдельным вызовом после – возвращает русский: даты, числа с запятой. Формулы Таблица хранит
+ * независимо от языка и сама показывает их по-русски.
+ */
+export const FINAL_REQUESTS: readonly Request[] = [
+  {
+    // Часовой пояс – для TODAY() в «Неделях».
+    updateSpreadsheetProperties: {
+      properties: { locale: 'ru_RU', timeZone: MINSK_TZ },
+      fields: 'locale,timeZone',
+    },
+  },
+];
+
+/**
+ * Запросы `batchUpdate`: язык для формул, недостающие листы, их порядок, содержимое
+ * и оформление. Единственный лист новой Таблицы («Лист1») становится «Заявками».
  */
 export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): Request[] {
   const requests: Request[] = [
-    {
-      // Часовой пояс – для TODAY() в «Неделях», язык – для дат и выпадающих списков.
-      updateSpreadsheetProperties: {
-        properties: { locale: 'ru_RU', timeZone: MINSK_TZ },
-        fields: 'locale,timeZone',
-      },
-    },
+    { updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' } },
   ];
   const ids = new Map(meta.sheets.map((item) => [item.title, item.sheetId]));
   const [only] = meta.sheets;
@@ -385,13 +494,45 @@ export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): R
       },
     });
   }
+  // Цвета статусов пересоздаются: удаляются прежние правила условного форматирования.
+  for (const item of meta.sheets) {
+    const title = [...ids].find(([, sheetId]) => sheetId === item.sheetId)?.[0];
+    if (title !== LEADS_SHEET && title !== SUMMARY) continue;
+    for (let rule = 0; rule < item.conditionalRules; rule += 1) {
+      requests.push({ deleteConditionalFormatRule: { sheetId: item.sheetId, index: 0 } });
+    }
+  }
 
   const leadsId = id(LEADS_SHEET);
   requests.push(
     write(leadsId, [LEAD_COLUMNS]),
+    header(leadsId, `A:${LAST_COLUMN}`),
+    // Строки, дописанные до исправления, взяли жирный шрифт заголовка.
+    paint(area(leadsId, [1], `A:${LAST_COLUMN}`), { textFormat: { bold: false } }),
+    paint(area(leadsId, [1], 'D'), { horizontalAlignment: 'CENTER' }),
     freezeHeader(leadsId),
-    ...format(leadsId, 'BQ', DATE_TIME),
-    ...format(leadsId, 'NO', DATE),
+    ...format(leadsId, 'BQ', DATE_TIME_FORMAT),
+    ...format(leadsId, 'NO', DATE_FORMAT),
+    ...statusColors(area(leadsId, [1], 'M')),
+    ...sizes(leadsId, {
+      A: 80,
+      B: 130,
+      C: 110,
+      D: 60,
+      E: 130,
+      F: 170,
+      G: 120,
+      H: 120,
+      I: 120,
+      J: 110,
+      K: 130,
+      L: 130,
+      M: 150,
+      N: 110,
+      O: 110,
+      P: 150,
+      Q: 130,
+    }),
   );
   const leadsSheet = meta.sheets.find((item) => item.sheetId === leadsId);
   if (!leadsSheet?.protections.includes(LEADS_PROTECTION)) {
@@ -408,30 +549,57 @@ export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): R
   }
 
   const summaryId = id(SUMMARY);
+  const blocks = ['A:F', 'H:N', 'P:Q', 'S:T'];
   requests.push(
     write(summaryId, summaryRows()),
+    ...blocks.flatMap((columns) => [header(summaryId, columns), total(summaryId, columns)]),
     freezeHeader(summaryId),
     ...format(summaryId, 'F', PERCENT),
     ...format(summaryId, 'LMN', MONEY),
+    ...statusColors(area(summaryId, [2], 'P')),
+    ...sizes(summaryId, {
+      A: 130,
+      B: 80,
+      C: 100,
+      D: 90,
+      E: 80,
+      F: 100,
+      G: 24,
+      H: 130,
+      I: 80,
+      J: 100,
+      K: 90,
+      L: 100,
+      M: 100,
+      N: 100,
+      O: 24,
+      P: 150,
+      Q: 80,
+      R: 24,
+      S: 150,
+      T: 80,
+    }),
   );
 
   const weeksId = id(WEEKS);
   requests.push(
     write(weeksId, weeksRows()),
+    header(weeksId, 'A:F'),
     freezeHeader(weeksId),
-    ...format(weeksId, 'A', DATE),
+    ...format(weeksId, 'A', DATE_FORMAT),
     ...format(weeksId, 'EF', MONEY),
+    ...sizes(weeksId, { A: 110, B: 90, C: 110, D: 100, E: 110, F: 110 }),
   );
 
   const linksId = id(LINKS);
   requests.push(
     write(linksId, [[...LINK_HEADERS, linkFormula()]]),
+    header(linksId, 'A:F'),
     freezeHeader(linksId),
     dropdown(linksId, 'A', 'J'),
     dropdown(linksId, 'B', 'F'),
     dropdown(linksId, 'C', 'H'),
-    width(linksId, 'A', 280),
-    width(linksId, 'F', 560),
+    ...sizes(linksId, { A: 300, B: 150, C: 150, D: 170, E: 170, F: 620 }),
   );
 
   const costsId = id(COSTS);
@@ -439,14 +607,33 @@ export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): R
     write(costsId, [
       ['Дата', 'Канал (utm_source)', 'Кампания (utm_campaign)', 'Сумма, BYN', 'Комментарий'],
     ]),
+    header(costsId, 'A:E'),
     freezeHeader(costsId),
-    ...format(costsId, 'A', DATE),
+    ...format(costsId, 'A', DATE_FORMAT),
     ...format(costsId, 'D', MONEY),
     dropdown(costsId, 'B', 'F'),
+    ...sizes(costsId, { A: 110, B: 150, C: 170, D: 110, E: 320 }),
   );
 
   const listsId = id(LISTS);
-  requests.push(write(listsId, listsRows(input)), freezeHeader(listsId));
+  requests.push(
+    write(listsId, listsRows(input)),
+    header(listsId, 'A:K'),
+    freezeHeader(listsId),
+    ...sizes(listsId, {
+      A: 150,
+      B: 140,
+      C: 140,
+      D: 120,
+      E: 280,
+      F: 120,
+      G: 120,
+      H: 100,
+      I: 200,
+      J: 300,
+      K: 110,
+    }),
+  );
 
   const guideId = id(GUIDE);
   requests.push(
@@ -454,14 +641,9 @@ export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): R
       guideId,
       GUIDE_LINES.map((line) => [line]),
     ),
-    width(guideId, 'A', 720),
-    {
-      repeatCell: {
-        range: { sheetId: guideId, startColumnIndex: 0, endColumnIndex: 1 },
-        cell: { userEnteredFormat: { wrapStrategy: 'WRAP', verticalAlignment: 'TOP' } },
-        fields: 'userEnteredFormat.wrapStrategy,userEnteredFormat.verticalAlignment',
-      },
-    },
+    header(guideId, 'A'),
+    paint(area(guideId, [1], 'A'), { wrapStrategy: 'WRAP', verticalAlignment: 'TOP' }),
+    ...sizes(guideId, { A: 760 }),
   );
 
   return requests;

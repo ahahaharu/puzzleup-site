@@ -9,7 +9,7 @@ import { getTutors } from '@/content';
 import { EnvError, parseEnv } from '@/lib/env';
 import { createSheetsClient } from '@/server/sheets/client';
 import { SheetsApiError } from '@/server/sheets/port';
-import { SHEET_TITLES, templateRequests } from '@/server/sheets/template';
+import { FINAL_REQUESTS, SHEET_TITLES, templateRequests } from '@/server/sheets/template';
 
 let env;
 try {
@@ -29,6 +29,7 @@ const metaSchema = z.object({
     z.object({
       properties: z.object({ sheetId: z.number(), title: z.string() }),
       protectedRanges: z.array(z.object({ description: z.string().optional() })).optional(),
+      conditionalFormats: z.array(z.unknown()).optional(),
     }),
   ),
 });
@@ -39,7 +40,10 @@ try {
   const meta = await client.request(
     {
       path: id,
-      query: { fields: 'sheets(properties(sheetId,title),protectedRanges(description))' },
+      query: {
+        fields:
+          'sheets(properties(sheetId,title),protectedRanges(description),conditionalFormats(ranges(sheetId)))',
+      },
     },
     metaSchema,
   );
@@ -48,14 +52,22 @@ try {
       sheets: meta.sheets.map((sheet) => ({
         ...sheet.properties,
         protections: (sheet.protectedRanges ?? []).flatMap((range) => range.description ?? []),
+        conditionalRules: sheet.conditionalFormats?.length ?? 0,
       })),
     },
     { siteUrl: env.SITE_URL, tutors: getTutors() },
   );
-  await client.request(
-    { method: 'POST', path: `${id}:batchUpdate`, body: { requests } },
-    z.unknown(),
-  );
+  const batchUpdate = (body: readonly object[]) =>
+    client.request(
+      { method: 'POST', path: `${id}:batchUpdate`, body: { requests: body } },
+      z.unknown(),
+    );
+  try {
+    await batchUpdate(requests);
+  } finally {
+    // Шаблон пишется при английском языке (формулы), русский возвращается в любом случае.
+    await batchUpdate(FINAL_REQUESTS);
+  }
   console.log(`Spreadsheet is ready: ${SHEET_TITLES.join(', ')}; links lead to ${env.SITE_URL}`);
 } catch (error) {
   if (!(error instanceof SheetsApiError)) throw error;

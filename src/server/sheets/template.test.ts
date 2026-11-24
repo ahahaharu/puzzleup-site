@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import { LEAD_STATUS_LABELS } from '@/lib/labels';
+
 import { LEAD_COLUMNS } from './row';
 import {
+  FINAL_REQUESTS,
   LEADS_PROTECTION,
   SHEET_TITLES,
   templateRequests,
@@ -17,7 +20,7 @@ const input: TemplateInput = {
   ],
 };
 const NEW_SPREADSHEET: SpreadsheetMeta = {
-  sheets: [{ sheetId: 0, title: 'Лист1', protections: [] }],
+  sheets: [{ sheetId: 0, title: 'Лист1', protections: [], conditionalRules: 0 }],
 };
 
 // Запросы – JSON Google API без своих типов: форму проверяют сами значения.
@@ -59,10 +62,40 @@ describe('templateRequests', () => {
     ).toEqual(SHEET_TITLES.slice(1).map((title, index) => [title, index + 1]));
   });
 
-  it('sets Minsk time zone and Russian locale', () => {
-    expect(of(templateRequests(NEW_SPREADSHEET, input), 'updateSpreadsheetProperties')).toEqual([
-      { properties: { locale: 'ru_RU', timeZone: 'Europe/Minsk' }, fields: 'locale,timeZone' },
+  it('writes formulas under English locale, then returns Russian and Minsk time', () => {
+    const requests = templateRequests(NEW_SPREADSHEET, input);
+    expect(requests[0]).toEqual({
+      updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' },
+    });
+    expect(of(requests, 'updateSpreadsheetProperties')).toHaveLength(1);
+    expect(FINAL_REQUESTS).toEqual([
+      {
+        updateSpreadsheetProperties: {
+          properties: { locale: 'ru_RU', timeZone: 'Europe/Minsk' },
+          fields: 'locale,timeZone',
+        },
+      },
     ]);
+  });
+
+  it('colours every status in «Заявки» and replaces old rules', () => {
+    const meta: SpreadsheetMeta = {
+      sheets: [
+        { sheetId: 3, title: 'Заявки', protections: [LEADS_PROTECTION], conditionalRules: 2 },
+      ],
+    };
+    const requests = templateRequests(meta, input);
+    expect(of(requests, 'deleteConditionalFormatRule')).toEqual([
+      { sheetId: 3, index: 0 },
+      { sheetId: 3, index: 0 },
+    ]);
+    const rules = of(requests, 'addConditionalFormatRule').filter(
+      (item) => item.rule.ranges[0].sheetId === 3,
+    );
+    expect(rules.map((item) => item.rule.booleanRule.condition.values[0].userEnteredValue)).toEqual(
+      Object.values(LEAD_STATUS_LABELS),
+    );
+    expect(rules[0].rule.ranges[0]).toMatchObject({ startRowIndex: 1, startColumnIndex: 12 });
   });
 
   it('writes headers A–Q to «Заявки» without touching the rows below', () => {
@@ -77,7 +110,7 @@ describe('templateRequests', () => {
 
   it('formats dates in «Заявки» as Minsk date and time', () => {
     const formats = of(templateRequests(NEW_SPREADSHEET, input), 'repeatCell').filter(
-      (item) => item.range.sheetId === 0,
+      (item) => item.range.sheetId === 0 && item.cell.userEnteredFormat.numberFormat,
     );
     expect(
       formats.map((item) => [
@@ -98,6 +131,7 @@ describe('templateRequests', () => {
         sheetId: 10 + index,
         title,
         protections: title === 'Заявки' ? [LEADS_PROTECTION] : [],
+        conditionalRules: 0,
       })),
     };
     const requests = templateRequests(meta, input);
@@ -111,12 +145,15 @@ describe('templateRequests', () => {
   });
 
   it('leaves foreign sheets alone', () => {
-    const meta: SpreadsheetMeta = { sheets: [{ sheetId: 5, title: 'Черновик', protections: [] }] };
+    const meta: SpreadsheetMeta = {
+      sheets: [{ sheetId: 5, title: 'Черновик', protections: [], conditionalRules: 1 }],
+    };
     const requests = templateRequests(meta, input);
     expect(
       of(requests, 'updateSheetProperties').some((item) => item.properties.sheetId === 5),
     ).toBe(false);
     expect(sheetIds(requests, meta).get('Заявки')).toBe(6);
+    expect(of(requests, 'deleteConditionalFormatRule')).toEqual([]);
   });
 
   it('lists the home page and pages of active tutors for the link generator', () => {
