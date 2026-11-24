@@ -43,7 +43,7 @@ import {
 // Данные страницы репетитора – ТЗ страницы репетитора, разделы 3–5. Чистые функции: страница
 // и витрина /dev/tutor-page собирают из них блоки, тесты проверяют правила без раскладки.
 
-/** Статус страницы: занятость из базы (пока – из MDX) или «ушёл». */
+/** Статус страницы: занятость из базы или «ушёл». */
 export type PageStatus = Availability | 'archived';
 
 /** Не больше трёх карточек в блоке «Другие репетиторы» (раздел 4, блок 7). */
@@ -66,7 +66,6 @@ export function activeSubjects(
 }
 
 export function pageStatus(tutor: Pick<Tutor, 'archived' | 'availability'>): PageStatus {
-  // Статус занятости пока – начальное значение из MDX; из базы его подставит feature/availability.
   return tutor.archived ? 'archived' : tutor.availability;
 }
 

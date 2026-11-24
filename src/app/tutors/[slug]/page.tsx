@@ -10,6 +10,8 @@ import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
 import { tutorShell } from '@/features/tutor-page/shell';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
 import { currentYear } from '@/features/tutors/current-year';
+import { withAvailability } from '@/lib/availability';
+import { getAvailability } from '@/server/availability/cache';
 
 // Страница репетитора – ТЗ страницы репетитора. Статическая: по странице на каждый файл
 // `content/tutors`, включая ушедших (раздел 6). Неизвестный адрес – 404 через `notFound()`:
@@ -35,12 +37,14 @@ export async function generateMetadata({ params }: PageProps<'/tutors/[slug]'>):
 }
 
 export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>) {
-  const tutor = getTutorBySlug((await params).slug);
+  const slug = (await params).slug;
+  // Статус занятости – из базы поверх начального из MDX (ТЗ страницы репетитора, раздел 5).
+  const tutors = withAvailability(getTutors(), await getAvailability());
+  const tutor = tutors.find((candidate) => candidate.slug === slug);
   if (!tutor) notFound();
 
   const site = getSite();
   const subjects = getSubjects();
-  const tutors = getTutors();
   const data = tutorPageData(tutor, {
     site,
     subjects,
