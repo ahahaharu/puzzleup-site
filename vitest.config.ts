@@ -3,6 +3,12 @@ import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
+// Вне Next модуль `server-only` бросает исключение; пустая версия – та, что Next берёт для
+// серверного кода (условие react-server). Юнит-тесты src/server идут в Node без Next.
+const SERVER_ONLY_EMPTY = fileURLToPath(
+  new URL('./node_modules/server-only/empty.js', import.meta.url),
+);
+
 // Проекты (docs/conventions.md, «Тесты»): юнит в Node, компоненты в настоящем Chromium,
 // интеграционные с Postgres в Testcontainers (`pnpm test:int`, нужен Docker).
 // Компонентный тест – `*.browser.test.tsx`, интеграционный – `*.int.test.ts` рядом с кодом.
@@ -19,6 +25,7 @@ export default defineConfig({
     projects: [
       {
         extends: true,
+        resolve: { alias: { 'server-only': SERVER_ONLY_EMPTY } },
         test: {
           name: 'unit',
           environment: 'node',
@@ -29,15 +36,7 @@ export default defineConfig({
       },
       {
         extends: true,
-        resolve: {
-          alias: {
-            // Вне Next модуль `server-only` бросает исключение; пустая версия – та, что Next
-            // берёт для серверного кода (условие react-server).
-            'server-only': fileURLToPath(
-              new URL('./node_modules/server-only/empty.js', import.meta.url),
-            ),
-          },
-        },
+        resolve: { alias: { 'server-only': SERVER_ONLY_EMPTY } },
         test: {
           name: 'int',
           environment: 'node',
