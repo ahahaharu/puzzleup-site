@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { getSite, getSubjects, getTutors } from '@/content';
+import type { Availability } from '@/lib/availability';
 import type { Goal } from '@/lib/goal';
 
 /** Репетитор глазами бота: имя для пометки «→ Андрею», его предметы и цели для `/add`. */
@@ -9,6 +10,8 @@ export type BotTutor = {
   name: string;
   nameDative: string;
   archived: boolean;
+  /** Начальный статус занятости из MDX – если в `tutor_availability` ещё нет строки. */
+  availability: Availability;
   subjects: readonly { id: string; from: number; to: number }[];
   goals: readonly Goal[];
 };
@@ -32,6 +35,7 @@ export function contentDirectory(): BotDirectory {
       name: tutor.name,
       nameDative: tutor.nameDative,
       archived: tutor.archived,
+      availability: tutor.availability,
       subjects: tutor.subjects,
       goals: tutor.goals,
     })),
