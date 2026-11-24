@@ -1,7 +1,7 @@
 // Воркер (docs/architecture.md, разделы 5 и 7): выполняет задания outbox и задания по
 // расписанию. Тот же образ, что у сайта, команда `node worker.js`; локально – `pnpm worker:dev`.
-// Обработчики добавляются в фичах интеграций: Google Таблица – 3.5. Пока обработчика нет
-// (или бот выключен локально), задания его типа ждут в очереди.
+// Обработчик интеграции подключается, только если она настроена: локально без бота или
+// Таблицы задания их типа ждут в очереди.
 import { EnvError, parseEnv, type Env } from '@/lib/env';
 import { systemClock } from '@/lib/time';
 import { contentDirectory } from '@/server/bot/directory';
@@ -9,8 +9,11 @@ import { createTelegramApi } from '@/server/bot/telegram-api';
 import { createDb } from '@/server/db/client';
 import { enqueueReminders } from '@/server/jobs/reminders';
 import { startScheduler, type ScheduledJob } from '@/server/jobs/scheduler';
+import { sheetsHandlers } from '@/server/outbox/handlers/sheets';
 import { telegramHandlers } from '@/server/outbox/handlers/telegram';
 import { errorCode, startOutboxWorker, type OutboxHandlers } from '@/server/outbox/worker';
+import { createSheetsClient } from '@/server/sheets/client';
+import { createGoogleSheets } from '@/server/sheets/google-sheets';
 
 const log = (event: string, fields: Record<string, string> = {}) =>
   console.error(JSON.stringify({ scope: 'worker', event, ...fields }));
@@ -54,6 +57,25 @@ if (env.telegram) {
     everyMs: 60_000,
     run: () => enqueueReminders(db, systemClock, directory.responseHours),
   });
+}
+
+if (env.sheets) {
+  let client;
+  try {
+    client = createSheetsClient(env.sheets);
+  } catch {
+    // Текст ошибки OpenSSL ключ не содержит, но и пользы в нём нет.
+    console.error('GOOGLE_SERVICE_ACCOUNT_JSON: private_key is not a valid PEM key');
+    process.exit(1);
+  }
+  Object.assign(
+    handlers,
+    sheetsHandlers({
+      db,
+      sheets: createGoogleSheets(client, env.sheets.spreadsheetId),
+      directory,
+    }),
+  );
 }
 
 const worker = startOutboxWorker({ db, databaseUrl: url, clock: systemClock, handlers });
