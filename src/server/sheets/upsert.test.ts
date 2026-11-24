@@ -39,4 +39,11 @@ describe('upsertRow', () => {
     await upsertRow(sheets.port, [1001, 'новая']);
     expect(sheets.calls).toEqual(['readKeys', 'appendRow']);
   });
+
+  it('appends to a sheet without even a header row', async () => {
+    const sheets = fakeSheets({ rows: [] });
+    await upsertRow(sheets.port, [1001, 'новая']);
+    expect(sheets.calls).toEqual(['readKeys', 'appendRow']);
+    expect(sheets.rows).toEqual([[1001, 'новая']]);
+  });
 });
