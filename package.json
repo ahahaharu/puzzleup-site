@@ -27,6 +27,7 @@
     "bot:set-webhook": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/bot-set-webhook.ts",
     "bot:poll": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/bot-poll.ts",
     "sheets:setup": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/sheets-setup.ts",
+    "cache:revalidate": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/cache-revalidate.ts",
     "e2e": "playwright test",
     "worker:dev": "tsx watch --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
     "worker:build": "tsup",
