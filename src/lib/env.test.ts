@@ -13,7 +13,17 @@ const TELEGRAM = {
   TELEGRAM_ALERT_CHAT_ID: '111111111',
   TELEGRAM_TUTORS: '{"111111111":"t-andrei","222222222":"t-maxim"}',
 };
-const DEPLOYED = { SITE_URL: 'https://puzzle-up.by', DATABASE_URL: DB, ...TELEGRAM };
+// Не настоящий ключ: разбор окружения проверяет только наличие полей.
+const KEY = {
+  client_email: 'sync@fake-project.iam.gserviceaccount.com',
+  private_key: 'PRIVATE KEY',
+};
+const base64 = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64');
+const GOOGLE = {
+  GOOGLE_SHEET_ID: '1FakeSheetIdFakeSheetIdFakeSheetId01',
+  GOOGLE_SERVICE_ACCOUNT_JSON: base64({ type: 'service_account', ...KEY }),
+};
+const DEPLOYED = { SITE_URL: 'https://puzzle-up.by', DATABASE_URL: DB, ...TELEGRAM, ...GOOGLE };
 
 describe('parseEnv', () => {
   it('defaults to local with localhost URL', () => {
@@ -145,6 +155,57 @@ describe('parseEnv', () => {
       );
       expect(() => parseEnv({ ...TELEGRAM, TELEGRAM_WEBHOOK_SECRET: 'fake-webhook!' })).toThrow(
         expect.objectContaining({ message: leaked }),
+      );
+    });
+  });
+
+  describe('Google Sheets', () => {
+    it('is off locally when no GOOGLE_* variable is set', () => {
+      expect(parseEnv({})).not.toHaveProperty('sheets');
+    });
+
+    it('parses the spreadsheet id and the service account key', () => {
+      expect(parseEnv(GOOGLE).sheets).toEqual({
+        spreadsheetId: GOOGLE.GOOGLE_SHEET_ID,
+        clientEmail: KEY.client_email,
+        privateKey: KEY.private_key,
+      });
+    });
+
+    it('requires both variables once one is set', () => {
+      expect(() => parseEnv({ GOOGLE_SHEET_ID: GOOGLE.GOOGLE_SHEET_ID })).toThrow(
+        /GOOGLE_SERVICE_ACCOUNT_JSON is required when any GOOGLE_\* variable is set/,
+      );
+    });
+
+    it.each(['staging', 'production'])('requires the spreadsheet when APP_ENV=%s', (appEnv) => {
+      const { GOOGLE_SHEET_ID: _, ...rest } = DEPLOYED;
+      expect(() => parseEnv({ ...rest, APP_ENV: appEnv })).toThrow(
+        new RegExp(`GOOGLE_SHEET_ID is required when APP_ENV=${appEnv}`),
+      );
+    });
+
+    it.each([
+      ['not base64 JSON', 'not-json'],
+      ['no private key', base64({ client_email: KEY.client_email })],
+      ['no email', base64({ private_key: KEY.private_key })],
+      ['a JSON string', base64('key')],
+    ])('rejects GOOGLE_SERVICE_ACCOUNT_JSON with %s', (_, value) => {
+      expect(() => parseEnv({ ...GOOGLE, GOOGLE_SERVICE_ACCOUNT_JSON: value })).toThrow(
+        /GOOGLE_SERVICE_ACCOUNT_JSON/,
+      );
+    });
+
+    it('rejects a spreadsheet URL instead of the id', () => {
+      expect(() =>
+        parseEnv({ ...GOOGLE, GOOGLE_SHEET_ID: 'https://docs.google.com/spreadsheets/d/x' }),
+      ).toThrow(/GOOGLE_SHEET_ID/);
+    });
+
+    it('does not leak the key into the error message', () => {
+      const value = base64({ client_email: 'not-an-email', private_key: 'secret-key' });
+      expect(() => parseEnv({ ...GOOGLE, GOOGLE_SERVICE_ACCOUNT_JSON: value })).toThrow(
+        expect.objectContaining({ message: expect.not.stringMatching(/secret-key|not-an-email/) }),
       );
     });
   });
