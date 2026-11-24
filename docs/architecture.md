@@ -130,17 +130,22 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
    4. Валидация той же Zod-схемой, что на клиенте.
    5. `leadService.create()` – одна транзакция: `leads` + `consents` + `outbox(telegram.lead_created)` + `outbox(sheets.upsert)`. Если у репетитора `full` – статус заявки сразу `waitlist`.
    6. Ответ: номер заявки и данные для экрана «Спасибо» (дневной или ночной текст по времени Минска, способ связи).
-3. Воркер (`worker/index.ts`) крутит цикл выборки:
+3. Воркер (`worker/index.ts`, цикл – `src/server/outbox/worker.ts`) захватывает задания одним запросом и отпускает строки сразу, до вызова обработчика:
    ```sql
-   SELECT … FROM outbox
-   WHERE status = 'pending' AND run_at <= now()
-   ORDER BY id LIMIT 10
-   FOR UPDATE SKIP LOCKED
+   UPDATE outbox SET status = 'processing', locked_at = now(), attempts = attempts + 1
+   WHERE id IN (
+     SELECT id FROM outbox
+     WHERE status = 'pending' AND run_at <= now() AND type = ANY(<типы с обработчиком>)
+     ORDER BY id LIMIT 10
+     FOR UPDATE SKIP LOCKED)
+   RETURNING …
    ```
-   - Для каждого задания вызывается обработчик по `type`.
-   - Ошибка – `attempts + 1`, `run_at = now() + backoff`: экспонента 10 с, 30 с, 1 мин, 5 мин, 15 мин, 1 ч и дальше по часу, до 10 попыток.
-   - После последней попытки – `dead` и задание `telegram.alert` Андрею.
-   - Чтобы не ждать опроса, используется `LISTEN/NOTIFY`, опрос раз в 5 с – страховка.
+   - Для каждого задания по порядку `id` вызывается обработчик по `type`, тайм-аут – 30 с. Успех – `done` и `done_at`.
+   - Ошибка – `run_at = now() + backoff`: экспонента 10 с, 30 с, 1 мин, 5 мин, 15 мин, 1 ч и дальше по часу, до 10 попыток. В `last_error` и лог – код ошибки (`OutboxJobError.code` или имя класса с SQLSTATE), без текста.
+   - После последней попытки – `dead` и задание `telegram.alert` Андрею с `{ outboxId }`. О «мёртвом» `telegram.alert` – только лог.
+   - Задание в `processing` дольше 15 минут (воркер упал посреди пачки) – неудачная попытка с кодом `lock_expired`.
+   - Задания типа без обработчика воркер не берёт: они ждут, пока интеграция не включена.
+   - Чтобы не ждать опроса, используется `LISTEN/NOTIFY` на отдельном соединении (переподключается само), опрос раз в 5 с – страховка. SIGTERM: текущее задание дорабатывает, новые не берутся.
 4. Обработчики:
    - `telegram.lead_created`: отправка сообщения в общий чат с кнопками статусов, сохранение `telegram_message_id`.
    - `telegram.lead_updated`: редактирование того же сообщения (новый статус, кто поменял).
@@ -201,7 +206,7 @@ YANDEX_METRIKA_ID=
 
 ## 9. Сборка, деплой, инфраструктура
 
-- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `worker.js`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
+- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `dist/worker.js` – один ESM-файл со всеми зависимостями, `tsup.config.ts`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
 - **CI** (`ci.yml`, на каждый PR в `develop`/`main` и push в них): install → format:check → lint → typecheck → `content:check` → unit → integration (Testcontainers) → build → e2e (Playwright против собранного приложения + Postgres service) → Lighthouse CI для `/` и `/tutors/andrei`. Параллельно – gitleaks по всей истории и `pnpm audit` (не блокирует). Шаги добавляются в фичах, где появляется то, что они проверяют; job `checks` и `build-e2e` обязательны для слияния в `develop` и `main`. Actions закреплены по SHA (ADR-022), сборка – отдельный шаг перед Playwright (ADR-024).
 - **Deploy** (`deploy.yml`):
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;

@@ -197,7 +197,7 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 |---|---|
 | `id` | bigint identity |
 | `type` | `'telegram.lead_created' \| 'telegram.lead_updated' \| 'telegram.reminder' \| 'telegram.alert' \| 'sheets.upsert'` |
-| `payload` | jsonb – только идентификаторы (`{ leadId }`), без ПД |
+| `payload` | jsonb – только идентификаторы: `{ leadId }`, у `telegram.alert` – `{ outboxId }` задания, ушедшего в `dead`; без ПД |
 | `status` | `'pending' \| 'processing' \| 'done' \| 'dead'` |
 | `attempts` | int |
 | `run_at` | timestamptz |
