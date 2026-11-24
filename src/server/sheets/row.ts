@@ -35,6 +35,20 @@ export const LEAD_COLUMNS = [
 /** Последний столбец листа – Q. */
 export const LAST_COLUMN = String.fromCharCode('A'.charCodeAt(0) + LEAD_COLUMNS.length - 1);
 
+/** Форматы чисел Таблицы: дата хранится числом дней, вид задаёт формат ячейки. */
+export const DATE_TIME_FORMAT = { type: 'DATE_TIME', pattern: 'dd.mm.yyyy hh:mm' } as const;
+export const DATE_FORMAT = { type: 'DATE', pattern: 'dd.mm.yyyy' } as const;
+
+/** Формат по номеру столбца (с 0): B и Q – дата и время, N и O – дата. */
+export const LEAD_COLUMN_FORMATS: Readonly<
+  Record<number, typeof DATE_TIME_FORMAT | typeof DATE_FORMAT>
+> = {
+  1: DATE_TIME_FORMAT,
+  13: DATE_FORMAT,
+  14: DATE_FORMAT,
+  16: DATE_TIME_FORMAT,
+};
+
 /** Имена репетиторов и названия предметов – из content/, как у бота. */
 export type SheetsDirectory = Pick<BotDirectory, 'tutors' | 'subjects'>;
 

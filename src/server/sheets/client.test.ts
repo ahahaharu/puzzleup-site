@@ -133,13 +133,28 @@ describe('createSheetsClient', () => {
 
 describe('createGoogleSheets', () => {
   const sheetUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
-  const range = (a1: string) => encodeURIComponent(`'Заявки'!${a1}`);
+  const META = {
+    sheets: [
+      { properties: { sheetId: 0, title: 'Сводка' } },
+      { properties: { sheetId: 7, title: 'Заявки' } },
+    ],
+  };
+  // Ответы API по адресу: метаданные Таблицы, столбец A, запись.
+  const google =
+    (keys: unknown[] = []) =>
+    (call: Call) =>
+      call.url.includes('fields=')
+        ? ok(META)
+        : call.url.includes('/values/')
+          ? ok({ values: [keys] })
+          : ok({});
+  const body = (call: Call | undefined) => JSON.parse(call?.body ?? '');
 
   it('reads column A of «Заявки» as raw values', async () => {
-    const { sheets, apiCalls } = setup(() => ok({ values: [['№ заявки', 1001, 1002]] }));
+    const { sheets, apiCalls } = setup(google(['№ заявки', 1001, 1002]));
     expect(await sheets.readKeys()).toEqual(['№ заявки', 1001, 1002]);
     expect(apiCalls()[0]?.url).toBe(
-      `${sheetUrl}/values/${range('A:A')}?majorDimension=COLUMNS&valueRenderOption=UNFORMATTED_VALUE`,
+      `${sheetUrl}/values/${encodeURIComponent("'Заявки'!A:A")}?majorDimension=COLUMNS&valueRenderOption=UNFORMATTED_VALUE`,
     );
   });
 
@@ -148,33 +163,77 @@ describe('createGoogleSheets', () => {
     expect(await sheets.readKeys()).toEqual([]);
   });
 
-  it('rewrites rows A–Q as raw values', async () => {
-    const { sheets, apiCalls } = setup();
-    await sheets.updateRows([
-      { row: 3, values: [1001, '=HYPERLINK("x")'] },
-      { row: 7, values: [1001, 'новая'] },
-    ]);
-    const [call] = apiCalls();
-    expect(call?.method).toBe('POST');
-    expect(call?.url).toBe(`${sheetUrl}/values:batchUpdate`);
-    expect(JSON.parse(call?.body ?? '')).toEqual({
-      valueInputOption: 'RAW',
-      data: [
-        { range: "'Заявки'!A3:Q3", values: [[1001, '=HYPERLINK("x")']] },
-        { range: "'Заявки'!A7:Q7", values: [[1001, 'новая']] },
-      ],
+  it('appends cells with date formats, text never as a formula', async () => {
+    const { sheets, apiCalls } = setup(google());
+    const row: (string | number)[] = Array.from({ length: 17 }, (_, index) =>
+      index === 1 || index === 13 ? 46350.5 : '',
+    );
+    row[0] = 1002;
+    row[8] = '=IMPORTXML("x")';
+    await sheets.appendRow(row);
+
+    const [meta, write] = apiCalls();
+    expect(new URL(meta?.url ?? '').searchParams.get('fields')).toBe(
+      'sheets.properties(sheetId,title)',
+    );
+    expect(write?.url).toBe(`${sheetUrl}:batchUpdate`);
+    const [request] = body(write).requests;
+    expect(request.appendCells.sheetId).toBe(7);
+    expect(request.appendCells.fields).toBe(
+      'userEnteredValue,userEnteredFormat.numberFormat,userEnteredFormat.textFormat.bold',
+    );
+    const cells = request.appendCells.rows[0].values;
+    expect(cells[0]).toEqual({
+      userEnteredValue: { numberValue: 1002 },
+      userEnteredFormat: { textFormat: { bold: false } },
     });
+    expect(cells[1].userEnteredFormat.numberFormat).toEqual({
+      type: 'DATE_TIME',
+      pattern: 'dd.mm.yyyy hh:mm',
+    });
+    expect(cells[13].userEnteredFormat.numberFormat).toEqual({
+      type: 'DATE',
+      pattern: 'dd.mm.yyyy',
+    });
+    expect(cells[8].userEnteredValue).toEqual({ stringValue: '=IMPORTXML("x")' });
+    // Пустое значение очищает ячейку.
+    expect(cells[2]).not.toHaveProperty('userEnteredValue');
   });
 
-  it('appends a row below the table as raw values', async () => {
-    const { sheets, apiCalls } = setup();
-    await sheets.appendRow([1002, 'новая']);
-    const [call] = apiCalls();
-    expect(call?.method).toBe('POST');
-    expect(call?.url).toBe(
-      `${sheetUrl}/values/${range('A:Q')}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
+  it('rewrites rows in place and reads the sheet id once', async () => {
+    const { sheets, apiCalls } = setup(google());
+    await sheets.updateRows([
+      { row: 3, values: [1001, 'новая'] },
+      { row: 7, values: [1001, 'новая'] },
+    ]);
+    await sheets.updateRows([{ row: 3, values: [1001, 'ученик'] }]);
+
+    const calls = apiCalls();
+    expect(calls.filter((call) => call.url.includes('fields='))).toHaveLength(1);
+    const starts = body(calls[1]).requests.map(
+      (request: { updateCells: { start: unknown } }) => request.updateCells.start,
     );
-    expect(call?.headers.get('content-type')).toBe('application/json');
-    expect(JSON.parse(call?.body ?? '')).toEqual({ values: [[1002, 'новая']] });
+    expect(starts).toEqual([
+      { sheetId: 7, rowIndex: 2, columnIndex: 0 },
+      { sheetId: 7, rowIndex: 6, columnIndex: 0 },
+    ]);
+  });
+
+  it('reads the sheet id again after a failed write', async () => {
+    let fail = true;
+    const { sheets, apiCalls } = setup((call) =>
+      call.url.includes('fields=') ? ok(META) : fail ? new Response('{}', { status: 500 }) : ok({}),
+    );
+    await expect(sheets.appendRow([1])).rejects.toMatchObject({ code: '500' });
+    fail = false;
+    await sheets.appendRow([1]);
+    expect(apiCalls().filter((call) => call.url.includes('fields='))).toHaveLength(2);
+  });
+
+  it('fails with a code when «Заявки» is missing', async () => {
+    const { sheets } = setup(() =>
+      ok({ sheets: [{ properties: { sheetId: 0, title: 'Лист1' } }] }),
+    );
+    await expect(sheets.appendRow([1])).rejects.toMatchObject({ code: 'no_leads_sheet' });
   });
 });
