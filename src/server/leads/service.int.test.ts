@@ -1,11 +1,11 @@
-import { eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { createTestDb } from '../../../tests/setup/db';
 import type { Db } from '../db/client';
 import { consents, leadEvents, leads, outbox, tutorAvailability } from '../db/schema';
-import type { NewFormLead } from './domain';
-import { createLead } from './service';
+import type { NewFormLead, NewManualLead } from './domain';
+import { changeStatus, createLead, createManualLead } from './service';
 
 let db: Db;
 
@@ -101,5 +101,167 @@ describe('createLead', () => {
     ).rejects.toThrow();
     expect(await db.$count(leads)).toBe(before);
     expect(await db.$count(outbox)).toBe(jobsBefore);
+  });
+});
+
+const at = (iso: string) => ({ now: () => Date.parse(iso) });
+
+const jobsOf = (leadId: number) =>
+  db
+    .select({ type: outbox.type })
+    .from(outbox)
+    .where(eq(outbox.payload, { leadId }))
+    .orderBy(asc(outbox.id));
+
+describe('changeStatus', () => {
+  it('updates the lead, logs the event and enqueues the message edit and the sheet row', async () => {
+    const { id } = await createLead(db, lead());
+    const clock = at('2026-11-24T12:00:00Z');
+
+    expect(
+      await changeStatus(db, clock, { leadId: id, status: 'contacted', actor: 't-maxim' }),
+    ).toEqual({ kind: 'changed' });
+
+    const [row] = await db.select().from(leads).where(eq(leads.id, id));
+    expect(row).toMatchObject({
+      status: 'contacted',
+      statusChangedBy: 't-maxim',
+      statusChangedAt: new Date('2026-11-24T12:00:00Z'),
+      rejectionReason: null,
+    });
+    const events = await db
+      .select({ from: leadEvents.fromStatus, to: leadEvents.toStatus, actor: leadEvents.actor })
+      .from(leadEvents)
+      .where(and(eq(leadEvents.leadId, id), eq(leadEvents.type, 'status_changed')));
+    expect(events).toEqual([{ from: 'new', to: 'contacted', actor: 't-maxim' }]);
+    expect((await jobsOf(id)).map((job) => job.type)).toEqual([
+      'telegram.lead_created',
+      'sheets.upsert',
+      'telegram.lead_updated',
+      'sheets.upsert',
+    ]);
+  });
+
+  it('does nothing when the status and the reason are the same', async () => {
+    const { id } = await createLead(db, lead());
+    const clock = at('2026-11-24T12:00:00Z');
+    await changeStatus(db, clock, {
+      leadId: id,
+      status: 'rejected',
+      reason: 'expensive',
+      actor: 't-anna',
+    });
+
+    expect(
+      await changeStatus(db, clock, {
+        leadId: id,
+        status: 'rejected',
+        reason: 'expensive',
+        actor: 't-anna',
+      }),
+    ).toEqual({ kind: 'unchanged' });
+    expect(await jobsOf(id)).toHaveLength(4);
+  });
+
+  it('stores the rejection reason and clears it on the next status', async () => {
+    const { id } = await createLead(db, lead());
+    const clock = at('2026-11-24T12:00:00Z');
+    await changeStatus(db, clock, {
+      leadId: id,
+      status: 'rejected',
+      reason: 'expensive',
+      actor: 't-anna',
+    });
+    await changeStatus(db, clock, {
+      leadId: id,
+      status: 'rejected',
+      reason: 'schedule',
+      actor: 't-anna',
+    });
+    const reason = async () =>
+      (await db.select({ reason: leads.rejectionReason }).from(leads).where(eq(leads.id, id)))[0];
+    expect(await reason()).toEqual({ reason: 'schedule' });
+
+    await changeStatus(db, clock, { leadId: id, status: 'trial_scheduled', actor: 't-anna' });
+    expect(await reason()).toEqual({ reason: null });
+  });
+
+  it('keeps the first trial and student dates', async () => {
+    const { id } = await createLead(db, lead());
+    const first = at('2026-11-24T12:00:00Z');
+    const later = at('2026-12-01T12:00:00Z');
+    await changeStatus(db, first, { leadId: id, status: 'trial_done', actor: 't-anna' });
+    await changeStatus(db, first, { leadId: id, status: 'student', actor: 't-anna' });
+    await changeStatus(db, later, { leadId: id, status: 'trial_done', actor: 't-anna' });
+    await changeStatus(db, later, { leadId: id, status: 'student', actor: 't-anna' });
+
+    const [row] = await db.select().from(leads).where(eq(leads.id, id));
+    expect(row).toMatchObject({
+      trialDoneAt: new Date('2026-11-24T12:00:00Z'),
+      studentAt: new Date('2026-11-24T12:00:00Z'),
+      statusChangedAt: new Date('2026-12-01T12:00:00Z'),
+    });
+  });
+
+  it('reports a lead that no longer exists', async () => {
+    expect(
+      await changeStatus(db, at('2026-11-24T12:00:00Z'), {
+        leadId: 999_999,
+        status: 'contacted',
+        actor: 't-anna',
+      }),
+    ).toEqual({ kind: 'not_found' });
+  });
+});
+
+describe('createManualLead', () => {
+  const manual = (overrides: Partial<NewManualLead> = {}): NewManualLead => ({
+    tutorId: 't-manual',
+    source: 'viber',
+    grade: 8,
+    subject: 'math',
+    goal: 'exam9',
+    referral: 'word_of_mouth',
+    initialAvailability: 'available',
+    ...overrides,
+  });
+
+  it('stores the lead without contacts as contacted, by the tutor who added it', async () => {
+    const created = await createManualLead(db, at('2026-11-24T12:00:00Z'), manual());
+    expect(created.status).toBe('contacted');
+
+    const [row] = await db.select().from(leads).where(eq(leads.id, created.id));
+    expect(row).toMatchObject({
+      source: 'viber',
+      parentName: null,
+      phone: null,
+      contactMethod: null,
+      entry: null,
+      landingPath: null,
+      grade: 8,
+      subjects: ['math'],
+      goal: 'exam9',
+      utmSource: 'word_of_mouth',
+      status: 'contacted',
+      statusChangedBy: 't-manual',
+      createdAt: new Date('2026-11-24T12:00:00Z'),
+    });
+    expect(await db.select().from(consents).where(eq(consents.leadId, created.id))).toEqual([]);
+    expect((await jobsOf(created.id)).map((job) => job.type)).toEqual([
+      'telegram.lead_created',
+      'sheets.upsert',
+    ]);
+  });
+
+  it('puts the lead on the waitlist when the tutor is full', async () => {
+    await db
+      .insert(tutorAvailability)
+      .values({ tutorId: 't-full', status: 'full', updatedBy: 'system' });
+    const created = await createManualLead(
+      db,
+      at('2026-11-24T12:00:00Z'),
+      manual({ tutorId: 't-full', goal: undefined }),
+    );
+    expect(created.status).toBe('waitlist');
   });
 });

@@ -48,3 +48,20 @@ export function isWithinHours(epochMs: number, hours: { from: string; to: string
   const now = time.hour * 60 + time.minute;
   return now >= minutesOf(hours.from) && now < minutesOf(hours.to);
 }
+
+const DATE_TIME = new Intl.DateTimeFormat('ru-RU', {
+  day: 'numeric',
+  month: 'long',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  timeZone: MINSK_TZ,
+});
+
+/** Момент по Минску – «24 ноября, 14:05»: время заявки и смены статуса в сообщениях бота. */
+export function formatDateTime(epochMs: number): string {
+  const parts = Object.fromEntries(
+    DATE_TIME.formatToParts(epochMs).map((part) => [part.type, part.value]),
+  );
+  return `${parts.day} ${parts.month}, ${parts.hour}:${parts.minute}`;
+}

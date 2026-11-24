@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { formatLongDate, isWithinHours, minskYear, shortTime } from './time';
+import { formatDateTime, formatLongDate, isWithinHours, minskYear, shortTime } from './time';
 
 describe('minskYear', () => {
   it('uses Minsk time at the year boundary', () => {
@@ -42,5 +42,16 @@ describe('isWithinHours', () => {
 
   it('treats the night after midnight as outside the hours', () => {
     expect(isWithinHours(Date.parse('2026-11-24T23:30:00Z'), hours)).toBe(false);
+  });
+});
+
+describe('formatDateTime', () => {
+  it('formats the moment in Minsk time', () => {
+    // 11:05 UTC – 14:05 в Минске (UTC+3).
+    expect(formatDateTime(Date.parse('2026-11-24T11:05:00Z'))).toBe('24 ноября, 14:05');
+  });
+
+  it('uses the Minsk date after 21:00 UTC', () => {
+    expect(formatDateTime(Date.parse('2026-12-31T21:30:00Z'))).toBe('1 января, 00:30');
   });
 });

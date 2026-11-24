@@ -7,7 +7,7 @@ import type { LeadStatus } from '@/lib/lead';
 import { consents, leadEvents, leads, tutorAvailability } from '@/server/db/schema';
 import type { DbOrTx } from '@/server/outbox/enqueue';
 
-import type { NewFormLead } from './domain';
+import type { Lead, NewFormLead, NewManualLead } from './domain';
 
 /** Текущий статус занятости репетитора; строки нет – `undefined`. */
 export async function findAvailability(
@@ -63,4 +63,47 @@ export async function insertFormLead(
     .insert(leadEvents)
     .values({ leadId: row.id, type: 'created', toStatus: context.status, actor: 'system' });
   return row.id;
+}
+
+/** Ручная заявка из `/add` и событие `created`: актор – репетитор, который её добавил. */
+export async function insertManualLead(
+  db: DbOrTx,
+  lead: NewManualLead,
+  context: { status: LeadStatus; availability: Availability; at: Date },
+): Promise<number> {
+  const [row] = await db
+    .insert(leads)
+    .values({
+      createdAt: context.at,
+      tutorId: lead.tutorId,
+      source: lead.source,
+      grade: lead.grade,
+      subjects: [lead.subject],
+      goal: lead.goal ?? null,
+      utmSource: lead.referral,
+      availabilityAtSubmit: context.availability,
+      status: context.status,
+      statusChangedAt: context.at,
+      statusChangedBy: lead.tutorId,
+    })
+    .returning({ id: leads.id });
+  if (!row) throw new Error('Lead insert returned no row');
+  await db.insert(leadEvents).values({
+    leadId: row.id,
+    at: context.at,
+    type: 'created',
+    toStatus: context.status,
+    actor: lead.tutorId,
+  });
+  return row.id;
+}
+
+export async function findLead(db: DbOrTx, id: number): Promise<Lead | undefined> {
+  const [row] = await db.select().from(leads).where(eq(leads.id, id));
+  return row;
+}
+
+/** Сообщение заявки в общем чате – чтобы потом его редактировать. */
+export async function saveTelegramMessageId(db: DbOrTx, id: number, messageId: number) {
+  await db.update(leads).set({ telegramMessageId: messageId }).where(eq(leads.id, id));
 }
