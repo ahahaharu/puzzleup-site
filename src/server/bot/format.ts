@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { AVAILABILITY_LABELS, availabilitySchema, type Availability } from '@/lib/availability';
 import { GOAL_LABELS, goalSchema } from '@/lib/goal';
 import {
   CONTACT_METHOD_LABELS,
@@ -174,6 +175,10 @@ export const CALLBACK_TEXTS = {
   foreignDialog: 'Эти кнопки – диалог другого репетитора',
   expiredDialog: 'Диалог устарел – начните заново: /add',
   failed: 'Не получилось. Попробуйте ещё раз',
+  availabilityChanged: (status: Availability) =>
+    `Статус: «${AVAILABILITY_LABELS[status]}». Сайт обновится через несколько секунд`,
+  availabilityUnchanged: (status: Availability) => `Статус уже «${AVAILABILITY_LABELS[status]}»`,
+  foreignAvailability: 'Эти кнопки – статус другого репетитора',
 } as const;
 
 /** Через сколько часов в статусе «новая» бот напоминает о заявке – ТЗ главной, раздел 8. */
@@ -209,6 +214,7 @@ export function alertMessage(job: {
 /** Меню команд в Telegram – `pnpm bot:set-webhook`; подробно – `/help`. */
 export const BOT_COMMANDS = [
   { command: 'add', description: 'Добавить заявку из мессенджера или звонка' },
+  { command: 'status', description: 'Статус занятости на сайте' },
   { command: 'help', description: 'Что умеет бот' },
 ] as const;
 
@@ -219,10 +225,32 @@ export function helpMessage(directory: BotDirectory): OutgoingMessage {
     html: [
       '<b>Что умеет бот</b>',
       '/add – добавить заявку, которая пришла напрямую: в Telegram, Viber или по звонку. Бот спросит способ обращения, класс, предмет, цель и откуда узнали. Имя и контакт не нужны.',
+      `/status – статус занятости на сайте: «${AVAILABILITY_LABELS.available}», «${AVAILABILITY_LABELS.few}» или «${AVAILABILITY_LABELS.full}». Новый статус виден на сайте через несколько секунд.`,
       '/help – эта подсказка.',
       '',
       `Статус заявки меняется кнопками под её сообщением в общем чате. Если заявка ${reminderAfter()} остаётся в статусе «${LEAD_STATUS_LABELS.new}», бот напомнит о ней – с ${shortTime(from)} до ${shortTime(to)} по Минску.`,
     ].join('\n'),
+  };
+}
+
+/**
+ * `/status`: текущий статус репетитора и кнопки всех трёх, текущий отмечен «✓» (ТЗ страницы
+ * репетитора, раздел 5). Кнопки меняют статус только того, кто вызвал команду.
+ */
+export function availabilityMessage(tutor: BotTutor, current: Availability): OutgoingMessage {
+  return {
+    html: [
+      `<b>Статус занятости – ${escapeHtml(tutor.name)}</b>`,
+      `Сейчас на сайте: «${AVAILABILITY_LABELS[current]}».`,
+      '',
+      `При «${AVAILABILITY_LABELS.full}» на странице – кнопка «Встать в лист ожидания», а новые заявки приходят со статусом «${LEAD_STATUS_LABELS.waitlist}».`,
+    ].join('\n'),
+    keyboard: availabilitySchema.options.map((status) => [
+      {
+        text: `${status === current ? '✓ ' : ''}${AVAILABILITY_LABELS[status]}`,
+        data: callbackData.availability(tutor.id, status),
+      },
+    ]),
   };
 }
 

@@ -5,6 +5,9 @@ import {
   addDoneMessage,
   addPrompt,
   alertMessage,
+  availabilityMessage,
+  BOT_COMMANDS,
+  CALLBACK_TEXTS,
   escapeHtml,
   helpMessage,
   leadMessage,
@@ -212,10 +215,57 @@ describe('service messages', () => {
     expect(helpMessage(directory).html).toMatchInlineSnapshot(`
       "<b>Что умеет бот</b>
       /add – добавить заявку, которая пришла напрямую: в Telegram, Viber или по звонку. Бот спросит способ обращения, класс, предмет, цель и откуда узнали. Имя и контакт не нужны.
+      /status – статус занятости на сайте: «Есть свободное время», «Последние места» или «Мест нет». Новый статус виден на сайте через несколько секунд.
       /help – эта подсказка.
 
       Статус заявки меняется кнопками под её сообщением в общем чате. Если заявка 2 часа остаётся в статусе «новая», бот напомнит о ней – с 9:00 до 22:00 по Минску."
     `);
+  });
+});
+
+describe('/status', () => {
+  it('shows the current status of the tutor with buttons for all three', () => {
+    expect(availabilityMessage(anna, 'few')).toMatchInlineSnapshot(`
+      {
+        "html": "<b>Статус занятости – Анна</b>
+      Сейчас на сайте: «Последние места».
+
+      При «Мест нет» на странице – кнопка «Встать в лист ожидания», а новые заявки приходят со статусом «лист ожидания».",
+        "keyboard": [
+          [
+            {
+              "data": "av:t-anna:available",
+              "text": "Есть свободное время",
+            },
+          ],
+          [
+            {
+              "data": "av:t-anna:few",
+              "text": "✓ Последние места",
+            },
+          ],
+          [
+            {
+              "data": "av:t-anna:full",
+              "text": "Мест нет",
+            },
+          ],
+        ],
+      }
+    `);
+  });
+
+  it('answers the button', () => {
+    expect(CALLBACK_TEXTS.availabilityChanged('full')).toMatchInlineSnapshot(
+      `"Статус: «Мест нет». Сайт обновится через несколько секунд"`,
+    );
+    expect(CALLBACK_TEXTS.availabilityUnchanged('available')).toMatchInlineSnapshot(
+      `"Статус уже «Есть свободное время»"`,
+    );
+  });
+
+  it('is in the command menu', () => {
+    expect(BOT_COMMANDS.map((item) => item.command)).toEqual(['add', 'status', 'help']);
   });
 });
 

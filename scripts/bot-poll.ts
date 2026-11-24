@@ -11,6 +11,7 @@ import { Api, GrammyError } from 'grammy/web';
 
 import { EnvError, parseEnv, type Env } from '@/lib/env';
 import { systemClock } from '@/lib/time';
+import { requestRevalidation } from '@/server/availability/revalidate';
 import { createTelegramApi } from '@/server/bot/telegram-api';
 import { createDb } from '@/server/db/client';
 import { errorCode } from '@/server/outbox/worker';
@@ -42,6 +43,12 @@ const { handleUpdate } = await import('@/server/bot/bot');
 const log = (event: string, fields: Record<string, string | number> = {}) =>
   console.error(JSON.stringify({ scope: 'bot', event, ...fields }));
 
+// Кэш страниц – в процессе `pnpm dev`: после `/status` бот просит сайт сбросить его по HTTP.
+const { SITE_URL: siteUrl, INTERNAL_API_SECRET: secret } = env;
+if (secret === undefined) {
+  console.error('INTERNAL_API_SECRET is not set: /status will not refresh the site cache');
+}
+
 const db = createDb(url);
 const deps = {
   db,
@@ -50,6 +57,9 @@ const deps = {
   access: { leadsChatId: telegram.leadsChatId, tutors: telegram.tutors },
   directory: contentDirectory(),
   log,
+  invalidateAvailability: async () => {
+    if (secret !== undefined) await requestRevalidation(siteUrl, secret);
+  },
 };
 
 const api = new Api(telegram.token);
