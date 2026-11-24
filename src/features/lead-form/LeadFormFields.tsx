@@ -204,6 +204,14 @@ export function LeadFormFields({ id, data, state, action, pending, onValid }: Le
   }, [lastResult]);
 
   function submit(event: FormEvent<HTMLFormElement>) {
+    // Перепроверка поля при вводе и уходе из него – тоже событие submit: Conform отправляет форму
+    // служебной кнопкой с `name` (намерение `validate`). Её он разбирает сам, а фокус и
+    // объявление ошибок – только для отправки родителем (кнопка без `name` или Enter).
+    const submitter = event.nativeEvent instanceof SubmitEvent ? event.nativeEvent.submitter : null;
+    if (submitter?.getAttribute('name')) {
+      form.onSubmit(event);
+      return;
+    }
     if (pending) {
       event.preventDefault();
       return;
