@@ -30,6 +30,31 @@ const tutorsSchema = z
       .refine((tutors) => Object.keys(tutors).length > 0, 'must list at least one tutor'),
   );
 
+/**
+ * Ключ сервисного аккаунта Google в base64 (файл JSON из Google Cloud). Нужны только почта
+ * аккаунта и закрытый ключ; остальные поля файла не читаются.
+ */
+const serviceAccountSchema = z
+  .string()
+  .transform((value, ctx) => {
+    try {
+      const parsed: unknown = JSON.parse(Buffer.from(value, 'base64').toString('utf8'));
+      return parsed;
+    } catch {
+      ctx.addIssue({ code: 'custom', message: 'must be base64 of the service account JSON key' });
+      return z.NEVER;
+    }
+  })
+  .pipe(
+    z.object(
+      {
+        client_email: z.email('must have client_email'),
+        private_key: z.string().includes('PRIVATE KEY', { message: 'must have private_key' }),
+      },
+      'must be base64 of the service account JSON key',
+    ),
+  );
+
 const TELEGRAM_KEYS = [
   'TELEGRAM_BOT_TOKEN',
   'TELEGRAM_WEBHOOK_SECRET',
@@ -37,6 +62,17 @@ const TELEGRAM_KEYS = [
   'TELEGRAM_ALERT_CHAT_ID',
   'TELEGRAM_TUTORS',
 ] as const;
+
+const GOOGLE_KEYS = ['GOOGLE_SHEET_ID', 'GOOGLE_SERVICE_ACCOUNT_JSON'] as const;
+
+/** Google Таблица (docs/architecture.md, раздел 5). Без неё строки ждут в outbox. */
+export type SheetsEnv = {
+  spreadsheetId: string;
+  /** Почта сервисного аккаунта – ей Таблица открыта на редактирование. */
+  clientEmail: string;
+  /** Закрытый ключ PEM. */
+  privateKey: string;
+};
 
 /** Бот (docs/architecture.md, раздел 6). Без него заявки ждут в outbox. */
 export type TelegramEnv = {
@@ -68,23 +104,38 @@ const envSchema = z
     TELEGRAM_LEADS_CHAT_ID: chatId.optional(),
     TELEGRAM_ALERT_CHAT_ID: chatId.optional(),
     TELEGRAM_TUTORS: tutorsSchema.optional(),
+    // id из адреса Таблицы: docs.google.com/spreadsheets/d/<id>/edit.
+    GOOGLE_SHEET_ID: z
+      .string()
+      .regex(/^[\w-]{20,100}$/, 'must be the id from the spreadsheet URL')
+      .optional(),
+    GOOGLE_SERVICE_ACCOUNT_JSON: serviceAccountSchema.optional(),
   })
   .transform((raw, ctx) => {
-    // Бот задаётся целиком или не задаётся: наполовину настроенный молча терял бы апдейты.
-    const missing = TELEGRAM_KEYS.filter((key) => raw[key] === undefined);
-    if (missing.length > 0 && (missing.length < TELEGRAM_KEYS.length || raw.APP_ENV !== 'local')) {
+    // Бот и Таблица задаются целиком или не задаются: наполовину настроенные молча теряли бы
+    // апдейты и строки. В staging и production обязательны оба.
+    let incomplete = false;
+    for (const [keys, prefix] of [
+      [TELEGRAM_KEYS, 'TELEGRAM_*'],
+      [GOOGLE_KEYS, 'GOOGLE_*'],
+    ] as const) {
+      const missing = keys.filter((key) => raw[key] === undefined);
+      if (missing.length === 0 || (missing.length === keys.length && raw.APP_ENV === 'local')) {
+        continue;
+      }
+      incomplete = true;
       for (const key of missing) {
         ctx.addIssue({
           code: 'custom',
           path: [key],
           message:
             raw.APP_ENV === 'local'
-              ? `${key} is required when any TELEGRAM_* variable is set`
+              ? `${key} is required when any ${prefix} variable is set`
               : `${key} is required when APP_ENV=${raw.APP_ENV}`,
         });
       }
-      return z.NEVER;
     }
+    if (incomplete) return z.NEVER;
     if (raw.APP_ENV !== 'local') {
       // Локально сайт работает и без базы: она нужна только форме и статусу занятости.
       if (raw.DATABASE_URL === undefined) {
@@ -130,6 +181,15 @@ const envSchema = z
               alertChatId: Number(raw.TELEGRAM_ALERT_CHAT_ID),
               tutors: raw.TELEGRAM_TUTORS,
             } satisfies TelegramEnv,
+          }),
+      ...(raw.GOOGLE_SHEET_ID === undefined || raw.GOOGLE_SERVICE_ACCOUNT_JSON === undefined
+        ? {}
+        : {
+            sheets: {
+              spreadsheetId: raw.GOOGLE_SHEET_ID,
+              clientEmail: raw.GOOGLE_SERVICE_ACCOUNT_JSON.client_email,
+              privateKey: raw.GOOGLE_SERVICE_ACCOUNT_JSON.private_key,
+            } satisfies SheetsEnv,
           }),
     };
   });

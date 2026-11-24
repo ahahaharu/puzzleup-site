@@ -78,7 +78,7 @@
 │  │  ├─ leads/                domain.ts (типы, статусы), service.ts, repository.ts
 │  │  ├─ outbox/               enqueue.ts, worker.ts, handlers/*.ts, backoff.ts
 │  │  ├─ bot/                  bot.ts (апдейты), update.ts (схема апдейта), deps.ts, webhook.ts, auth.ts, directory.ts (данные контента), callback.ts, format.ts (тексты и кнопки), port.ts + telegram-api.ts (grammY), dialogs.ts, commands/*.ts, fixtures.ts (тесты)
-│  │  ├─ sheets/               client.ts, row.ts (маппинг A–Q)
+│  │  ├─ sheets/               port.ts, client.ts (токен сервисного аккаунта, fetch), google-sheets.ts (адаптер), row.ts (маппинг A–Q), upsert.ts, template.ts (шаблон Таблицы), fixtures.ts (тесты)
 │  │  ├─ availability/         seed.ts, repository.ts, cache.ts (cacheTag)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
 │  │  ├─ env.ts                проверенное окружение сервера
@@ -149,7 +149,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 4. Обработчики:
    - `telegram.lead_created`: отправка сообщения в общий чат с кнопками статусов, сохранение `telegram_message_id`.
    - `telegram.lead_updated`: редактирование того же сообщения (новый статус, кто поменял).
-   - `sheets.upsert`: строка по номеру заявки – найти и обновить, иначе дописать. Столбцы A–Q строго по `docs/data-model.md`.
+   - `sheets.upsert`: строка по номеру заявки – найти и обновить, иначе дописать. Столбцы A–Q строго по `docs/data-model.md`. Строка пишется ячейками через `batchUpdate` (`updateCells` / `appendCells`): текст – всегда `stringValue`, так что метка `=…` из адреса остаётся текстом; даты – числами дней по Минску с форматом в каждой ячейке. Номер встретился в двух строках – обновляются обе (ADR-052).
    - `telegram.reminder` – напоминание; `telegram.alert` – предупреждение Андрею в личку.
 5. В payload задания – только идентификаторы: `leadId`, у `telegram.alert` – `outboxId`. Обработчик читает данные из базы, поэтому персональные данные не дублируются в outbox.
 
@@ -204,7 +204,9 @@ UMAMI_WEBSITE_ID=
 YANDEX_METRIKA_ID=
 ```
 
-`TELEGRAM_*` задаются все вместе или ни одной: в staging и production обязательны, локально без них бот выключен – вебхук отвечает 404, задания Telegram ждут в outbox, напоминания не планируются.
+`TELEGRAM_*` задаются все вместе или ни одной: в staging и production обязательны, локально без них бот выключен – вебхук отвечает 404, задания Telegram ждут в outbox, напоминания не планируются. С `GOOGLE_*` так же: без них задания `sheets.upsert` ждут в outbox.
+
+**Google Таблица окружения.** Таблицу создаёт человек и открывает на редактирование почте сервисного аккаунта (`client_email` из ключа). Затем `pnpm sheets:setup` с переменными этого окружения готовит листы по шаблону `src/server/sheets/template.ts`: «Заявки» (заголовки A–Q, форматы дат, защита с предупреждением), «Сводка», «Недели», «Ссылки» (генератор UTM), «Расходы», «Справочники», «Инструкция». Повторный запуск безопасен: в «Заявках», «Ссылках» и «Расходах» обновляются только заголовки и форматы, остальные листы пересоздаются целиком. Новый репетитор появляется в списке страниц «Ссылок» после повторного запуска.
 
 В репозитории – только `.env.example` без значений.
 
