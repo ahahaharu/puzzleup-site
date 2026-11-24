@@ -8,10 +8,10 @@ describe('startScheduler', () => {
     const logs: unknown[] = [];
     const scheduler = startScheduler(
       [
-        { name: 'count', everyMs: 5, run: async () => (runs += 1) },
+        { name: 'count', waitMs: 5, run: async () => (runs += 1) },
         {
           name: 'broken',
-          everyMs: 1000,
+          waitMs: () => 1000,
           run: async () => {
             throw new TypeError('Мария');
           },

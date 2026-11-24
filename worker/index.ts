@@ -54,7 +54,7 @@ if (env.telegram) {
   // Без бота напоминания копились бы в очереди и пришли бы разом, когда его включат.
   jobs.push({
     name: 'reminders',
-    everyMs: 60_000,
+    waitMs: 60_000,
     run: () => enqueueReminders(db, systemClock, directory.responseHours),
   });
 }
