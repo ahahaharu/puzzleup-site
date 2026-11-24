@@ -29,6 +29,7 @@ export default defineConfig([
   globalIgnores([
     '.next/**',
     'out/**',
+    'dist/**',
     'build/**',
     'coverage/**',
     'playwright-report/**',

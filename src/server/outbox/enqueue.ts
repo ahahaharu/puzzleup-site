@@ -5,6 +5,12 @@ import { outbox, type outboxTypeEnum } from '@/server/db/schema';
 
 export type OutboxType = (typeof outboxTypeEnum.enumValues)[number];
 
+/**
+ * Только идентификаторы: заявка (`leadId`) или задание, которое ушло в `dead` (`outboxId` –
+ * у `telegram.alert`). Обработчик сам читает данные из базы.
+ */
+export type OutboxPayload = { leadId: number } | { outboxId: number };
+
 /** Транзакция Drizzle или сама база: задание ставится в той же транзакции, что и заявка. */
 export type DbOrTx = Pick<Db, 'insert' | 'select' | 'update'>;
 
@@ -15,7 +21,7 @@ export type DbOrTx = Pick<Db, 'insert' | 'select' | 'update'>;
  */
 export async function enqueue(
   db: DbOrTx,
-  jobs: readonly { type: OutboxType; payload: { leadId: number } }[],
+  jobs: readonly { type: OutboxType; payload: OutboxPayload }[],
 ): Promise<void> {
   if (jobs.length === 0) return;
   await db.insert(outbox).values(jobs.map((job) => ({ type: job.type, payload: job.payload })));
