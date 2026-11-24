@@ -59,12 +59,16 @@ export default defineConfig({
         // страницу тестов и роняет уже запущенные файлы – на CI кэша нет, так было бы каждый раз.
         optimizeDeps: {
           include: [
+            '@conform-to/react',
+            '@conform-to/zod/v4',
             'next/dist/shared/lib/image-external',
             'next/link',
+            'next/navigation',
             'react',
             'react/jsx-dev-runtime',
             'react-dom/client',
             'vitest-browser-react',
+            'zod',
           ],
         },
         test: {
