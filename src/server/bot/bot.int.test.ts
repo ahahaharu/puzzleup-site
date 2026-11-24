@@ -3,13 +3,14 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { createTestDb } from '../../../tests/setup/db';
 import type { Db } from '../db/client';
-import { botDialogs, leads, outbox } from '../db/schema';
+import { botDialogs, leads, outbox, tutorAvailability } from '../db/schema';
 import { createLead } from '../leads/service';
 import { handleUpdate } from './bot';
 import { callbackData } from './callback';
 import type { BotDeps } from './deps';
 import { directory, fakeTelegram, type FakeCall } from './fixtures';
 import { CALLBACK_TEXTS } from './format';
+import type { Keyboard } from './port';
 
 let db: Db;
 
@@ -27,10 +28,12 @@ let now = Date.parse('2026-11-24T12:00:00Z');
 let telegram: ReturnType<typeof fakeTelegram>;
 let logs: { event: string; fields: Record<string, string | number> }[];
 let deps: BotDeps;
+let invalidations: number;
 
 beforeEach(() => {
   telegram = fakeTelegram();
   logs = [];
+  invalidations = 0;
   deps = {
     db,
     clock: { now: () => now },
@@ -38,6 +41,9 @@ beforeEach(() => {
     access: { leadsChatId: LEADS_CHAT, tutors: { [ANNA]: 't-anna', [OLEG]: 't-oleg' } },
     directory,
     log: (event, fields) => logs.push({ event, fields }),
+    invalidateAvailability: async () => {
+      invalidations += 1;
+    },
   };
 });
 
@@ -284,5 +290,69 @@ describe('/add', () => {
     await handleUpdate(press(ANNA, callbackData.add('source', 'call'), second), deps);
     expect(toast(telegram.calls)).toBe(CALLBACK_TEXTS.expiredDialog);
     expect(await db.select().from(botDialogs)).toEqual([]);
+  });
+});
+
+describe('/status', () => {
+  const sent = () => telegram.calls.findLast((call) => call.method === 'sendMessage');
+  const edited = () => telegram.calls.findLast((call) => call.method === 'editMessage');
+  const checked = (keyboard: Keyboard | undefined) =>
+    keyboard?.flat().find((button) => button.text.startsWith('✓'))?.text;
+  const stored = async (tutorId: string) =>
+    (await db.select().from(tutorAvailability).where(eq(tutorAvailability.tutorId, tutorId)))[0];
+
+  it('shows the initial status from MDX while the table has no row', async () => {
+    await handleUpdate(message(ANNA, '/status', privateChat(ANNA)), deps);
+    expect(sent()).toMatchObject({ chatId: ANNA, html: expect.stringContaining('Анна') });
+    expect(sent()?.html).toContain('Сейчас на сайте: «Есть свободное время».');
+    expect(checked(sent()?.keyboard)).toBe('✓ Есть свободное время');
+  });
+
+  it('stores the chosen status, refreshes the site and the message', async () => {
+    await handleUpdate(press(ANNA, callbackData.availability('t-anna', 'full'), 501), deps);
+
+    expect(await stored('t-anna')).toMatchObject({ status: 'full', updatedBy: 't-anna' });
+    expect(invalidations).toBe(1);
+    expect(edited()).toMatchObject({ chatId: LEADS_CHAT, messageId: 501 });
+    expect(edited()?.html).toContain('Сейчас на сайте: «Мест нет».');
+    expect(checked(edited()?.keyboard)).toBe('✓ Мест нет');
+    expect(toast(telegram.calls)).toBe(CALLBACK_TEXTS.availabilityChanged('full'));
+
+    // Следующая заявка к Анне – в лист ожидания.
+    const id = await newLead();
+    const [lead] = await db.select().from(leads).where(eq(leads.id, id));
+    expect(lead).toMatchObject({ status: 'waitlist', availabilityAtSubmit: 'full' });
+
+    await handleUpdate(message(ANNA, '/status'), deps);
+    expect(checked(sent()?.keyboard)).toBe('✓ Мест нет');
+  });
+
+  it('refreshes the site again on the same status', async () => {
+    const before = await stored('t-anna');
+    now += 60_000;
+    await handleUpdate(press(ANNA, callbackData.availability('t-anna', 'full'), 501), deps);
+    expect(toast(telegram.calls)).toBe(CALLBACK_TEXTS.availabilityUnchanged('full'));
+    expect(invalidations).toBe(1);
+    expect((await stored('t-anna'))?.updatedAt).toEqual(before?.updatedAt);
+  });
+
+  it('keeps the status of another tutor', async () => {
+    await handleUpdate(press(OLEG, callbackData.availability('t-anna', 'available'), 501), deps);
+    expect(toast(telegram.calls)).toBe(CALLBACK_TEXTS.foreignAvailability);
+    expect((await stored('t-anna'))?.status).toBe('full');
+    expect(invalidations).toBe(0);
+    expect(edited()).toBeUndefined();
+  });
+
+  it('stores the status even when the site cache is not refreshed', async () => {
+    deps.invalidateAvailability = async () => {
+      throw Object.assign(new Error('fetch failed'), { code: 'ECONNREFUSED' });
+    };
+    await handleUpdate(press(OLEG, callbackData.availability('t-oleg', 'few'), 502), deps);
+    expect((await stored('t-oleg'))?.status).toBe('few');
+    expect(logs).toEqual([
+      { event: 'availability_invalidate_failed', fields: { code: 'Error:ECONNREFUSED' } },
+    ]);
+    expect(toast(telegram.calls)).toBe(CALLBACK_TEXTS.availabilityChanged('few'));
   });
 });

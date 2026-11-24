@@ -1,13 +1,7 @@
-import type { Availability } from '@/lib/availability';
+import { AVAILABILITY_LABELS, type Availability } from '@/lib/availability';
 import { cn } from '@/lib/cn';
 
 // Плашка занятости – ТЗ страницы репетитора, раздел 5; docs/design-system.md, раздел 6; макет T-S-statuses.
-
-export const AVAILABILITY_LABELS: Record<Availability, string> = {
-  available: 'Есть свободное время',
-  few: 'Последние места',
-  full: 'Мест нет',
-};
 
 // Цвет кружка – только подсказка: статус всегда назван словами.
 const DOT: Record<Availability, string> = {

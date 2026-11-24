@@ -110,6 +110,11 @@ const envSchema = z
       .regex(/^[\w-]{20,100}$/, 'must be the id from the spreadsheet URL')
       .optional(),
     GOOGLE_SERVICE_ACCOUNT_JSON: serviceAccountSchema.optional(),
+    // Bearer-токен `POST /api/revalidate`: post-deploy ревалидация и `pnpm bot:poll`.
+    INTERNAL_API_SECRET: z
+      .string()
+      .regex(/^[\w-]{32,256}$/, 'must be 32–256 characters A-Z, a-z, 0-9, _ and -')
+      .optional(),
   })
   .transform((raw, ctx) => {
     // Бот и Таблица задаются целиком или не задаются: наполовину настроенные молча теряли бы
@@ -146,6 +151,15 @@ const envSchema = z
         });
         return z.NEVER;
       }
+      // Без него после деплоя страницы держали бы статусы занятости из сборки.
+      if (raw.INTERNAL_API_SECRET === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['INTERNAL_API_SECRET'],
+          message: `INTERNAL_API_SECRET is required when APP_ENV=${raw.APP_ENV}`,
+        });
+        return z.NEVER;
+      }
       if (raw.SITE_URL === undefined) {
         ctx.addIssue({
           code: 'custom',
@@ -167,6 +181,9 @@ const envSchema = z
       APP_ENV: raw.APP_ENV,
       SITE_URL: (raw.SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, ''),
       ...(raw.DATABASE_URL === undefined ? {} : { DATABASE_URL: raw.DATABASE_URL }),
+      ...(raw.INTERNAL_API_SECRET === undefined
+        ? {}
+        : { INTERNAL_API_SECRET: raw.INTERNAL_API_SECRET }),
       ...(raw.TELEGRAM_BOT_TOKEN === undefined ||
       raw.TELEGRAM_WEBHOOK_SECRET === undefined ||
       raw.TELEGRAM_LEADS_CHAT_ID === undefined ||

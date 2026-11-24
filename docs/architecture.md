@@ -79,12 +79,12 @@
 │  │  ├─ outbox/               enqueue.ts, worker.ts, handlers/*.ts, backoff.ts
 │  │  ├─ bot/                  bot.ts (апдейты), update.ts (схема апдейта), deps.ts, webhook.ts, auth.ts, directory.ts (данные контента), callback.ts, format.ts (тексты и кнопки), port.ts + telegram-api.ts (grammY), dialogs.ts, commands/*.ts, fixtures.ts (тесты)
 │  │  ├─ sheets/               port.ts, client.ts (токен сервисного аккаунта, fetch), google-sheets.ts (адаптер), row.ts (маппинг A–Q), upsert.ts, template.ts (шаблон Таблицы), fixtures.ts (тесты)
-│  │  ├─ availability/         seed.ts, repository.ts, cache.ts (cacheTag)
+│  │  ├─ availability/         seed.ts, repository.ts, cache.ts (cacheTag, инвалидация), revalidate.ts (`POST /api/revalidate`)
 │  │  ├─ jobs/                 reminders.ts, retention.ts, scheduler.ts
 │  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
 │  ├─ instrumentation.ts       проверка окружения при старте сервера
-│  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости), entry.ts (Zod-тип `entry`), cn.ts (склейка классов)
+│  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости, подписи, `withAvailability`), entry.ts (Zod-тип `entry`), cn.ts (склейка классов)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/                 сценарии Playwright
@@ -113,10 +113,9 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 - Главная и `/tutors/[slug]` должны оставаться статическими. Проверять через `ensureStatic` (Next 16.4) и вывод `next build`.
 - `/tutors/[slug]`: `generateStaticParams` по всем файлам `content/tutors`, включая ушедших; неизвестный slug – `notFound()`, `ensureStatic = 'navigation'` (ADR-045).
 - Фильтр по предметам на главной – клиентский компонент, который читает `?subject=` через `useSearchParams` внутри `<Suspense>`. Статическая оболочка показывает всех репетиторов, так что без JS виден полный список.
-- **Статус занятости.** Читается функцией с `'use cache'`, `cacheTag('availability')` и `cacheLife('max')`. Бот после `/status` вызывает инвалидацию тега. Открытый момент, который решается прототипом в первой же фиче про статус:
-  - при сборке в CI базы нет – функция должна вернуть начальное значение из `availability` в MDX;
-  - после деплоя тег нужно сбросить (шаг `post-deploy` вызывает внутренний защищённый эндпоинт);
-  - выбрать между `updateTag` (только Server Actions) и `revalidateTag` с немедленным истечением (Route Handler вебхука). Решение – в `docs/decisions.md`.
+- **Статус занятости** (ADR-053). `getAvailability()` с `'use cache'` и `cacheTag('availability')` читает `tutor_availability`; страницы накладывают статусы на начальные из MDX (`withAvailability`). Ответ базы живёт `cacheLife('max')`. Без базы – при сборке в CI и Docker или при её падении – ответ пустой: страницы показывают статусы из MDX, живут `cacheLife('minutes')` и через минуту спрашивают базу сами.
+  - Сброс – `revalidateTag('availability', { expire: 0 })` (`updateTag` есть только в Server Actions): вебхук бота после `/status` и `POST /api/revalidate` с `Authorization: Bearer <INTERNAL_API_SECRET>` (без секрета – 404, чужой – 401).
+  - Post-deploy – `pnpm cache:revalidate [адрес]`: страницы в образе собраны со статусами из MDX.
 - Кэш Next.js – встроенный, на диске контейнера. Инстанс один на окружение, поэтому внешний cache handler не нужен.
 - Фото: `next/image`, AVIF/WebP, фото профиля на первом экране – `priority`, остальные – lazy.
 
@@ -161,7 +160,7 @@ ESLint-правило `no-restricted-imports` следит за этими гр�
 - Сообщение заявки: «Заявка № 1024 → Андрею», у пришедшей при «Мест нет» – «· лист ожидания», статус и кто его поменял, данные родителя, откуда пришла. Под ним – кнопки всех статусов, текущий отмечен «✓».
 - Кнопки меняют статус (`changeStatus` в `src/server/leads/service.ts`): строка блокируется, пишутся заявка, `lead_events` и задания `telegram.lead_updated` + `sheets.upsert`, кто нажал – по Telegram ID → tutorId. Сообщение правит воркер. На «Отказ» кнопки под сообщением сменяются причинами и «← Назад»; статус меняется только после выбора причины. Всё нужное – в `callback_data` (`st:1024:contacted`, `rr:1024:expensive`), состояния в базе у выбора причины нет.
 - `/add` – ручная заявка (родитель написал напрямую). Пошаговый диалог кнопками в одном сообщении бота: способ обращения, класс, предмет (единственный выбирается сам), цель (или «Не указана»), откуда узнали. Имени и контакта нет. Заявка – от того, кто вызвал `/add`, со статусом «связался» (при «Мест нет» – «лист ожидания»), сообщение с кнопками появляется в общем чате из outbox. Состояние диалога – в `bot_dialogs`, без in-memory сессий; чужие кнопки и устаревший диалог отвечают подсказкой.
-- `/status` – выбор «Есть свободное время / Последние места / Мест нет» для себя. Запись в `tutor_availability` и инвалидация кэша (пункт 3.6).
+- `/status` – выбор «Есть свободное время / Последние места / Мест нет» для себя: сообщение с тремя кнопками, текущий отмечен «✓», в `callback_data` – id репетитора (`av:t-andrei:full`), чужие кнопки статус не меняют. Запись в `tutor_availability` и сброс кэша страниц – прямо в вебхуке; `bot:poll` просит сброс у `POST /api/revalidate` запущенного `pnpm dev`.
 - `/help` и `/start` – что умеет бот.
 - Тексты сообщений бота – в `src/server/bot/format.ts`, покрыты snapshot-тестами.
 - Бот не удаляет сообщения: Telegram не даёт удалять сообщения старше 48 часов. Чистка чата по сроку хранения – вручную, это указано в политике.
@@ -217,7 +216,7 @@ YANDEX_METRIKA_ID=
 - **Deploy** (`deploy.yml`):
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;
   - тег `v*` на `main` – образ `:vX.Y.Z` → production.
-  - На сервере по SSH: `docker compose pull` → `run --rm app pnpm db:migrate` → `up -d` → проверка `/api/health` → post-deploy ревалидация.
+  - На сервере по SSH: `docker compose pull` → `run --rm app pnpm db:migrate` → `up -d` → проверка `/api/health` → post-deploy ревалидация (`pnpm cache:revalidate`, ADR-053).
 - **Caddy**: HTTPS (Let's Encrypt), сжатие, заголовки безопасности (CSP, HSTS, Referrer-Policy, Permissions-Policy), basic auth и `X-Robots-Tag: noindex` на staging, проксирование `X-Forwarded-For`.
 - **Сервер**: минимум 2 vCPU, 2 ГБ RAM + 2 ГБ swap, 30 ГБ SSD; комфортно 4 ГБ. Ubuntu 24.04, UFW (22, 80, 443), вход по SSH-ключу, unattended-upgrades.
 - **Бэкапы** на этапе запуска не делаются (решение от 11.11.2026). Тома Postgres именованные, чтобы бэкап можно было добавить без миграции данных.

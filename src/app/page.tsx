@@ -30,6 +30,8 @@ import { Tutors } from '@/features/home/tutors/Tutors';
 import { countReviews, toTutorCardData } from '@/features/tutors/card-data';
 import { currentYear } from '@/features/tutors/current-year';
 import { sortByAvailability } from '@/features/tutors/sort';
+import { withAvailability } from '@/lib/availability';
+import { getAvailability } from '@/server/availability/cache';
 
 /** Пример итога пробного занятия – только пока его репетитор на сайте (docs/data-model.md). */
 function trialExample(example: Site['trialExample'], tutors: readonly Tutor[]) {
@@ -40,12 +42,11 @@ function trialExample(example: Site['trialExample'], tutors: readonly Tutor[]) {
 export default async function HomePage() {
   const site = getSite();
   const subjects = getSubjects();
-  const tutors = listedTutors(getTutors());
+  const tutors = withAvailability(listedTutors(getTutors()), await getAvailability());
   const published = getPublishedReviews();
   const reviews = countReviews(published);
   const year = await currentYear();
 
-  // Статус занятости пока – начальное значение из MDX; из базы его подставит feature/availability.
   const cards = sortByAvailability(tutors).map((tutor) =>
     toTutorCardData(tutor, {
       subjects,

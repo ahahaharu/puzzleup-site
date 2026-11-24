@@ -1,5 +1,7 @@
 import 'server-only';
 
+import type { Availability } from '@/lib/availability';
+import { findAvailability, setAvailability } from '@/server/availability/repository';
 import { findLead } from '@/server/leads/repository';
 import { changeStatus } from '@/server/leads/service';
 import { errorCode } from '@/server/outbox/worker';
@@ -9,7 +11,13 @@ import { parseCallback, type Callback } from './callback';
 import { answerAdd, startAdd } from './commands/add';
 import type { BotDeps } from './deps';
 import type { BotTutor } from './directory';
-import { CALLBACK_TEXTS, helpMessage, reasonKeyboard, statusKeyboard } from './format';
+import {
+  availabilityMessage,
+  CALLBACK_TEXTS,
+  helpMessage,
+  reasonKeyboard,
+  statusKeyboard,
+} from './format';
 import { commandOf, updateSchema, type Update } from './update';
 
 /**
@@ -48,6 +56,11 @@ async function onMessage(message: NonNullable<Update['message']>, deps: BotDeps)
     case 'add':
       await startAdd(deps, { chatId: message.chat.id, userId: message.from.id }, tutor);
       return;
+    case 'status': {
+      const current = (await findAvailability(deps.db, tutor.id)) ?? tutor.availability;
+      await deps.telegram.sendMessage(message.chat.id, availabilityMessage(tutor, current));
+      return;
+    }
     case 'help':
     case 'start':
       await deps.telegram.sendMessage(message.chat.id, helpMessage(deps.directory));
@@ -88,6 +101,10 @@ async function dispatch(
   if (callback.kind === 'add') {
     return answerAdd(deps, { chatId: place.chatId, userId }, place.messageId, tutor, callback);
   }
+  if (callback.kind === 'availability') {
+    if (callback.tutorId !== tutor.id) return CALLBACK_TEXTS.foreignAvailability;
+    return changeAvailability(deps, place, tutor, callback.status);
+  }
   // Кнопки статусов есть только под сообщениями заявок в общем чате.
   if (place.chatId !== deps.access.leadsChatId) return undefined;
 
@@ -125,6 +142,36 @@ async function dispatch(
       return undefined;
     }
   }
+}
+
+/**
+ * Статус занятости из `/status`: запись в базу и сброс кэша страниц (ТЗ страницы репетитора,
+ * раздел 5). Кэш сбрасывается и при том же статусе – так нажатие чинит и устаревшую страницу.
+ * Не сбросился – статус всё равно записан, страницы спросят базу сами после следующего сброса.
+ */
+async function changeAvailability(
+  deps: BotDeps,
+  place: Place,
+  tutor: BotTutor,
+  status: Availability,
+): Promise<string> {
+  const result = await setAvailability(deps.db, {
+    tutorId: tutor.id,
+    status,
+    by: tutor.id,
+    at: new Date(deps.clock.now()),
+  });
+  await deps.invalidateAvailability().catch((error: unknown) => {
+    deps.log('availability_invalidate_failed', { code: errorCode(error) });
+  });
+  await deps.telegram.editMessage(
+    place.chatId,
+    place.messageId,
+    availabilityMessage(tutor, status),
+  );
+  return result === 'changed'
+    ? CALLBACK_TEXTS.availabilityChanged(status)
+    : CALLBACK_TEXTS.availabilityUnchanged(status);
 }
 
 async function showReasons(leadId: number, place: Place, deps: BotDeps) {

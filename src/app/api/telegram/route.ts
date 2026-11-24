@@ -1,4 +1,5 @@
 import { systemClock } from '@/lib/time';
+import { invalidateAvailability } from '@/server/availability/cache';
 import { handleUpdate } from '@/server/bot/bot';
 import type { BotDeps } from '@/server/bot/deps';
 import { contentDirectory } from '@/server/bot/directory';
@@ -19,6 +20,8 @@ async function botDeps(telegram: NonNullable<typeof env.telegram>): Promise<BotD
     access: { leadsChatId: telegram.leadsChatId, tutors: telegram.tutors },
     directory: contentDirectory(),
     log: (event, fields) => console.error(JSON.stringify({ scope: 'bot', event, ...fields })),
+    // Вебхук – маршрут Next.js: кэш страниц сбрасывается прямо здесь (ADR-053).
+    invalidateAvailability: async () => invalidateAvailability(),
   };
   return deps;
 }

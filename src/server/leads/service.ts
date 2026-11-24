@@ -3,6 +3,7 @@ import 'server-only';
 import { eq, sql } from 'drizzle-orm';
 
 import type { Clock } from '@/lib/time';
+import { findAvailability } from '@/server/availability/repository';
 import type { Db } from '@/server/db/client';
 import { leadEvents, leads } from '@/server/db/schema';
 import { enqueue } from '@/server/outbox/enqueue';
@@ -16,7 +17,7 @@ import {
   type StatusChange,
   type StatusChangeResult,
 } from './domain';
-import { findAvailability, insertFormLead, insertManualLead } from './repository';
+import { insertFormLead, insertManualLead } from './repository';
 
 /**
  * Заявка с сайта – одна транзакция: `leads` + `consents` + `lead_events` + задания outbox

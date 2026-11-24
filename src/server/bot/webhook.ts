@@ -1,16 +1,12 @@
 import 'server-only';
 
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { secretMatches } from '@/server/http';
 
 /** Заголовок, в котором Telegram присылает секрет из `setWebhook` (`pnpm bot:set-webhook`). */
 export const SECRET_HEADER = 'x-telegram-bot-api-secret-token';
 
-// Сравнение хешей: одинаковая длина и время сравнения не выдают длину и начало секрета.
-const digest = (value: string) => createHash('sha256').update(value).digest();
-
 export function isTelegramRequest(headers: Pick<Headers, 'get'>, secret: string): boolean {
-  const received = headers.get(SECRET_HEADER);
-  return received !== null && timingSafeEqual(digest(received), digest(secret));
+  return secretMatches(headers.get(SECRET_HEADER), secret);
 }
 
 /**

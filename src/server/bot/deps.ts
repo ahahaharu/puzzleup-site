@@ -17,4 +17,6 @@ export type BotDeps = {
   access: BotAccess;
   directory: BotDirectory;
   log: BotLog;
+  /** Сброс кэша статусов занятости на сайте после `/status` (src/server/availability/cache.ts). */
+  invalidateAvailability: () => Promise<void>;
 };

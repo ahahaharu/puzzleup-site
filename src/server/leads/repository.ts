@@ -4,22 +4,10 @@ import { eq } from 'drizzle-orm';
 
 import type { Availability } from '@/lib/availability';
 import type { LeadStatus } from '@/lib/lead';
-import { consents, leadEvents, leads, tutorAvailability } from '@/server/db/schema';
+import { consents, leadEvents, leads } from '@/server/db/schema';
 import type { DbOrTx } from '@/server/outbox/enqueue';
 
 import type { Lead, NewFormLead, NewManualLead } from './domain';
-
-/** Текущий статус занятости репетитора; строки нет – `undefined`. */
-export async function findAvailability(
-  db: DbOrTx,
-  tutorId: string,
-): Promise<Availability | undefined> {
-  const [row] = await db
-    .select({ status: tutorAvailability.status })
-    .from(tutorAvailability)
-    .where(eq(tutorAvailability.tutorId, tutorId));
-  return row?.status;
-}
 
 /** Заявка, факт согласия и событие `created` в журнале. Возвращает номер заявки. */
 export async function insertFormLead(

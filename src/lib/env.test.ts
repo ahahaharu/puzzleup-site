@@ -23,7 +23,14 @@ const GOOGLE = {
   GOOGLE_SHEET_ID: '1FakeSheetIdFakeSheetIdFakeSheetId01',
   GOOGLE_SERVICE_ACCOUNT_JSON: base64({ type: 'service_account', ...KEY }),
 };
-const DEPLOYED = { SITE_URL: 'https://puzzle-up.by', DATABASE_URL: DB, ...TELEGRAM, ...GOOGLE };
+const INTERNAL = 'fake-internal-secret-fake-internal-secret';
+const DEPLOYED = {
+  SITE_URL: 'https://puzzle-up.by',
+  DATABASE_URL: DB,
+  INTERNAL_API_SECRET: INTERNAL,
+  ...TELEGRAM,
+  ...GOOGLE,
+};
 
 describe('parseEnv', () => {
   it('defaults to local with localhost URL', () => {
@@ -63,6 +70,18 @@ describe('parseEnv', () => {
     expect(() => parseEnv({ ...DEPLOYED, APP_ENV: appEnv, DATABASE_URL: undefined })).toThrow(
       /DATABASE_URL is required/,
     );
+  });
+
+  it.each(['staging', 'production'])('requires INTERNAL_API_SECRET when APP_ENV=%s', (appEnv) => {
+    expect(() =>
+      parseEnv({ ...DEPLOYED, APP_ENV: appEnv, INTERNAL_API_SECRET: undefined }),
+    ).toThrow(/INTERNAL_API_SECRET is required/);
+  });
+
+  it('keeps INTERNAL_API_SECRET optional locally and checks its format', () => {
+    expect(parseEnv({})).not.toHaveProperty('INTERNAL_API_SECRET');
+    expect(parseEnv({ INTERNAL_API_SECRET: INTERNAL }).INTERNAL_API_SECRET).toBe(INTERNAL);
+    expect(() => parseEnv({ INTERNAL_API_SECRET: 'short' })).toThrow(/INTERNAL_API_SECRET/);
   });
 
   it('keeps DATABASE_URL optional locally', () => {

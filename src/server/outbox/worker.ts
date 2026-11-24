@@ -3,6 +3,7 @@ import 'server-only';
 import { setTimeout as delay } from 'node:timers/promises';
 
 import { and, asc, eq, inArray, lt, lte, sql } from 'drizzle-orm';
+import { DrizzleQueryError } from 'drizzle-orm/errors';
 import { Client } from 'pg';
 
 import type { Clock } from '@/lib/time';
@@ -71,6 +72,9 @@ const MAX_ERROR_LENGTH = 200;
 /** Код ошибки без сообщения: имя класса и, если есть, код pg (SQLSTATE) или Node (`ECONNRESET`). */
 export function errorCode(error: unknown): string {
   if (error instanceof OutboxJobError) return error.code.slice(0, MAX_ERROR_LENGTH);
+  // Drizzle оборачивает ошибку pg в свою, без имени и кода; в ней же – текст запроса с параметрами.
+  if (error instanceof DrizzleQueryError && error.cause !== undefined)
+    return errorCode(error.cause);
   if (!(error instanceof Error)) return 'unknown';
   const code = 'code' in error && typeof error.code === 'string' ? `:${error.code}` : '';
   return `${error.name}${code}`.slice(0, MAX_ERROR_LENGTH);
