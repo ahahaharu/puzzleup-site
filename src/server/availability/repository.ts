@@ -1,10 +1,23 @@
 import 'server-only';
 
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import type { Availability, AvailabilityMap } from '@/lib/availability';
 import type { Db } from '@/server/db/client';
 import { tutorAvailability } from '@/server/db/schema';
+import type { DbOrTx } from '@/server/outbox/enqueue';
+
+/** Текущий статус занятости репетитора; строки нет – `undefined`. */
+export async function findAvailability(
+  db: DbOrTx,
+  tutorId: string,
+): Promise<Availability | undefined> {
+  const [row] = await db
+    .select({ status: tutorAvailability.status })
+    .from(tutorAvailability)
+    .where(eq(tutorAvailability.tutorId, tutorId));
+  return row?.status;
+}
 
 export async function listAvailability(db: Db): Promise<AvailabilityMap> {
   const rows = await db
