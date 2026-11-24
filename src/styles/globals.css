@@ -118,12 +118,20 @@
    */
   --animate-piece-land: piece-land 600ms ease-out both;
   --animate-piece-fade: piece-fade 600ms ease-out both;
+  /* Экран «Спасибо»: акцентная деталь «встаёт» в угол за 400 мс (ТЗ главной, блок 9). */
+  --animate-piece-snap: piece-snap 400ms ease-out both;
   /* Смена карточек после выбора вкладки фильтра – появление за 150 мс. */
   --animate-fade-in: fade-in 150ms ease-out both;
 
   @keyframes piece-land {
     from {
       transform: translate(16px, 14px) rotate(-6deg);
+    }
+  }
+  @keyframes piece-snap {
+    from {
+      opacity: 0;
+      transform: translate(-12px, -12px) rotate(-30deg);
     }
   }
   @keyframes fade-in {

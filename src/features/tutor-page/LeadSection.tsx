@@ -11,7 +11,7 @@ import { FORM_TITLE, leadMessengers, leadPoints, leadTitle, tutorChip } from './
 // макеты T-6-form, TM-6-form, T-S-formfull, TM-S-formfull.
 // Слева (5 колонок) – заголовок, три пункта и мессенджеры репетитора, при «Мест нет» – плашка
 // листа ожидания. Справа (7 колонок) – тёмная деталь с «язычком», на телефоне – под колонкой,
-// язычок сверху. Поля формы (LeadForm) встают в деталь в feature/lead-form.
+// язычок сверху. Поля формы и экран «Спасибо» – LeadForm.
 
 export const LEAD_ID = 'lead';
 
@@ -55,20 +55,21 @@ export function LeadSection({ lead, children }: LeadSectionProps) {
           </div>
         </div>
 
-        <div className="relative col-span-full rounded-piece bg-ink p-6 text-paper lg:col-span-7 lg:p-10">
+        <div className="group/lead relative col-span-full rounded-piece bg-ink p-6 text-paper lg:col-span-7 lg:p-10">
           {/* «Язычок» детали смотрит в левую колонку; на телефоне – вверх. */}
           <span
             aria-hidden="true"
             className="absolute -top-3.5 left-1/2 h-3.5 w-11 -translate-x-1/2 rounded-t-full bg-ink lg:top-1/2 lg:-left-3.5 lg:h-11 lg:w-3.5 lg:translate-x-0 lg:-translate-y-1/2 lg:rounded-t-none lg:rounded-l-full"
           />
           <div className="flex flex-col gap-5">
-            <div className="flex flex-wrap items-baseline justify-between gap-3">
+            {/* На экране «Спасибо» (`data-lead-thanks`) заголовка и чипа нет – макеты X-thanks. */}
+            <div className="flex flex-wrap items-baseline justify-between gap-3 group-has-data-lead-thanks/lead:hidden">
               <h3 className="font-display text-h3">{FORM_TITLE}</h3>
               {/* Spectral Italic 18 px – ТЗ главной, блок 9. */}
               <p className="font-hand text-[1.125rem] text-accent-light italic">{lead.price}</p>
             </div>
             {/* Репетитор задан страницей, снять его нельзя (ТЗ главной, блок 9, поля формы). */}
-            <p className="inline-flex min-h-10 items-center gap-1.5 self-start rounded-full bg-paper px-4.5 text-field font-medium text-ink">
+            <p className="inline-flex min-h-10 items-center gap-1.5 self-start rounded-full bg-paper px-4.5 text-field font-medium text-ink group-has-data-lead-thanks/lead:hidden">
               <Icon name="check" size={18} strokeWidth={2.2} />
               {tutorChip(lead.name)}
             </p>

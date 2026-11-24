@@ -9,6 +9,7 @@ import { navData, navLinks } from './nav';
 import { SamePageLinks } from './SamePageLinks';
 import { MAIN_ID, SkipLink } from './SkipLink';
 import { footerTexts, listedTutors, responseHoursLine } from './texts';
+import { UtmCapture } from './UtmCapture';
 
 // Каркас страницы: ссылка «к содержанию», шапка, содержимое, подвал и нижняя панель на телефоне.
 // Данные – из content/, компоненты получают их пропсами.
@@ -84,6 +85,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         hideWhenVisible={bottomBar?.hideWhenVisible ?? 'tutors'}
       />
       <SamePageLinks />
+      <UtmCapture />
     </>
   );
 }
