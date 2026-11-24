@@ -213,7 +213,7 @@ type ReferralChannel = 'instagram' | 'tiktok' | 'telegram' | 'word_of_mouth' | '
 
 ### `bot_dialogs`
 
-Состояние пошаговых диалогов `/add` и выбора причины отказа: `chat_id`, `user_id`, `kind`, `step`, `data` jsonb, `expires_at` (30 минут). Ключ – `(chat_id, user_id)`: один активный диалог пользователя в чате.
+Состояние пошаговых диалогов (сейчас – `/add`): `chat_id`, `user_id`, `kind`, `step`, `data` jsonb (у `/add` – ответы и `messageId` сообщения с вопросом), `expires_at` (30 минут от последнего шага). Ключ – `(chat_id, user_id)`: один активный диалог пользователя в чате, новый `/add` заменяет прежний. Причина отказа выбирается без диалога: всё нужное – в `callback_data` кнопки (ADR-051).
 
 ### Удаление по сроку
 
