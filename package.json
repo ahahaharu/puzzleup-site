@@ -24,6 +24,7 @@
     "db:down": "docker compose -f docker/compose.dev.yml down",
     "db:generate": "NODE_OPTIONS=--conditions=react-server drizzle-kit generate",
     "db:migrate": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/db-migrate.ts",
+    "bot:set-webhook": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/bot-set-webhook.ts",
     "e2e": "playwright test",
     "worker:dev": "tsx watch --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
     "worker:build": "tsup",

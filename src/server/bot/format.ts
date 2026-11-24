@@ -206,6 +206,12 @@ export function alertMessage(job: {
   };
 }
 
+/** Меню команд в Telegram – `pnpm bot:set-webhook`; подробно – `/help`. */
+export const BOT_COMMANDS = [
+  { command: 'add', description: 'Добавить заявку из мессенджера или звонка' },
+  { command: 'help', description: 'Что умеет бот' },
+] as const;
+
 /** `/help` и `/start`: что умеет бот. */
 export function helpMessage(directory: BotDirectory): OutgoingMessage {
   const { from, to } = directory.responseHours;
