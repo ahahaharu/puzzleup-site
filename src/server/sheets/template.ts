@@ -431,11 +431,15 @@ function linkFormula(): string {
 }
 
 /**
- * API разбирает формулы по языку Таблицы: в русском аргументы разделяет «;». Поэтому шаблон
- * пишется при английском языке (`templateRequests` начинается с него), а этот запрос –
- * отдельным вызовом после – возвращает русский: даты, числа с запятой. Формулы Таблица хранит
- * независимо от языка и сама показывает их по-русски.
+ * API разбирает формулы по языку, который был у Таблицы до вызова `batchUpdate`: в русском
+ * аргументы разделяет «;», а смена языка внутри того же вызова на разбор не влияет. Поэтому
+ * язык переключается отдельными вызовами: английский – до шаблона, русский (даты, числа
+ * с запятой) – после. Формулы Таблица хранит независимо от языка и показывает их по-русски.
  */
+export const PREPARE_REQUESTS: readonly Request[] = [
+  { updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' } },
+];
+
 export const FINAL_REQUESTS: readonly Request[] = [
   {
     // Часовой пояс – для TODAY() в «Неделях».
@@ -447,13 +451,11 @@ export const FINAL_REQUESTS: readonly Request[] = [
 ];
 
 /**
- * Запросы `batchUpdate`: язык для формул, недостающие листы, их порядок, содержимое
+ * Запросы `batchUpdate` (после `PREPARE_REQUESTS`): недостающие листы, их порядок, содержимое
  * и оформление. Единственный лист новой Таблицы («Лист1») становится «Заявками».
  */
 export function templateRequests(meta: SpreadsheetMeta, input: TemplateInput): Request[] {
-  const requests: Request[] = [
-    { updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' } },
-  ];
+  const requests: Request[] = [];
   const ids = new Map(meta.sheets.map((item) => [item.title, item.sheetId]));
   const [only] = meta.sheets;
   if (

@@ -6,6 +6,7 @@ import { LEAD_COLUMNS } from './row';
 import {
   FINAL_REQUESTS,
   LEADS_PROTECTION,
+  PREPARE_REQUESTS,
   SHEET_TITLES,
   templateRequests,
   type SpreadsheetMeta,
@@ -62,12 +63,11 @@ describe('templateRequests', () => {
     ).toEqual(SHEET_TITLES.slice(1).map((title, index) => [title, index + 1]));
   });
 
-  it('writes formulas under English locale, then returns Russian and Minsk time', () => {
-    const requests = templateRequests(NEW_SPREADSHEET, input);
-    expect(requests[0]).toEqual({
-      updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' },
-    });
-    expect(of(requests, 'updateSpreadsheetProperties')).toHaveLength(1);
+  it('switches to English for formulas and back to Russian with Minsk time', () => {
+    expect(of(templateRequests(NEW_SPREADSHEET, input), 'updateSpreadsheetProperties')).toEqual([]);
+    expect(PREPARE_REQUESTS).toEqual([
+      { updateSpreadsheetProperties: { properties: { locale: 'en_US' }, fields: 'locale' } },
+    ]);
     expect(FINAL_REQUESTS).toEqual([
       {
         updateSpreadsheetProperties: {

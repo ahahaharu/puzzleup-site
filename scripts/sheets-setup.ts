@@ -9,7 +9,12 @@ import { getTutors } from '@/content';
 import { EnvError, parseEnv } from '@/lib/env';
 import { createSheetsClient } from '@/server/sheets/client';
 import { SheetsApiError } from '@/server/sheets/port';
-import { FINAL_REQUESTS, SHEET_TITLES, templateRequests } from '@/server/sheets/template';
+import {
+  FINAL_REQUESTS,
+  PREPARE_REQUESTS,
+  SHEET_TITLES,
+  templateRequests,
+} from '@/server/sheets/template';
 
 let env;
 try {
@@ -62,10 +67,12 @@ try {
       { method: 'POST', path: `${id}:batchUpdate`, body: { requests: body } },
       z.unknown(),
     );
+  // Отдельные вызовы: язык применяется к разбору формул только со следующего вызова.
+  await batchUpdate(PREPARE_REQUESTS);
   try {
     await batchUpdate(requests);
   } finally {
-    // Шаблон пишется при английском языке (формулы), русский возвращается в любом случае.
+    // Русский язык возвращается, даже если шаблон не записался.
     await batchUpdate(FINAL_REQUESTS);
   }
   console.log(`Spreadsheet is ready: ${SHEET_TITLES.join(', ')}; links lead to ${env.SITE_URL}`);
