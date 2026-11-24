@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm content:check && next build",
+    "build": "pnpm content:check && next build && pnpm worker:build",
     "start": "node scripts/start-standalone.ts",
     "lint": "eslint . && tsx scripts/copy-lint.ts",
     "lint:copy": "tsx scripts/copy-lint.ts",
@@ -25,6 +25,8 @@
     "db:generate": "NODE_OPTIONS=--conditions=react-server drizzle-kit generate",
     "db:migrate": "tsx --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local scripts/db-migrate.ts",
     "e2e": "playwright test",
+    "worker:dev": "tsx watch --conditions=react-server --env-file-if-exists=.env --env-file-if-exists=.env.local worker/index.ts",
+    "worker:build": "tsup",
     "prepare": "lefthook install"
   },
   "dependencies": {
@@ -63,6 +65,7 @@
     "prettier": "3.10.1",
     "prettier-plugin-tailwindcss": "0.8.1",
     "tailwindcss": "4.3.5",
+    "tsup": "9.0.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.2",

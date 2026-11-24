@@ -3,6 +3,7 @@ docs/
 *.md
 pnpm-lock.yaml
 .next/
+dist/
 coverage/
 playwright-report/
 test-results/
