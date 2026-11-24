@@ -8,6 +8,13 @@ export const availabilitySchema = z.enum(['available', 'few', 'full']);
 
 export type Availability = z.infer<typeof availabilitySchema>;
 
+/** Текст плашки – ТЗ страницы репетитора, раздел 5. Им же бот называет статус в `/status`. */
+export const AVAILABILITY_LABELS: Record<Availability, string> = {
+  available: 'Есть свободное время',
+  few: 'Последние места',
+  full: 'Мест нет',
+};
+
 /** tutorId → текущий статус из базы. Репетитора без строки нет: у него статус из MDX. */
 export type AvailabilityMap = Readonly<Partial<Record<string, Availability>>>;
 
