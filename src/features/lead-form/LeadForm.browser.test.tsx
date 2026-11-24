@@ -125,6 +125,17 @@ describe('LeadForm', () => {
     expect(submit).not.toHaveBeenCalled();
   });
 
+  it('keeps the focus in the field while it is rechecked after a failed submit', async () => {
+    await render(<LeadForm data={data} />);
+    await button().click();
+    const name = page.getByLabelText('Имя родителя');
+    await expect.element(name).toHaveFocus();
+    // Перепроверка при вводе – служебная отправка Conform, а не отправка родителя.
+    await userEvent.keyboard('Мария');
+    await expect.element(name).toHaveValue('Мария');
+    await expect.element(name).toHaveFocus();
+  });
+
   it('shows the grade hint with a link to the other tutor', async () => {
     await render(<LeadForm data={data} />);
     await chip('10').click();
