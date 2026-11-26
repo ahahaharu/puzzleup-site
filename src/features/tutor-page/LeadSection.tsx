@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { Icon } from '@/components/ui/Icon';
 import { MessengerButtons } from '@/components/ui/MessengerButtons';
+import { reveal } from '@/lib/reveal';
 
 import { Notice } from './Notice';
 import type { LeadData } from './page-data';
@@ -25,7 +26,7 @@ export function LeadSection({ lead, children }: LeadSectionProps) {
   return (
     <section id={LEAD_ID} aria-labelledby="lead-title" className="paper-section">
       <div className="page-container page-grid items-center gap-y-10 py-14 lg:gap-y-6 lg:py-24">
-        <div className="col-span-full flex flex-col gap-6 lg:col-span-5 lg:gap-8">
+        <div {...reveal()} className="col-span-full flex flex-col gap-6 lg:col-span-5 lg:gap-8">
           <h2 id="lead-title" className="font-display text-h2 text-ink">
             {leadTitle(lead.nameDative)}
           </h2>
@@ -55,7 +56,10 @@ export function LeadSection({ lead, children }: LeadSectionProps) {
           </div>
         </div>
 
-        <div className="group/lead relative col-span-full rounded-piece bg-ink p-6 text-paper lg:col-span-7 lg:p-10">
+        <div
+          {...reveal('piece')}
+          className="group/lead relative col-span-full rounded-piece bg-ink p-6 text-paper lg:col-span-7 lg:p-10"
+        >
           {/* «Язычок» детали смотрит в левую колонку; на телефоне – вверх. */}
           <span
             aria-hidden="true"

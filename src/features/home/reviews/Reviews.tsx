@@ -6,6 +6,7 @@ import { SectionHead } from '@/components/ui/SectionHead';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
 import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import type { ReviewColumn } from './columns';
 import { REVIEWS_LEAD, REVIEWS_TITLE } from './texts';
@@ -37,6 +38,7 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
           {columns.map((column) => (
             <li
               key={column.tutor.slug}
+              {...reveal()}
               className="row-span-3 grid min-w-0 grid-rows-subgrid max-md:not-first:mt-5"
             >
               <div className="flex items-center gap-3.5">

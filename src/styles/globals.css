@@ -207,6 +207,29 @@
     overflow: hidden;
   }
 
+  /*
+   * Появление при прокрутке (ADR-063, src/lib/reveal.ts): блок ниже первого экрана один раз
+   * поднимается и проявляется. Здесь – только начальный кадр вида; прячет и показывает блок скрипт
+   * ScrollReveal (Web Animations API) – без него и при reduced-motion всё видно сразу.
+   */
+  [data-reveal] {
+    --reveal-from: translateY(1.5rem);
+  }
+  [data-reveal='paper'] {
+    --reveal-from: translateY(1rem) rotate(-1.5deg);
+  }
+  /* Пузырь растёт от угла отправителя – верхнего левого, где у него острый угол. */
+  [data-reveal='message'] {
+    --reveal-from: translateY(0.75rem) scale(0.96);
+    transform-origin: 0 0;
+  }
+  /* Выступ формы на десктопе смотрит влево – деталь приходит справа и встаёт в паз. */
+  [data-reveal='piece'] {
+    @variant lg {
+      --reveal-from: translateX(2rem);
+    }
+  }
+
   /* Движение выключено целиком; состояния меняются мгновенно, конечный кадр анимации сохраняется. */
   @media (prefers-reduced-motion: reduce) {
     *,

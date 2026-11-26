@@ -8,6 +8,7 @@ import { Footer } from './Footer';
 import { Header, type Cta } from './Header';
 import { navData, navLinks } from './nav';
 import { SamePageLinks } from './SamePageLinks';
+import { ScrollReveal } from './ScrollReveal';
 import { MAIN_ID, SkipLink } from './SkipLink';
 import { footerTexts, listedTutors, responseHoursLine } from './texts';
 import { UtmCapture } from './UtmCapture';
@@ -87,6 +88,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         hideWhenVisible={bottomBar?.hideWhenVisible ?? 'tutors'}
       />
       <SamePageLinks />
+      <ScrollReveal />
       <UtmCapture />
     </>
   );

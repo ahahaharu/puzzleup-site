@@ -50,6 +50,14 @@ async function open(w: number) {
 async function settle(page: Page) {
   await page.waitForLoadState('networkidle').catch(() => undefined);
   await page.evaluate(() => document.fonts.ready);
+  // Блоки ниже окна появляются при прокрутке (ADR-063): прокрутка до конца и назад показывает все,
+  // на скриншоте – их конечный кадр.
+  const top = await page.evaluate(() => window.scrollY);
+  await page.evaluate(() =>
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }),
+  );
+  await page.waitForTimeout(1000);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
 }
 
 if (values.mock) {

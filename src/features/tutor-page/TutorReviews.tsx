@@ -1,6 +1,7 @@
 import { splitScreenshots, type ReviewCardData } from '@/features/reviews/card-data';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
 import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
+import { reveal } from '@/lib/reveal';
 
 import { ReviewsList } from './ReviewsList';
 
@@ -23,18 +24,18 @@ export function TutorReviews({ title, label, reviews }: TutorReviewsProps) {
   return (
     <section id="reviews" aria-labelledby="reviews-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
-        <h2 id="reviews-title" className="font-display text-h2 text-ink">
+        <h2 id="reviews-title" {...reveal()} className="font-display text-h2 text-ink">
           {title}
         </h2>
         {screenshots.length > 0 && (
-          <div className="mt-7 lg:mt-10">
+          <div {...reveal()} className="mt-7 lg:mt-10">
             <ScreenshotCarousel reviews={screenshots} label={label} />
           </div>
         )}
         {cards.length > 0 && (
           <ReviewsList count={cards.length}>
             {cards.map((review) => (
-              <li key={review.id} className="min-w-0 scroll-mt-24 focus:outline-none">
+              <li key={review.id} {...reveal()} className="min-w-0 scroll-mt-24 focus:outline-none">
                 <ReviewCard review={review} />
               </li>
             ))}

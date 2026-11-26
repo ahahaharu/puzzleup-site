@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/Button';
 import { Doodle } from '@/components/ui/Doodle';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import {
   EXAMPLE_BADGE,
@@ -42,7 +43,10 @@ function Example({ example }: { example: TrialExample }) {
   ] as const;
 
   return (
-    <div className="rounded-card border border-ink/12 bg-card p-5 shadow-paper lg:p-6">
+    <div
+      {...reveal('message')}
+      className="rounded-card border border-ink/12 bg-card p-5 shadow-paper lg:p-6"
+    >
       <div className="mb-4 flex items-center justify-between gap-3">
         <h3 className="font-display text-h3 text-ink">{EXAMPLE_TITLE}</h3>
         <span className="flex-none rounded-full bg-kraft px-3 py-1 text-caption font-semibold text-ink">
@@ -90,7 +94,7 @@ export function How({ steps, example }: HowProps) {
         <div className="mt-8 page-grid gap-y-8 lg:mt-12 lg:gap-y-10">
           <ol className="col-span-full flex flex-col gap-9 lg:col-span-7 lg:gap-12">
             {steps.map((step, index) => (
-              <li key={step.title}>
+              <li key={step.title} {...reveal()}>
                 <div
                   className={cn(
                     'relative flex gap-2 lg:gap-3',
@@ -128,7 +132,7 @@ export function How({ steps, example }: HowProps) {
             </div>
           )}
 
-          <div className="col-span-full lg:col-span-7 lg:row-start-2">
+          <div {...reveal()} className="col-span-full lg:col-span-7 lg:row-start-2">
             <Button href="#tutors" fullWidth className="md:w-auto">
               {HOW_CTA}
             </Button>

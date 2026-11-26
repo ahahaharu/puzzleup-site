@@ -5,6 +5,7 @@ import { Doodle } from '@/components/ui/Doodle';
 import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import type { SituationCard } from './cards';
 import { ctaSpan, knobs } from './puzzle-grid';
@@ -87,8 +88,12 @@ export function Situations({ cards }: SituationsProps) {
         />
         <SectionHead id="situations-title" title={SITUATIONS_TITLE} lead={SITUATIONS_LEAD} />
 
-        {/* Лента прокручивается вбок; клавиатура доходит до ссылок карточек, прокрутка – за фокусом. */}
-        <div className="-mx-4 mt-7 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 pb-2 md:mx-0 md:overflow-visible md:px-0 md:pb-0 lg:mt-12">
+        {/* Лента прокручивается вбок; клавиатура доходит до ссылок карточек, прокрутка – за фокусом.
+            Появляется целиком: карточки сцеплены, зазоры между ними – фон списка. */}
+        <div
+          {...reveal()}
+          className="-mx-4 mt-7 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 pb-2 md:mx-0 md:overflow-visible md:px-0 md:pb-0 lg:mt-12"
+        >
           {/* Внешняя рамка – поверх карточек: квадратные углы карточек закрыли бы рамку-зазор на
               скруглении. */}
           <ul className="relative flex w-max gap-px overflow-hidden rounded-card bg-ink/20 after:pointer-events-none after:absolute after:inset-0 after:z-20 after:rounded-card after:border after:border-ink/20 md:grid md:w-auto md:grid-cols-2 lg:grid-cols-3">

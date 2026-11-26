@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 // Заголовок секции – H2 и лид; docs/design-system.md, раздел 6; макет ds/SectionHead.
 
@@ -27,7 +28,7 @@ export function SectionHead({
   className,
 }: SectionHeadProps) {
   return (
-    <div className={cn('flex max-w-3xl flex-col gap-4', className)}>
+    <div {...reveal()} className={cn('flex max-w-3xl flex-col gap-4', className)}>
       {number && (
         <span aria-hidden="true" className="font-hand text-hand-md text-accent-text italic">
           {number}
