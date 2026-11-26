@@ -87,3 +87,10 @@ test('a tutor page has canonical, Person and BreadcrumbList markup', async ({ pa
   });
   expect(JSON.stringify(data)).not.toMatch(/Organization|worksFor|Review|Rating/);
 });
+
+test('a policy page borrows the home page image', async ({ page }) => {
+  await page.goto('/privacy');
+
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `${SITE}/privacy`);
+  await expectOgImage(page);
+});

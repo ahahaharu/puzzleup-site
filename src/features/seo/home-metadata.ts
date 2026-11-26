@@ -13,3 +13,8 @@ export function homeMetadata(
     description: homeDescription(subjectsAndGrades(subjects), badgeNames(tutors)),
   };
 }
+
+/** Подпись картинки главной – бейдж без имён. */
+export function homeOgAlt(subjects: readonly Subject[], tutors: readonly Pick<Tutor, 'name'>[]) {
+  return heroBadgeTitle(subjects, tutors.length);
+}

@@ -2,13 +2,14 @@ import type { ReactNode } from 'react';
 
 import { PUZZLE_PIECE_PATH } from '@/components/ui/PuzzlePiece';
 
+import { OG_SIZE } from '../metadata';
 import { withAlpha, type OgColors } from './assets';
+
+export { OG_SIZE };
 
 // Шаблоны OG-картинок 1200×630 для `next/og` – макет P-og: фон в клетку, слева вклейка, справа
 // текст, в правом нижнем углу логотип. Только то, что умеет `next/og`: flex-раскладка, стили
 // в `style`, цвета в hex и rgba. Главная – тот же шаблон, вместо фото – деталь пазла (ADR-055).
-
-export const OG_SIZE = { width: 1200, height: 630 };
 
 const DISPLAY = 'Unbounded';
 const TEXT = 'Golos Text';
