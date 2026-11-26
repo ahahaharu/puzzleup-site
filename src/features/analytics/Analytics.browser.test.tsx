@@ -37,12 +37,12 @@ describe('Analytics', () => {
     expect(loadUmami).toHaveBeenCalledWith(UMAMI);
     expect(loadMetrika).not.toHaveBeenCalled();
 
-    choose('all');
+    choose('accepted');
     await vi.waitFor(() => expect(loadMetrika).toHaveBeenCalledWith(COUNTER));
   });
 
-  it('never loads Metrika after «Только необходимые»', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'necessary');
+  it('never loads Metrika after «Отклонить»', async () => {
+    window.localStorage.setItem(CONSENT_KEY, 'declined');
     await renderAnalytics();
 
     expect(loadUmami).toHaveBeenCalledOnce();
@@ -50,14 +50,14 @@ describe('Analytics', () => {
   });
 
   it('loads Metrika at once when consent was given earlier', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'all');
+    window.localStorage.setItem(CONSENT_KEY, 'accepted');
     await renderAnalytics();
 
     await vi.waitFor(() => expect(loadMetrika).toHaveBeenCalledOnce());
   });
 
   it('counts nothing outside the production address', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'all');
+    window.localStorage.setItem(CONSENT_KEY, 'accepted');
     await renderAnalytics('https://puzzle-up.by');
 
     expect(loadUmami).not.toHaveBeenCalled();
@@ -65,17 +65,17 @@ describe('Analytics', () => {
   });
 
   it('forgets Metrika when consent is withdrawn', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'all');
+    window.localStorage.setItem(CONSENT_KEY, 'accepted');
     await renderAnalytics();
     await vi.waitFor(() => expect(loadMetrika).toHaveBeenCalledOnce());
 
-    choose('necessary');
+    choose('declined');
 
     await vi.waitFor(() => expect(forgetMetrika).toHaveBeenCalledOnce());
   });
 
   it('sends a Metrika hit on navigation inside the site', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'all');
+    window.localStorage.setItem(CONSENT_KEY, 'accepted');
     const screen = await renderAnalytics();
     await vi.waitFor(() => expect(loadMetrika).toHaveBeenCalledOnce());
     const before = window.location.href;

@@ -2,12 +2,12 @@
 
 import { useSyncExternalStore } from 'react';
 
-// Выбор в cookie-баннере (ТЗ главной, «Глобальные элементы»): «Принять» – `all`, «Только
-// необходимые» – `necessary`. Хранится в localStorage этого браузера: на сервер не нужен,
+// Выбор в cookie-баннере (ТЗ главной, «Глобальные элементы»): «Принять» – `accepted`,
+// «Отклонить» – `declined`. Хранится в localStorage этого браузера: на сервер не нужен,
 // страницы статические (ADR-056). Баннер и кнопка «Настройки cookie» в подвале – разные деревья
 // React, поэтому состояние общее, вне компонентов.
 
-export type ConsentChoice = 'all' | 'necessary';
+export type ConsentChoice = 'accepted' | 'declined';
 
 export type ConsentState = {
   /** `false` – на сервере и до гидратации: выбор ещё не прочитан, баннер не показывается. */
@@ -36,7 +36,7 @@ function storage(): Storage | undefined {
 function read(): ConsentChoice | undefined {
   try {
     const value = storage()?.getItem(CONSENT_KEY);
-    return value === 'all' || value === 'necessary' ? value : undefined;
+    return value === 'accepted' || value === 'declined' ? value : undefined;
   } catch {
     return undefined;
   }

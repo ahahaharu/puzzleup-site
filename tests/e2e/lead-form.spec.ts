@@ -17,7 +17,7 @@ const SUBMIT = 'Записаться на пробное занятие';
 // Выбор в cookie-баннере уже сделан: на телефоне баннер внизу экрана закрывал бы кнопки формы.
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem('puzzleup:cookie-consent', 'necessary');
+    window.localStorage.setItem('puzzleup:cookie-consent', 'declined');
   });
 });
 

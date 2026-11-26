@@ -6,8 +6,7 @@ import { CONSENT_KEY, resetConsentForTests } from './consent';
 import { CookieBanner } from './CookieBanner';
 import { CookieSettingsButton } from './CookieSettingsButton';
 
-const TEXT =
-  'Сайт использует cookie «Яндекс Метрики» для статистики посещений – только с вашего согласия.';
+const TEXT = 'Сайт использует cookie для статистики: по ним видно, какие страницы читают чаще.';
 
 function renderBanner() {
   return render(
@@ -46,12 +45,12 @@ describe('CookieBanner', () => {
       await page.viewport(width, 800);
       const screen = await renderBanner();
       const accept = screen.getByRole('button', { name: 'Принять' }).element();
-      const necessary = screen.getByRole('button', { name: 'Только необходимые' }).element();
+      const decline = screen.getByRole('button', { name: 'Отклонить' }).element();
 
-      expect(accept.className).toBe(necessary.className);
-      expect(accept.getBoundingClientRect().width).toBe(necessary.getBoundingClientRect().width);
+      expect(accept.className).toBe(decline.className);
+      expect(accept.getBoundingClientRect().width).toBe(decline.getBoundingClientRect().width);
       expect(accept.getBoundingClientRect().height).toBeGreaterThanOrEqual(48);
-      expect(necessary.scrollWidth).toBeLessThanOrEqual(necessary.clientWidth);
+      expect(decline.scrollWidth).toBeLessThanOrEqual(decline.clientWidth);
       screen.unmount();
     }
   });
@@ -68,8 +67,8 @@ describe('CookieBanner', () => {
   });
 
   it.each([
-    ['Принять', 'all'],
-    ['Только необходимые', 'necessary'],
+    ['Принять', 'accepted'],
+    ['Отклонить', 'declined'],
   ])('remembers «%s» and hides', async (label, stored) => {
     const screen = await renderBanner();
 
@@ -80,7 +79,7 @@ describe('CookieBanner', () => {
   });
 
   it('stays hidden after a remembered choice and reopens from the settings button', async () => {
-    window.localStorage.setItem(CONSENT_KEY, 'necessary');
+    window.localStorage.setItem(CONSENT_KEY, 'declined');
     const screen = await renderBanner();
     expect(banner()).toBeNull();
 
@@ -90,7 +89,7 @@ describe('CookieBanner', () => {
     await expect.element(screen.getByRole('button', { name: 'Принять' })).toHaveFocus();
     await screen.getByRole('button', { name: 'Принять' }).click();
     expect(banner()).toBeNull();
-    expect(window.localStorage.getItem(CONSENT_KEY)).toBe('all');
+    expect(window.localStorage.getItem(CONSENT_KEY)).toBe('accepted');
     await expect.element(settings).toHaveFocus();
   });
 });

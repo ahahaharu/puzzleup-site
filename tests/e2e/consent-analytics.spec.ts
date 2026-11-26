@@ -31,7 +31,7 @@ test.describe('with JavaScript', () => {
       'href',
       '/cookies',
     );
-    await page.getByRole('button', { name: 'Только необходимые' }).click();
+    await page.getByRole('button', { name: 'Отклонить' }).click();
     await expect(banner(page)).toHaveCount(0);
 
     await page.goto('/tutors/andrei');

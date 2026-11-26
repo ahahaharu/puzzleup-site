@@ -45,14 +45,14 @@ describe('clearMetrikaData', () => {
     document.cookie = '_ym_d=2; path=/';
     document.cookie = 'keep=3; path=/';
     window.localStorage.setItem('_ym_retryReqs', '{}');
-    window.localStorage.setItem('puzzleup:cookie-consent', 'necessary');
+    window.localStorage.setItem('puzzleup:cookie-consent', 'declined');
 
     clearMetrikaData();
 
     expect(document.cookie).not.toContain('_ym');
     expect(document.cookie).toContain('keep=3');
     expect(window.localStorage.getItem('_ym_retryReqs')).toBeNull();
-    expect(window.localStorage.getItem('puzzleup:cookie-consent')).toBe('necessary');
+    expect(window.localStorage.getItem('puzzleup:cookie-consent')).toBe('declined');
     document.cookie = 'keep=; max-age=0; path=/';
     window.localStorage.clear();
   });

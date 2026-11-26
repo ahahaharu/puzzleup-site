@@ -57,7 +57,7 @@ function useMetrika(counterId: number | undefined, enabled: boolean) {
 export function Analytics({ siteUrl, umami, metrikaId }: AnalyticsProps) {
   const live = useLive(siteUrl);
   const { choice } = useConsent();
-  useMetrika(metrikaId, live && choice === 'all');
+  useMetrika(metrikaId, live && choice === 'accepted');
 
   const umamiScript = umami?.scriptUrl;
   const umamiWebsite = umami?.websiteId;

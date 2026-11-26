@@ -53,13 +53,13 @@ export function CookieBanner({ text, policyLinkLabel }: CookieBannerProps) {
         </Link>
         .
       </p>
-      {/* Кнопки одинаковые по размеру и весу (ТЗ). Обе не помещаются в ряд – обе на всю ширину. */}
-      <div className="flex flex-wrap gap-2.5">
-        <Button size="md" className="flex-1 basis-48" onClick={select('all')}>
+      {/* Кнопки одинаковые по размеру и весу (ТЗ), в ряд – как в макете. */}
+      <div className="flex gap-2.5">
+        <Button size="md" className="flex-1" onClick={select('accepted')}>
           Принять
         </Button>
-        <Button size="md" className="flex-1 basis-48" onClick={select('necessary')}>
-          Только необходимые
+        <Button size="md" className="flex-1" onClick={select('declined')}>
+          Отклонить
         </Button>
       </div>
     </section>
