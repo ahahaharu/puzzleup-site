@@ -76,6 +76,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         links={links}
         tutors={contacts}
         documents={documents}
+        cookieSettings={site.analytics?.metrika !== undefined}
         {...footerTexts(site, tutors)}
       />
       <BottomBar

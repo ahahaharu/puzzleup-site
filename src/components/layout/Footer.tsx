@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { Logo } from '@/components/ui/Logo';
+import { CookieSettingsButton } from '@/features/analytics/CookieSettingsButton';
 import { telegramUrl, viberUrl } from '@/lib/urls';
 
 import type { NavLink } from './nav';
@@ -24,6 +25,8 @@ type FooterProps = {
   links: readonly NavLink[];
   tutors: readonly FooterTutor[];
   documents: ReadonlyArray<{ title: string; href: string }>;
+  /** Кнопка «Настройки cookie» – когда на сайте есть cookie-баннер. */
+  cookieSettings?: boolean;
   /** Раскрытие статуса сайта и реквизиты – из шаблона `site.json` (`footer.requisites`). */
   requisites: string;
   copyright: string;
@@ -64,6 +67,7 @@ export function Footer({
   links,
   tutors,
   documents,
+  cookieSettings = false,
   requisites,
   copyright,
 }: FooterProps) {
@@ -121,7 +125,7 @@ export function Footer({
             </Column>
           )}
 
-          {documents.length > 0 && (
+          {(documents.length > 0 || cookieSettings) && (
             <Column id="footer-documents" title="Документы">
               <ul>
                 {documents.map((doc) => (
@@ -131,6 +135,12 @@ export function Footer({
                     </Link>
                   </li>
                 ))}
+                {cookieSettings && (
+                  // Пустой пункт до гидратации не виден: кнопка появляется вместе со скриптом.
+                  <li className="empty:hidden">
+                    <CookieSettingsButton className={`${LINK} cursor-pointer text-left`} />
+                  </li>
+                )}
               </ul>
             </Column>
           )}

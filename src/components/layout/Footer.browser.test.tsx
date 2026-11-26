@@ -55,4 +55,23 @@ describe('Footer', () => {
       .element(screen.getByRole('heading', { name: 'Репетиторы' }))
       .not.toBeInTheDocument();
   });
+
+  it('reopens the cookie banner from «Настройки cookie» after the last document', async () => {
+    const screen = await render(<Footer {...PROPS} cookieSettings />);
+
+    const settings = screen.getByRole('button', { name: 'Настройки cookie' });
+    await expect.element(settings).toBeVisible();
+    expect(settings.element().getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    expect(parseFloat(getComputedStyle(settings.element()).fontSize)).toBeGreaterThanOrEqual(14);
+    // «Документы» – последняя колонка подвала.
+    expect(screen.getByRole('listitem').elements().at(-1)?.textContent).toBe('Настройки cookie');
+  });
+
+  it('has no cookie settings without a cookie banner', async () => {
+    const screen = await render(<Footer {...PROPS} />);
+
+    await expect
+      .element(screen.getByRole('button', { name: 'Настройки cookie' }))
+      .not.toBeInTheDocument();
+  });
 });
