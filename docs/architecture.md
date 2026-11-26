@@ -50,7 +50,7 @@
 ├─ content/
 │  ├─ tutors/andrei.mdx, maxim.mdx
 │  ├─ reviews.json, subjects.json, situations.json, faq.json, site.json
-│  └─ legal/privacy.mdx, cookies.mdx
+│  └─ legal/privacy.mdx (cookies.mdx – только с Метрикой, ADR-057)
 ├─ public/tutors/              исходники фото, JPEG или PNG (оптимизирует next/image)
 ├─ assets/fonts/               TTF с лицензиями OFL для OG-картинок: `next/og` не читает woff2 и `next/font`
 ├─ src/
