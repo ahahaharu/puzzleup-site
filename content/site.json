@@ -28,6 +28,14 @@
     "policyLinkLabel": "политика",
     "details": "Операторы – репетиторы {operators}. Данные хранятся на сервере в Беларуси и передаются через Telegram и Viber, в том числе за границу: уровень защиты там может быть ниже, чем в Беларуси. Заявку видят оба репетитора; напишет тот, кого вы выбрали. Срок хранения и право отозвать согласие – в политике."
   },
+  "analytics": {
+    "umami": { "scriptUrl": "[адрес script.js Umami]", "websiteId": "[id сайта в Umami]" },
+    "metrika": { "counterId": "[номер счётчика Метрики]" }
+  },
+  "cookieBanner": {
+    "text": "Сайт использует cookie «Яндекс Метрики» для статистики посещений – только с вашего согласия.",
+    "policyLinkLabel": "Политике cookie"
+  },
   "siteOperatorTutorId": "t-andrei",
   "trialExample": {
     "tutorId": "t-andrei",

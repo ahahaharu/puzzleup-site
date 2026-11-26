@@ -205,6 +205,24 @@ export const siteSchema = z.strictObject({
     policyLinkLabel: text,
     details: text,
   }),
+  /**
+   * Счётчики (ТЗ главной, «Глобальные элементы»): Umami без cookie считает всегда, Яндекс Метрика –
+   * только после «Принять» в cookie-баннере. Без `metrika` баннера нет: спрашивать не о чем.
+   * Работают только на боевом адресе `url` (ADR-056).
+   */
+  analytics: z
+    .strictObject({
+      umami: z
+        .strictObject({
+          scriptUrl: orPlaceholder(z.url({ protocol: /^https$/ })),
+          websiteId: orPlaceholder(z.uuid()),
+        })
+        .optional(),
+      metrika: z.strictObject({ counterId: orPlaceholder(z.int().positive()) }).optional(),
+    })
+    .optional(),
+  /** Cookie-баннер: «{text} Подробнее – в {policyLinkLabel}.», ссылка – на `/cookies`. */
+  cookieBanner: z.strictObject({ text, policyLinkLabel: text }),
   /** Кто технически ведёт сайт – строка «Сайт ведёт» в подвале. */
   siteOperatorTutorId: z.string(),
   /**

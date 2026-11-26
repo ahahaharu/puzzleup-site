@@ -72,6 +72,7 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
       policyLinkLabel: 'политика',
       details: 'Операторы – {operators}.',
     },
+    cookieBanner: { text: 'Сайт использует cookie.', policyLinkLabel: 'Политике cookie' },
     siteOperatorTutorId: 't-maria',
   };
   const legal = (slug: string): SourceFile => ({
@@ -224,6 +225,24 @@ describe('validateContent', () => {
     expect(
       messages(raw({ tutors: [tutor('maria', { telegram: 'https://t.me/maria_example' })] })),
     ).toEqual([]);
+  });
+
+  it('accepts analytics placeholders until release and rejects a non-https Umami script', () => {
+    const site = raw().site;
+    const withAnalytics = (umami: object) => ({
+      site: {
+        ...site,
+        data: { ...Object(site.data), analytics: { umami, metrika: { counterId: '[номер]' } } },
+      },
+    });
+    const placeholders = withAnalytics({ scriptUrl: '[адрес]', websiteId: '[id]' });
+    expect(messages(raw(placeholders))).toEqual([]);
+    expect(messages(raw(placeholders), true)).toHaveLength(3);
+    const http = withAnalytics({
+      scriptUrl: 'http://stats.example/script.js',
+      websiteId: '0b6f5b37-8f8a-4c47-9b4a-0d3f3c6e2a11',
+    });
+    expect(messages(raw(http))[0]).toContain('analytics.umami.scriptUrl');
   });
 
   it('rejects placeholders in JSON files in strict mode', () => {

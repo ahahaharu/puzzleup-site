@@ -96,6 +96,8 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 | `defaultPlatforms` | `['Google Meet', 'Miro']` для репетитора без `platforms` |
 | `prices` | заголовки и подписи карточек «Пробное занятие» и «Занятие», строка об оплате, сноска об оферте |
 | `consent` | `version` (дата редакции, `YYYY-MM-DD`), `label`, `policyLinkLabel`, `details` – шаблон с `{operators}` |
+| `analytics` | необязательные счётчики: `umami { scriptUrl, websiteId }` (адрес `https://`, UUID сайта в Umami) и `metrika { counterId }`; до релиза – заглушки `[…]`. Работают только на боевом адресе `url`; без `metrika` нет cookie-баннера (ADR-056) |
+| `cookieBanner` | `text` и `policyLinkLabel` cookie-баннера: «{text} Подробнее – в {policyLinkLabel}.», ссылка – на `/cookies` |
 | `siteOperatorTutorId` | кто ведёт сайт: `t-andrei` |
 | `trialExample` | необязательный пример итога пробного занятия (блок «Как это работает»): `{ tutorId, intro, strong, improve, startWith, offer }` – сообщение репетитора `tutorId`, строки «Уверенно», «Подтянуть», «Начнём с». Репетитор должен существовать; если он ушёл, карточки нет |
 
