@@ -51,7 +51,7 @@ describe('CookieBanner', () => {
       expect(accept.getBoundingClientRect().width).toBe(decline.getBoundingClientRect().width);
       expect(accept.getBoundingClientRect().height).toBeGreaterThanOrEqual(48);
       expect(decline.scrollWidth).toBeLessThanOrEqual(decline.clientWidth);
-      screen.unmount();
+      await screen.unmount();
     }
   });
 
@@ -59,7 +59,7 @@ describe('CookieBanner', () => {
     await page.viewport(390, 800);
     let screen = await renderBanner();
     expect(banner()!.getBoundingClientRect()).toMatchObject({ left: 0, width: 390, bottom: 800 });
-    screen.unmount();
+    await screen.unmount();
 
     await page.viewport(1280, 800);
     screen = await renderBanner();
