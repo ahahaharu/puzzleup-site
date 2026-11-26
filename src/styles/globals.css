@@ -256,6 +256,25 @@
     }
   }
 
+  /*
+   * View Transitions: фото репетитора перелетает из карточки в профиль (ADR-065, класс `morph` от
+   * React <ViewTransition>), скриншот отзыва вырастает из миниатюры (`screenshot-zoom`). Тот же ease-out,
+   * что у появления блоков. Снимки вписываются целиком: рамки миниатюры и окна разной формы.
+   */
+  ::view-transition-group(.morph) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-group(screenshot-zoom) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-old(screenshot-zoom),
+  ::view-transition-new(screenshot-zoom) {
+    height: 100%;
+    object-fit: contain;
+  }
+
   /* Движение выключено целиком; состояния меняются мгновенно, конечный кадр анимации сохраняется. */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -267,6 +286,12 @@
       transition-delay: 0s !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+    /* Псевдоэлементы View Transitions под `*` не попадают. */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
     }
   }
 }
