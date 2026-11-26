@@ -36,7 +36,7 @@
 | Бот | grammY, webhook | Один бот, общий чат репетиторов |
 | Таблица | Google Sheets API v4, сервисный аккаунт | Только обезличенные строки |
 | Защита формы | honeypot, `rate-limiter-flexible` (memory), проверка Origin | Один инстанс на окружение |
-| Аналитика | Umami self-hosted (без cookie), Яндекс Метрика после согласия | |
+| Аналитика | Umami self-hosted (без cookie); Яндекс Метрика на запуске выключена, включается полем `analytics.metrika` – тогда после согласия в cookie-баннере (ADR-057) | |
 | Качество | ESLint 10 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `@ianvs/prettier-plugin-sort-imports` + `prettier-plugin-tailwindcss` | |
 | Тесты | Vitest 5, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
 | Хуки | lefthook, commitlint, gitleaks | |
@@ -50,7 +50,7 @@
 ├─ content/
 │  ├─ tutors/andrei.mdx, maxim.mdx
 │  ├─ reviews.json, subjects.json, situations.json, faq.json, site.json
-│  └─ legal/privacy.mdx, cookies.mdx
+│  └─ legal/privacy.mdx (cookies.mdx – только с Метрикой, ADR-057)
 ├─ public/tutors/              исходники фото, JPEG или PNG (оптимизирует next/image)
 ├─ assets/fonts/               TTF с лицензиями OFL для OG-картинок: `next/og` не читает woff2 и `next/font`
 ├─ src/
@@ -67,12 +67,13 @@
 │  │  └─ opengraph-image.tsx
 │  ├─ components/
 │  │  ├─ ui/                   Button, Chip, ChoiceChip, Field, Checkbox, Badge, Sheet, PuzzlePiece, PuzzleStep, Doodle, SectionHead, Logo, Icon
-│  │  └─ layout/               SiteShell (каркас страницы), SkipLink, Header, MobileMenu, Footer, BottomBar, CookieBanner
+│  │  └─ layout/               SiteShell (каркас страницы), SkipLink, Header, MobileMenu, Footer, BottomBar
 │  ├─ features/
 │  │  ├─ home/                 блоки главной: Hero, Tutors (+ фильтр), Situations, How, Subjects, Reviews, Prices, Faq, About
 │  │  ├─ tutor-page/           Profile, About, Outside, Reviews, HowToStart, More, статусы
 │  │  ├─ lead-form/            LeadForm (клиент), schema.ts (Zod), action.ts (Server Action), Thanks
 │  │  ├─ tutors/               TutorCard, сортировка, availability
+│  │  ├─ analytics/            CookieBanner, CookieSettingsButton (подвал), consent.ts (выбор в localStorage), Analytics (Umami, Метрика после согласия), metrika.ts, umami.ts
 │  │  └─ seo/                  метатеги (pageMetadata, главная), JSON-LD, sitemap, даты из git, шаблоны OG-картинок (og/)
 │  ├─ content/                 загрузчик (index.ts, server-only), схемы, перекрёстные проверки и правила текстов
 │  ├─ server/                  только серверный код, каждый index.ts начинается с import 'server-only'
@@ -86,7 +87,7 @@
 │  │  ├─ env.ts                проверенное окружение сервера
 │  │  └─ rate-limit.ts
 │  ├─ instrumentation.ts       проверка окружения при старте сервера
-│  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости, подписи, `withAvailability`), entry.ts (Zod-тип `entry`), cn.ts (склейка классов)
+│  ├─ lib/                     env.ts (схема), goal.ts (Zod-тип цели), template.ts (плейсхолдеры `{key}`), time.ts (Минск, Temporal), phone.ts, utm.ts, urls.ts, plural.ts, text.ts, availability.ts (Zod-тип статуса занятости, подписи, `withAvailability`), entry.ts (Zod-тип `entry`), cn.ts (склейка классов), analytics.ts (настроенные счётчики из `site.json`), csp.ts (Content-Security-Policy)
 │  └─ styles/globals.css
 ├─ worker/index.ts             запускает outbox-цикл и планировщик
 ├─ tests/e2e/                 сценарии Playwright
@@ -200,10 +201,9 @@ TELEGRAM_TUTORS=                 # JSON: {"123456789":"t-andrei","987654321":"t-
 GOOGLE_SHEET_ID=
 GOOGLE_SERVICE_ACCOUNT_JSON=     # base64 ключа сервисного аккаунта
 INTERNAL_API_SECRET=             # для post-deploy ревалидации
-UMAMI_SCRIPT_URL=
-UMAMI_WEBSITE_ID=
-YANDEX_METRIKA_ID=
 ```
+
+Счётчиков в окружении нет: адрес скрипта Umami, id сайта в Umami и номер счётчика Метрики – в `site.json` (`analytics`), они публичны и нужны статическим страницам и CSP при сборке (ADR-056).
 
 `TELEGRAM_*` задаются все вместе или ни одной: в staging и production обязательны, локально без них бот выключен – вебхук отвечает 404, задания Telegram ждут в outbox, напоминания не планируются. С `GOOGLE_*` так же: без них задания `sheets.upsert` ждут в outbox.
 
@@ -219,7 +219,7 @@ YANDEX_METRIKA_ID=
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;
   - тег `v*` на `main` – образ `:vX.Y.Z` → production.
   - На сервере по SSH: `docker compose pull` → `run --rm app pnpm db:migrate` → `up -d` → проверка `/api/health` → post-deploy ревалидация (`pnpm cache:revalidate`, ADR-053).
-- **Caddy**: HTTPS (Let's Encrypt), сжатие, заголовки безопасности (CSP, HSTS, Referrer-Policy, Permissions-Policy), basic auth и `X-Robots-Tag: noindex` на staging, проксирование `X-Forwarded-For`.
+- **Caddy**: HTTPS (Let's Encrypt), сжатие, заголовки безопасности (HSTS, Referrer-Policy, Permissions-Policy; CSP ставит само приложение, ADR-056), basic auth и `X-Robots-Tag: noindex` на staging, проксирование `X-Forwarded-For`.
 - **Сервер**: минимум 2 vCPU, 2 ГБ RAM + 2 ГБ swap, 30 ГБ SSD; комфортно 4 ГБ. Ubuntu 24.04, UFW (22, 80, 443), вход по SSH-ключу, unattended-upgrades.
 - **Бэкапы** на этапе запуска не делаются (решение от 11.11.2026). Тома Postgres именованные, чтобы бэкап можно было добавить без миграции данных.
 - **Логи**: pino в JSON в stdout, ротация Docker (`max-size`). Поля с персональными данными вырезаются redact-списком. Sentry и другие внешние сборщики ошибок не используются.
@@ -228,6 +228,6 @@ YANDEX_METRIKA_ID=
 
 - Server Action: проверка Origin, rate limit, Zod, лимиты длины полей, honeypot.
 - Webhook: секрет в заголовке, белый список Telegram ID.
-- CSP без `unsafe-inline` для скриптов, кроме nonce для Umami и Метрики; Метрика подключается только после согласия.
+- CSP – `next.config.ts` `headers()` из `src/lib/csp.ts`, без nonce: страницы статические, а nonce требует отрисовки на каждый запрос. Скрипты – `'self'` и `'unsafe-inline'` (данные страниц Next встроены в `<script>`), внешние – только хосты настроенных счётчиков; без `eval` в production, `object-src 'none'`, `frame-ancestors 'none'`, `form-action 'self'`. Метрика подключается только после согласия (ADR-056).
 - Ключи – только в env на сервере. На CI – GitHub Secrets для деплоя (SSH-ключ, хост).
 - Зависимости: Dependabot (еженедельно), CodeQL, `pnpm audit` в CI. Обновления Next.js по security-релизам ставятся сразу.

@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 
+import { hasCookieBanner } from '@/lib/analytics';
 import { markdownHeadings } from '@/lib/headings';
 import { templateKeys } from '@/lib/template';
 
@@ -65,7 +66,15 @@ export type CheckOptions = {
 };
 
 /** Страницы политик (ТЗ страницы репетитора, раздел 7) – файлы `content/legal/<slug>.mdx`. */
-export const REQUIRED_LEGAL = ['privacy', 'cookies'] as const;
+export const LEGAL_SLUGS = ['privacy', 'cookies'] as const;
+
+/**
+ * Политика персональных данных нужна всегда, политика cookie – только когда сайт ставит cookie:
+ * с Метрикой, на которую ссылается cookie-баннер (ADR-057).
+ */
+export function requiredLegal(site: Site): readonly (typeof LEGAL_SLUGS)[number][] {
+  return hasCookieBanner(site.analytics) ? LEGAL_SLUGS : ['privacy'];
+}
 
 const ABOUT_LENGTH = { min: 600, max: 1200 };
 const ABOUT_PARAGRAPHS = { min: 2, max: 4 };
@@ -295,10 +304,19 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
     );
   }
 
-  for (const slug of REQUIRED_LEGAL) {
+  const required = requiredLegal(site);
+  for (const slug of required) {
     if (!legal.some((doc) => doc.slug === slug)) {
       report(`content/legal/${slug}.mdx`, '', 'file is missing');
     }
+  }
+  // Политика cookie без cookie обещала бы то, чего на сайте нет (ADR-057).
+  if (!required.includes('cookies') && legal.some((doc) => doc.slug === 'cookies')) {
+    report(
+      'content/legal/cookies.mdx',
+      '',
+      'the cookie policy needs analytics.metrika in site.json',
+    );
   }
   for (const doc of legal) {
     checkLegalHeadings(doc, report);

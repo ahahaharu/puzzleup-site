@@ -3,6 +3,9 @@ import { Golos_Text, Spectral, Unbounded } from 'next/font/google';
 import type { ReactNode } from 'react';
 
 import { getSite } from '@/content';
+import { Analytics } from '@/features/analytics/Analytics';
+import { CookieBanner } from '@/features/analytics/CookieBanner';
+import { hasCookieBanner, resolveAnalytics } from '@/lib/analytics';
 
 import '@/styles/globals.css';
 
@@ -39,6 +42,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const site = getSite();
   return (
     <html
       lang="ru"
@@ -46,7 +50,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       data-scroll-behavior="smooth"
       className={`${unbounded.variable} ${golos.variable} ${spectral.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        {hasCookieBanner(site.analytics) && <CookieBanner {...site.cookieBanner} />}
+        <Analytics siteUrl={site.url} {...resolveAnalytics(site.analytics)} />
+      </body>
     </html>
   );
 }

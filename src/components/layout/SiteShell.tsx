@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { getLegal, getPublishedReviews, getSite, getSubjects, getTutors } from '@/content';
+import { hasCookieBanner } from '@/lib/analytics';
 
 import { BottomBar } from './BottomBar';
 import { Footer } from './Footer';
@@ -14,7 +15,7 @@ import { UtmCapture } from './UtmCapture';
 // Каркас страницы: ссылка «к содержанию», шапка, содержимое, подвал и нижняя панель на телефоне.
 // Данные – из content/, компоненты получают их пропсами.
 
-/** Документы подвала по порядку ТЗ (блок 10); страница без файла в content/legal не выводится. */
+/** Документы подвала по порядку ТЗ (блок 10); политики без файла в content/legal (cookie без Метрики) нет. */
 const DOCUMENTS = ['privacy', 'cookies'] as const;
 
 export type SiteShellProps = {
@@ -76,6 +77,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         links={links}
         tutors={contacts}
         documents={documents}
+        cookieSettings={hasCookieBanner(site.analytics)}
         {...footerTexts(site, tutors)}
       />
       <BottomBar

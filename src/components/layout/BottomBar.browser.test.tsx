@@ -83,6 +83,19 @@ describe('BottomBar', () => {
     expect(getComputedStyle(bar()).display).toBe('none');
   });
 
+  it('hides while the cookie banner is shown', async () => {
+    await render(<Page withSections={false} />);
+    await expect.poll(isShown).toBe(true);
+
+    const banner = document.createElement('section');
+    banner.dataset.cookieBanner = '';
+    document.body.append(banner);
+    expect(getComputedStyle(bar()).display).toBe('none');
+
+    banner.remove();
+    expect(getComputedStyle(bar()).display).not.toBe('none');
+  });
+
   it('is not shown on a desktop', async () => {
     await page.viewport(1280, 800);
     await render(<Page withSections={false} />);

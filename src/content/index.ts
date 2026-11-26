@@ -3,8 +3,8 @@ import 'server-only';
 import {
   formatIssues,
   validateContent,
+  type LEGAL_SLUGS,
   type LegalDoc,
-  type REQUIRED_LEGAL,
   type Tutor,
 } from './check';
 import { readContent } from './raw';
@@ -17,8 +17,8 @@ import { readContent } from './raw';
 
 export type TutorEntry = Tutor & { mdx: string };
 export type LegalEntry = LegalDoc & { mdx: string };
-/** Обязательные политики: `privacy`, `cookies`. */
-export type LegalSlug = (typeof REQUIRED_LEGAL)[number];
+/** Политики: `privacy` – всегда, `cookies` – только с Метрикой (ADR-057). */
+export type LegalSlug = (typeof LEGAL_SLUGS)[number];
 
 const { raw, mdx } = readContent();
 const result = validateContent(raw);
@@ -45,6 +45,6 @@ export const getSituations = () => content.situations;
 export const getFaq = () => content.faq;
 export const getLegal = (slug: string) => legal.find((doc) => doc.slug === slug);
 
-export { REQUIRED_LEGAL } from './check';
+export { LEGAL_SLUGS } from './check';
 export type { Content, LegalDoc, Tutor } from './check';
 export type { FaqItem, Review, Site, Situation, Subject } from './schemas';

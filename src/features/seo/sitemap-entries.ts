@@ -11,7 +11,7 @@ import { absoluteUrl } from './urls';
 type Sources = {
   siteUrl: string;
   tutors: readonly Pick<Tutor, 'slug' | 'file' | 'archived'>[];
-  /** Политики, у которых есть страница: `/privacy`, `/cookies`. */
+  /** Политики, у которых есть файл: `/privacy`, с Метрикой – и `/cookies`. */
   legal: readonly Pick<LegalDoc, 'slug' | 'file'>[];
   /** Папка контента – для даты главной: она собирается из всего `content/`. */
   contentDir: string;
