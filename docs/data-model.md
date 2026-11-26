@@ -19,7 +19,7 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 | `pronoun` | `'он' \| 'она'` | да | «он ответит с 9:00 до 22:00» («Как начать»), «посмотрите его страницу» (плашка ушедшего, подсказка о классе) |
 | `fullName` | string | да* | ФИО для «Услуги оказывает» и подвала |
 | `unp` | string | да* | 9 цифр, в YAML – в кавычках: `'123456789'` |
-| `photo` | string | нет | файл в `public/tutors/`; нет – инициалы на kraft |
+| `photo` | string | нет | JPEG или PNG в `public/tutors/` (`next/og` не читает WebP и AVIF); нет – инициалы на kraft |
 | `subjects` | `{ id: SubjectId, from: number, to: number }[]` | да | предмет из `subjects.json`, классы в его диапазоне |
 | `education` | string | да | одна строка, только подтверждённое документом |
 | `teachingSince` | number | да | год; стаж считается автоматически |
@@ -87,6 +87,7 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 | Поле | Что |
 |---|---|
 | `name`, `slogan` | «PuzzleUp», «Всё сложится.» |
+| `url` | боевой адрес `https://puzzle-up.by` без `/` в конце: canonical, sitemap, `og:image`, JSON-LD (ADR-055) |
 | `disclosure` | раскрытие статуса сайта отдельной фразой – для мест вне подвала; в подвале раскрытие входит в `footer.requisites` (ADR-041) |
 | `about` | текст блока «О сайте» как есть (решение владельца, ADR-035) |
 | `footer.tagline`, `footer.requisites`, `footer.copyright` | подвал; реквизиты – шаблон с `{tutorsRequisites}` и `{siteOperatorFullName}`, копирайт – с `{tutorsFullNames}` |

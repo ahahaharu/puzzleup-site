@@ -48,6 +48,7 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
   });
   const site = {
     name: 'PuzzleUp',
+    url: 'https://puzzle-up.by',
     slogan: 'Всё сложится.',
     disclosure: 'PuzzleUp – общий сайт независимых репетиторов.',
     about: 'Текст о сайте.',
@@ -180,6 +181,16 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('requires an https site url without a trailing slash', () => {
+    const site = raw().site;
+    const withUrl = (url: string) =>
+      raw({ site: { ...site, data: { ...Object(site.data), url } } });
+    expect(messages(withUrl('https://puzzle-up.by/'))).toEqual([
+      'content/site.json › url: Without a trailing slash',
+    ]);
+    expect(messages(withUrl('http://puzzle-up.by'))).toHaveLength(1);
+  });
+
   it('rejects response hours that end before they start', () => {
     const site = raw().site;
     const data = {
@@ -260,6 +271,13 @@ describe('validateContent', () => {
       },
     ]);
     expect(validateContent(content, { photoExists: (name) => name === 'maria.jpg' }).ok).toBe(true);
+  });
+
+  // OG-картинку рисует `next/og`, а он не читает WebP и AVIF.
+  it('accepts only a JPEG or PNG photo', () => {
+    expect(messages(raw({ tutors: [tutor('maria', { photo: 'maria.webp' })] }))).toEqual([
+      'content/tutors/maria.mdx › photo: JPEG or PNG file name in public/tutors/',
+    ]);
   });
 
   it('rejects a review of an unknown tutor or of a subject the tutor does not teach', () => {

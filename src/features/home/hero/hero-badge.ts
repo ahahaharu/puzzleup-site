@@ -33,6 +33,36 @@ function grades(subjects: readonly BadgeSubject[]): string {
 }
 
 /**
+ * «по математике и физике для 5–11 классов» – предметы и классы бейджа; пусто, если активных
+ * предметов нет. Из этой же части собираются метатеги главной.
+ */
+export function subjectsAndGrades(subjects: readonly BadgeSubject[]): string {
+  const active = subjects.filter((subject) => subject.status === 'active');
+  if (active.length === 0) return '';
+  const names =
+    active.length > LISTED_SUBJECTS_MAX
+      ? subjectsCount(active.length)
+      : joinWithAnd(
+          // Предлог один раз, как в ТЗ: «по математике и физике».
+          active.map((subject, index) =>
+            index === 0 ? subject.nameDativeWithPrep : withoutPrep(subject.nameDativeWithPrep),
+          ),
+        );
+  return `${names} ${grades(active)}`;
+}
+
+/** «Онлайн-репетиторы по математике для 5–11 классов» – бейдж без имён. */
+export function heroBadgeTitle(subjects: readonly BadgeSubject[], tutorCount: number): string {
+  const who = tutorCount === 1 ? 'Онлайн-репетитор' : 'Онлайн-репетиторы';
+  return [who, subjectsAndGrades(subjects)].filter(Boolean).join(' ');
+}
+
+/** Имена в бейдже: «Андрей и Максим»; при трёх и более репетиторах – пусто. */
+export function badgeNames(tutors: readonly BadgeTutor[]): string {
+  return tutors.length > NAMED_TUTORS_MAX ? '' : joinWithAnd(tutors.map((tutor) => tutor.name));
+}
+
+/**
  * «Онлайн-репетиторы по математике для 5–11 классов: Андрей и Максим».
  * `tutors` – уже отобранные для показа (без ушедших) и по порядку `order`.
  */
@@ -40,25 +70,7 @@ export function heroBadge(
   subjects: readonly BadgeSubject[],
   tutors: readonly BadgeTutor[],
 ): string {
-  const active = subjects.filter((subject) => subject.status === 'active');
-  const who = tutors.length === 1 ? 'Онлайн-репетитор' : 'Онлайн-репетиторы';
-
-  const parts = [who];
-  if (active.length > 0) {
-    parts.push(
-      active.length > LISTED_SUBJECTS_MAX
-        ? subjectsCount(active.length)
-        : joinWithAnd(
-            // Предлог один раз, как в ТЗ: «по математике и физике».
-            active.map((subject, index) =>
-              index === 0 ? subject.nameDativeWithPrep : withoutPrep(subject.nameDativeWithPrep),
-            ),
-          ),
-      grades(active),
-    );
-  }
-
-  const title = parts.join(' ');
-  if (tutors.length === 0 || tutors.length > NAMED_TUTORS_MAX) return title;
-  return `${title}: ${joinWithAnd(tutors.map((tutor) => tutor.name))}`;
+  const title = heroBadgeTitle(subjects, tutors.length);
+  const names = badgeNames(tutors);
+  return names ? `${title}: ${names}` : title;
 }

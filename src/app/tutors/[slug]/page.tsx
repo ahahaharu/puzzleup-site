@@ -6,11 +6,15 @@ import { SiteShell } from '@/components/layout/SiteShell';
 import { getPublishedReviews, getSite, getSubjects, getTutorBySlug, getTutors } from '@/content';
 import { leadFormData } from '@/features/lead-form/form-data';
 import { LeadForm } from '@/features/lead-form/LeadForm';
+import { personJsonLd, tutorBreadcrumbJsonLd } from '@/features/seo/json-ld';
+import { JsonLd } from '@/features/seo/JsonLd';
+import { pageMetadata } from '@/features/seo/metadata';
 import { tutorMetadata, tutorPageData } from '@/features/tutor-page/page-data';
 import { tutorShell } from '@/features/tutor-page/shell';
 import { TutorPage } from '@/features/tutor-page/TutorPage';
 import { currentYear } from '@/features/tutors/current-year';
 import { withAvailability } from '@/lib/availability';
+import { tutorUrl } from '@/lib/urls';
 import { getAvailability } from '@/server/availability/cache';
 
 // Страница репетитора – ТЗ страницы репетитора. Статическая: по странице на каждый файл
@@ -29,8 +33,12 @@ export async function generateMetadata({ params }: PageProps<'/tutors/[slug]'>):
   if (!tutor) return {};
   const meta = tutorMetadata(tutor, getSubjects(), await currentYear());
   return {
-    title: meta.title,
-    description: meta.description,
+    ...pageMetadata({
+      siteName: getSite().name,
+      path: tutorUrl(tutor.slug),
+      title: meta.title,
+      description: meta.description,
+    }),
     // Ушедший скрыт от поисковиков, ссылки с его страницы остаются (раздел 6, «Мета-теги»).
     robots: meta.noindex ? { index: false, follow: true } : { index: true, follow: true },
   };
@@ -55,6 +63,8 @@ export default async function TutorRoute({ params }: PageProps<'/tutors/[slug]'>
 
   return (
     <SiteShell {...tutorShell(tutor)}>
+      <JsonLd data={personJsonLd(tutor, subjects, site.url)} />
+      <JsonLd data={tutorBreadcrumbJsonLd(tutor, site.url)} />
       <TutorPage
         data={data}
         aboutText={<MDXContent code={tutor.mdx} />}

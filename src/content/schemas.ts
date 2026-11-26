@@ -63,7 +63,8 @@ export const tutorSchema = z.strictObject({
   ),
   photo: z
     .string()
-    .regex(/^[\w-]+\.(?:jpe?g|png|webp|avif)$/i, 'File name in public/tutors/')
+    // Только JPEG и PNG: OG-картинку рисует `next/og`, а он не читает WebP и AVIF (ADR-055).
+    .regex(/^[\w-]+\.(?:jpe?g|png)$/i, 'JPEG or PNG file name in public/tutors/')
     .optional(),
   subjects: z
     .array(tutorSubject)
@@ -167,6 +168,11 @@ const time = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, '`HH:MM`');
 
 export const siteSchema = z.strictObject({
   name: text,
+  /**
+   * Боевой адрес сайта без `/` в конце – canonical, sitemap, `og:image` и JSON-LD. Не `SITE_URL`:
+   * страницы статические, а копия на staging тоже должна ссылаться на боевой сайт (ADR-055).
+   */
+  url: z.url({ protocol: /^https$/ }).regex(/[^/]$/, 'Without a trailing slash'),
   slogan: text,
   /** Раскрытие статуса сайта – на каждой странице (ТЗ главной, раздел 1). */
   disclosure: text,
