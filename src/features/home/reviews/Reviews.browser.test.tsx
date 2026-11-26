@@ -13,6 +13,22 @@ describe('Reviews', () => {
     expect(screen.container.innerHTML).toBe('');
   });
 
+  it('shows the screenshot strip instead of the card when the tutor has screenshots', async () => {
+    const [first, second] = TWO;
+    if (!first || !second) throw new Error('fixture');
+    const withScreenshots = {
+      ...first,
+      screenshots: [{ ...first.review, id: 's-1', screenshot: '/reviews/s-1.png' }],
+    };
+    const screen = await render(<Reviews columns={[withScreenshots, second]} />);
+
+    await expect
+      .element(screen.getByRole('list', { name: 'Скриншоты отзывов о Анне' }))
+      .toBeInTheDocument();
+    // Карточка с кавычкой – только у второго репетитора.
+    expect(screen.container.querySelectorAll('blockquote')).toHaveLength(1);
+  });
+
   it('gives every tutor a column with a link to all their reviews', async () => {
     const screen = await render(<Reviews columns={TWO} />);
 

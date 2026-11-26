@@ -82,6 +82,23 @@ describe('reviewColumns', () => {
     expect(columns[1]?.allLabel).toBe('Все отзывы о Максиме');
   });
 
+  it('puts the tutor screenshots, newest first, into the column', () => {
+    const [column] = reviewColumns(
+      [
+        { ...review('a1', 't-andrei', '2026-09-01'), screenshot: 'a1.png' },
+        review('a2', 't-andrei', '2026-10-05', true),
+        { ...review('a3', 't-andrei', '2026-10-09'), screenshot: 'a3.png' },
+      ],
+      TUTORS,
+      SUBJECTS,
+    );
+    expect(column?.screenshots.map((item) => item.screenshot)).toEqual([
+      '/reviews/a3.png',
+      '/reviews/a1.png',
+    ]);
+    expect(column?.screenshotsLabel).toBe('Скриншоты отзывов об Андрее');
+  });
+
   it('leaves out tutors without reviews and reviews of tutors who left', () => {
     const columns = reviewColumns([review('x', 't-anna', '2026-10-01', true)], TUTORS, SUBJECTS);
     expect(columns).toEqual([]);
