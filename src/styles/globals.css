@@ -113,21 +113,13 @@
 
   /*
    * Движение – docs/design-system.md, раздел 7: один раз, только transform и opacity.
-   * Акцентная деталь первого экрана «встаёт» на место из положения макета D-1-hero
-   * (сдвиг и поворот −6°), тень полёта и пустое место под ней гаснут. При reduced-motion сразу виден конечный кадр.
+   * Деталь первого экрана следует за прокруткой – утилиты hero-piece ниже.
    */
-  --animate-piece-land: piece-land 600ms ease-out both;
-  --animate-piece-fade: piece-fade 600ms ease-out both;
   /* Экран «Спасибо»: акцентная деталь «встаёт» в угол за 400 мс (ТЗ главной, блок 9). */
   --animate-piece-snap: piece-snap 400ms ease-out both;
   /* Смена карточек после выбора вкладки фильтра – появление за 150 мс. */
   --animate-fade-in: fade-in 150ms ease-out both;
 
-  @keyframes piece-land {
-    from {
-      transform: translate(16px, 14px) rotate(-6deg);
-    }
-  }
   @keyframes piece-snap {
     from {
       opacity: 0;
@@ -139,12 +131,46 @@
       opacity: 0;
     }
   }
-  @keyframes piece-fade {
-    from {
-      opacity: 1;
+}
+
+/*
+ * Акцентная деталь первого экрана следует за прокруткой (ADR-064; ТЗ главной, блок 1): у самого верха
+ * страницы она в положении макета D-1-hero – сдвинута и повёрнута на −6°, с тенью полёта над пустым
+ * местом; за первые 40 % высоты окна прокрутки встаёт на место, при прокрутке назад снова
+ * приподнимается. Только transform и opacity. Где scroll-driven animations нет и при reduced-motion –
+ * деталь сразу на месте, тень и пустое место скрыты (у них opacity-0 в разметке).
+ */
+@keyframes piece-lift {
+  from {
+    transform: translate(16px, 14px) rotate(-6deg);
+  }
+}
+@keyframes piece-lift-trace {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@utility hero-piece {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: piece-lift ease-out both;
+      animation-timeline: scroll(root);
+      animation-range: 0 40vh;
     }
-    to {
-      opacity: 0;
+  }
+}
+
+/* Тень полёта и пустое место под деталью – видны, пока деталь приподнята. */
+@utility hero-piece-trace {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: piece-lift-trace ease-out both;
+      animation-timeline: scroll(root);
+      animation-range: 0 40vh;
     }
   }
 }

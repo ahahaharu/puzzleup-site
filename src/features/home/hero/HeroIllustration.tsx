@@ -10,7 +10,8 @@ import { cn } from '@/lib/cn';
 
 // Иллюстрация первого экрана: квадрат из четырёх деталей пазла из разных тетрадей (ТЗ главной,
 // блок 1, п. 6; макеты D-1-hero, M-0-1-hero). Метафора, а не список предметов: при новых
-// предметах её не меняют. Акцентная деталь один раз «встаёт» на место – анимация `piece-land`.
+// предметах её не меняют. Акцентная деталь встаёт на место по мере прокрутки и приподнимается при
+// прокрутке назад – утилита `hero-piece` (ADR-064).
 //
 // Координаты – из макета (поле 420 × 420), видимая область поджата до деталей с запасом на тень,
 // чтобы в пяти колонках сетки детали были ближе к размеру макета. Толщина линий и размер подписей
@@ -74,13 +75,13 @@ export function HeroIllustration({ className }: { className?: string }) {
         </filter>
       </defs>
 
-      {/* Пустое место, куда встаёт акцентная деталь. Гаснет к концу анимации: пунктир выходит
-          за контур и иначе виден рваной каймой вокруг вставшей детали. */}
+      {/* Пустое место, куда встаёт акцентная деталь. Гаснет, когда деталь встала: пунктир выходит
+          за контур и иначе виден рваной каймой вокруг неё. */}
       <path
         d={BOTTOM_RIGHT_PIECE}
         strokeOpacity="0.4"
         strokeDasharray="5 4"
-        className="animate-piece-fade fill-kraft-shadow stroke-ink stroke-[1.6] opacity-0 md:stroke-[1.2]"
+        className="hero-piece-trace fill-kraft-shadow stroke-ink stroke-[1.6] opacity-0 md:stroke-[1.2]"
       />
 
       <g filter={`url(#${ref('paper')})`}>
@@ -157,12 +158,12 @@ export function HeroIllustration({ className }: { className?: string }) {
           className="stroke-accent stroke-[2.2] md:stroke-[1.8]"
         />
 
-        {/* Акцентная деталь: круг и длина окружности. Летит с тенью и встаёт на место. */}
-        <g className="origin-center animate-piece-land transform-fill">
+        {/* Акцентная деталь: круг и длина окружности. Приподнята с тенью и встаёт на место. */}
+        <g className="origin-center hero-piece transform-fill">
           <path
             d={BOTTOM_RIGHT_PIECE}
             filter={`url(#${ref('flying')})`}
-            className="animate-piece-fade fill-accent opacity-0"
+            className="hero-piece-trace fill-accent opacity-0"
           />
           <path d={BOTTOM_RIGHT_PIECE} filter={`url(#${ref('paper')})`} className="fill-accent" />
           <g
