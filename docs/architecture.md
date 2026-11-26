@@ -36,7 +36,7 @@
 | Бот | grammY, webhook | Один бот, общий чат репетиторов |
 | Таблица | Google Sheets API v4, сервисный аккаунт | Только обезличенные строки |
 | Защита формы | honeypot, `rate-limiter-flexible` (memory), проверка Origin | Один инстанс на окружение |
-| Аналитика | Umami self-hosted (без cookie), Яндекс Метрика после согласия | |
+| Аналитика | Umami self-hosted (без cookie); Яндекс Метрика на запуске выключена, включается полем `analytics.metrika` – тогда после согласия в cookie-баннере (ADR-057) | |
 | Качество | ESLint 10 (flat, `eslint-config-next`, `jsx-a11y`), Prettier + `@ianvs/prettier-plugin-sort-imports` + `prettier-plugin-tailwindcss` | |
 | Тесты | Vitest 5, Testing Library, Testcontainers, Playwright, `@axe-core/playwright`, Lighthouse CI | |
 | Хуки | lefthook, commitlint, gitleaks | |
