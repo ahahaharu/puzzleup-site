@@ -38,7 +38,7 @@ export function Profile({ profile }: { profile: ProfileData }) {
     <section
       id={PROFILE_ID}
       aria-labelledby="profile-title"
-      className="relative isolate overflow-hidden paper-page"
+      className="relative isolate overflow-hidden paper-section"
     >
       <div className="page-container pt-6 pb-14 lg:pt-8 lg:pb-24">
         <Breadcrumbs name={profile.name} />

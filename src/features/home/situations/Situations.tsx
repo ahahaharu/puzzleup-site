@@ -77,7 +77,7 @@ export function Situations({ cards }: SituationsProps) {
     'relative flex w-[75vw] max-w-80 flex-none snap-start flex-col md:w-auto md:max-w-none';
 
   return (
-    <section id="situations" aria-labelledby="situations-title" className="isolate paper-page">
+    <section id="situations" aria-labelledby="situations-title" className="isolate paper-section">
       <div className="relative page-container py-14 lg:py-24">
         <Doodle
           shape="triangle"
@@ -89,7 +89,9 @@ export function Situations({ cards }: SituationsProps) {
 
         {/* Лента прокручивается вбок; клавиатура доходит до ссылок карточек, прокрутка – за фокусом. */}
         <div className="-mx-4 mt-7 snap-x snap-mandatory scroll-px-4 overflow-x-auto px-4 pb-2 md:mx-0 md:overflow-visible md:px-0 md:pb-0 lg:mt-12">
-          <ul className="flex w-max gap-px overflow-hidden rounded-card bg-ink/20 p-px md:grid md:w-auto md:grid-cols-2 lg:grid-cols-3">
+          {/* Внешняя рамка – поверх карточек: квадратные углы карточек закрыли бы рамку-зазор на
+              скруглении. */}
+          <ul className="relative flex w-max gap-px overflow-hidden rounded-card bg-ink/20 after:pointer-events-none after:absolute after:inset-0 after:z-20 after:rounded-card after:border after:border-ink/20 md:grid md:w-auto md:grid-cols-2 lg:grid-cols-3">
             {cards.map((card, index) => (
               <li key={card.id} className={cn(cell, 'bg-card')}>
                 <div className="flex grow flex-col justify-between gap-6 p-6 lg:p-8">

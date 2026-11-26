@@ -193,13 +193,18 @@ export default function UiKitPage() {
 
       <Section id="fields" title="Field и Checkbox">
         <div className="grid gap-6 lg:grid-cols-3">
-          <Field id="ui-name" label="Имя родителя" placeholder="Мария" autoComplete="off" />
+          <Field
+            id="ui-name"
+            label="Имя родителя"
+            placeholder="Как к вам обращаться"
+            autoComplete="off"
+          />
           <Field
             id="ui-phone"
             type="tel"
             label="Телефон"
             hint="Мобильный номер с кодом 25, 29, 33 или 44"
-            placeholder="+375 (29) 000-00-00"
+            placeholder="+375 (__) ___-__-__"
             autoComplete="off"
           />
           <Field

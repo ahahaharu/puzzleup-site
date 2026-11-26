@@ -8,10 +8,10 @@ import { useEffect, useState, type ReactNode } from 'react';
 const SCROLLED_AFTER = 80;
 
 /**
- * Закреплённая шапка. После 80 px – фон paper 92 % с размытием и линия снизу; на десктопе шапка
- * уходит вверх на 16 px, а её содержимое опускается на 8 px: видно 72 px вместо 88. Двигается только
- * `transform` – содержимое страницы под шапкой не сдвигается. Без JavaScript шапка остаётся в
- * исходном виде.
+ * Закреплённая шапка. Фон – paper 92 % с размытием всегда (ADR-058). После 80 px снизу появляется
+ * линия, а на десктопе шапка уходит вверх на 16 px и её содержимое опускается на 8 px: видно 72 px
+ * вместо 88. Двигается только `transform` – содержимое страницы под шапкой не сдвигается. Без
+ * JavaScript шапка остаётся в исходном виде.
  */
 export function HeaderFrame({ children }: { children: ReactNode }) {
   const [scrolled, setScrolled] = useState(false);
@@ -28,11 +28,11 @@ export function HeaderFrame({ children }: { children: ReactNode }) {
       data-scrolled={scrolled || undefined}
       className="group/header sticky top-0 z-40 transition-transform duration-200 ease-out lg:data-scrolled:-translate-y-4"
     >
-      {/* До прокрутки – та же клетка, что у страницы, выровненная по низу: линии продолжаются в первом
-          блоке. Размытие 8 px – из ТЗ. */}
+      {/* Клетка своего фона не стыковалась с клеткой страницы, поэтому фон один и тот же до и после
+          прокрутки. Размытие 8 px – из ТЗ. */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 border-b border-transparent paper-page bg-bottom group-data-scrolled/header:border-ink/10 group-data-scrolled/header:bg-paper/92 group-data-scrolled/header:bg-none group-data-scrolled/header:backdrop-blur-[8px]"
+        className="absolute inset-0 -z-10 border-b border-transparent bg-paper/92 backdrop-blur-[8px] group-data-scrolled/header:border-ink/10"
       />
       {children}
     </header>

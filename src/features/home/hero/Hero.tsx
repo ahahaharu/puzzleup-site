@@ -19,7 +19,7 @@ export function Hero({ badge, slogan }: HeroProps) {
   const { lines, dot } = splitSlogan(slogan);
 
   return (
-    <section id="top" className="relative isolate overflow-clip">
+    <section id="top" className="relative isolate overflow-clip paper-section">
       <div className="relative page-container pt-6 pb-9 lg:pt-10 lg:pb-10">
         <div className="page-grid items-center gap-y-5 lg:gap-y-0">
           <div className="relative col-span-full flex flex-col items-start gap-5 lg:col-span-7 lg:gap-7">

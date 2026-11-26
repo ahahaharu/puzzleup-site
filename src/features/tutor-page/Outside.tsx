@@ -15,7 +15,7 @@ export function Outside({ outside }: { outside: OutsideData }) {
   if (outside.paragraphs.length === 0) return null;
 
   return (
-    <section aria-labelledby="outside-title" className="paper-page">
+    <section aria-labelledby="outside-title" className="paper-section">
       <div className="page-container py-10 lg:py-18">
         <div
           className={`relative mx-auto max-w-180 rounded-field border border-ink/12 py-7 pr-6 pl-16 shadow-paper lg:-rotate-[0.5deg] lg:py-10 lg:pr-10 lg:pl-20 ${SHEET}`}

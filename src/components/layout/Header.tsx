@@ -62,10 +62,11 @@ export function Header({ links, spy, cta, menu }: HeaderProps) {
       {/* 64 px до 1024 px, дальше 88 – из ТЗ; после прокрутки содержимое опускается к центру 72 px. */}
       <div className="page-container flex h-16 items-center justify-between gap-3 transition-transform duration-200 ease-out lg:h-22 lg:group-data-scrolled/header:translate-y-2">
         <Link href="/" className="inline-flex min-h-11 flex-none items-center rounded-button">
-          <span className="lg:hidden">
+          {/* Обёртки – flex, а не строчные: в строке логотип вставал на базовую линию и уходил вверх. */}
+          <span className="flex lg:hidden">
             <Logo size={26} wordClassName={narrowLogo} />
           </span>
-          <span className="hidden lg:inline">
+          <span className="hidden lg:flex">
             <Logo size={32} wordSize={22} />
           </span>
         </Link>

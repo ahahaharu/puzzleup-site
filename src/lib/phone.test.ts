@@ -27,6 +27,8 @@ describe('parsePhone', () => {
   it('reports an empty value', () => {
     expect(parsePhone('')).toEqual({ ok: false, problem: 'empty' });
     expect(parsePhone('+ ( ) -')).toEqual({ ok: false, problem: 'empty' });
+    // Начало маски без цифр номера.
+    expect(parsePhone('+375 (')).toEqual({ ok: false, problem: 'empty' });
   });
 
   it('reports an incomplete number', () => {
@@ -60,6 +62,7 @@ describe('nationalDigits', () => {
 
   it('drops a full number pasted into the masked field', () => {
     expect(nationalDigits('+375 (+375 29 000-00-00')).toBe('290000000');
+    expect(nationalDigits('+375 (8 029 000-00-00')).toBe('290000000');
   });
 });
 
@@ -71,7 +74,37 @@ describe('maskPhoneInput', () => {
 
   it('deletes the separator together with the digit after it', () => {
     expect(maskPhoneInput('+375 (29) ', 10)).toEqual({ value: '+375 (29', caret: 8 });
-    expect(maskPhoneInput('+375 (', 6)).toEqual({ value: '', caret: 0 });
+  });
+
+  it('keeps the start of the mask without digits and lets it be erased', () => {
+    expect(maskPhoneInput('+375 (', 6)).toEqual({ value: '+375 (', caret: 6 });
+    expect(maskPhoneInput('+375 ', 5)).toEqual({ value: '+375 ', caret: 5 });
+    expect(maskPhoneInput('', 0)).toEqual({ value: '', caret: 0 });
+  });
+
+  it('does not repeat the country code the parent types out of habit', () => {
+    // Фокус подставил «+375 (», родитель набирает «+375 29…».
+    let value = '+375 (';
+    for (const key of '+375291234567') {
+      value = maskPhoneInput(value + key, value.length + 1).value;
+    }
+    expect(value).toBe('+375 (29) 123-45-67');
+  });
+
+  it('accepts the country code typed into an empty field', () => {
+    let value = '';
+    for (const key of '+375291234567') {
+      value = maskPhoneInput(value + key, value.length + 1).value;
+    }
+    expect(value).toBe('+375 (29) 123-45-67');
+  });
+
+  it('drops the trunk prefix 8 0 typed before the code', () => {
+    let value = '+375 (';
+    for (const key of '80291234567') {
+      value = maskPhoneInput(value + key, value.length + 1).value;
+    }
+    expect(value).toBe('+375 (29) 123-45-67');
   });
 
   it('keeps the caret after the same digit when editing in the middle', () => {

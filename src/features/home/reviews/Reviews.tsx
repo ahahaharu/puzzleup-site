@@ -24,7 +24,7 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
   if (columns.length === 0) return null;
 
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="paper-page-alt">
+    <section id={id} aria-labelledby={`${id}-title`} className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <SectionHead id={`${id}-title`} title={REVIEWS_TITLE} lead={REVIEWS_LEAD} />
         <ul

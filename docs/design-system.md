@@ -118,7 +118,7 @@ background-image:
 background-size: 32px 32px;   /* 24px на телефоне */
 ```
 
-Под будущие предметы есть ещё три бумаги из макета `ds/DS-Papers`: косая линейка, нотный стан (станы повторяются каждые 72 px), чистый лист с полями. Утилиты: `paper-page` (секция на `paper`), `paper-page-alt` (та же клетка на `paper-alt`), `paper-cell`, `paper-mm`, `paper-lined`, `paper-slanted`, `paper-staff`, `paper-margin`, `paper-plain`. Все видны на витрине `/dev/tokens` (только `pnpm dev`).
+Под будущие предметы есть ещё три бумаги из макета `ds/DS-Papers`: косая линейка, нотный стан (станы повторяются каждые 72 px), чистый лист с полями. Утилиты: `paper-page` (фон на `paper`), `paper-page-alt` (та же клетка на `paper-alt`), `paper-section` (секция страницы: `paper` и `paper-alt` чередуются по порядку секций, ADR-059), `paper-cell`, `paper-mm`, `paper-lined`, `paper-slanted`, `paper-staff`, `paper-margin`, `paper-plain`. Все видны на витрине `/dev/tokens` (только `pnpm dev`).
 
 ## 5. Tailwind 4: стартовый `@theme`
 

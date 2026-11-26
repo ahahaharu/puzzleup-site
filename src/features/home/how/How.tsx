@@ -77,7 +77,7 @@ function Example({ example }: { example: TrialExample }) {
 
 export function How({ steps, example }: HowProps) {
   return (
-    <section id="how" aria-labelledby="how-title" className="isolate paper-page-alt">
+    <section id="how" aria-labelledby="how-title" className="isolate paper-section">
       <div className="relative page-container py-14 lg:py-24">
         <Doodle
           shape="lever"
@@ -90,7 +90,7 @@ export function How({ steps, example }: HowProps) {
         <div className="mt-8 page-grid gap-y-8 lg:mt-12 lg:gap-y-10">
           <ol className="col-span-full flex flex-col gap-9 lg:col-span-7 lg:gap-12">
             {steps.map((step, index) => (
-              <li key={step.title} className="relative">
+              <li key={step.title}>
                 <div
                   className={cn(
                     'relative flex gap-2 lg:gap-3',
@@ -118,13 +118,6 @@ export function How({ steps, example }: HowProps) {
                     <p className="text-body text-ink-2">{step.text}</p>
                   </div>
                 </div>
-                {/* «Карандашная» линия к следующему шагу. */}
-                {index < steps.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-11 -bottom-6 left-4.5 border-l-2 border-dashed border-ink/30 lg:top-10 lg:-bottom-9 lg:left-5.5"
-                  />
-                )}
               </li>
             ))}
           </ol>

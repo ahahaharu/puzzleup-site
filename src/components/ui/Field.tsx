@@ -39,8 +39,9 @@ const ERROR_BORDER: Record<Tone, string> = {
 };
 
 // Поле светлое на любом фоне. 52 px, рамка 1,5 px ink 30 % – из ДС; текст 16 px, чтобы iOS не масштабировал.
+// Плейсхолдер – ink 65 %: заметно светлее введённого текста, контраст с paper 4,7 : 1 (WCAG AA).
 const CONTROL =
-  'w-full rounded-field bg-paper px-4 text-field text-ink placeholder:text-ink-muted disabled:opacity-40';
+  'w-full rounded-field bg-paper px-4 text-field text-ink placeholder:text-ink/65 disabled:opacity-40';
 
 function InputControl({ multiline, ...props }: ComponentProps<'input'> & { multiline?: false }) {
   return <input {...props} />;

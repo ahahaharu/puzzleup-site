@@ -9,24 +9,29 @@ export const BY_MOBILE_CODES = ['25', '29', '33', '44'] as const;
 /** Национальная часть номера: код оператора и семь цифр. */
 const NATIONAL_LENGTH = 9;
 
-// Префиксы перед национальной частью: +375, 8 0XX, 0XX. Национальная часть начинается с кода
-// 25/29/33/44, поэтому с этих цифр она начаться не может.
-const PREFIX = /^(?:375|80|8|0)/;
+/** Начало номера в поле с маской: его подставляет фокус в пустом поле. */
+export const PHONE_PREFIX = '+375 (';
 
-/** Цифры, набранные до национальной части: код страны или междугородний префикс. */
-function prefixLength(raw: string): number {
-  const digits = raw.replace(/\D/g, '');
-  // Поле с маской начинается с «+375»: дальше – только национальная часть, если её не вставили
-  // целиком ещё раз. Без маски (вставка, автозаполнение, форма без JS) префикс отрезается, только
-  // когда цифр больше девяти: иначе первая набранная «8» пропадала бы.
-  const country = raw.trimStart().startsWith('+375') ? 3 : 0;
-  const rest = digits.slice(country);
-  return country + (rest.length > NATIONAL_LENGTH ? (PREFIX.exec(rest)?.[0].length ?? 0) : 0);
+// Национальная часть начинается с кода 25/29/33/44, поэтому с «375», «80» или «0» она начаться не
+// может: такие цифры в начале – код страны или междугородний префикс. Они отбрасываются, сколько бы
+// раз ни встретились: «+375» из маски и «+375», набранное следом по привычке, или номер, вставленный
+// целиком.
+const PREFIX = /^(?:375|80|0)/;
+
+/** Цифры номера без префиксов и число отброшенных цифр. */
+function splitPrefix(value: string): { prefix: number; rest: string } {
+  let rest = value.replace(/\D/g, '');
+  let prefix = 0;
+  for (let match = PREFIX.exec(rest); match; match = PREFIX.exec(rest)) {
+    prefix += match[0].length;
+    rest = rest.slice(match[0].length);
+  }
+  return { prefix, rest };
 }
 
 /** Цифры номера без кода страны и междугороднего префикса; лишние цифры в конце отбрасываются. */
 export function nationalDigits(value: string): string {
-  return value.replace(/\D/g, '').slice(prefixLength(value)).slice(0, NATIONAL_LENGTH);
+  return splitPrefix(value).rest.slice(0, NATIONAL_LENGTH);
 }
 
 /**
@@ -63,9 +68,16 @@ export function caretAfterDigit(formatted: string, count: number): number {
  * набранной цифры, поэтому правка в середине номера не уводит её в конец.
  */
 export function maskPhoneInput(raw: string, caret: number): { value: string; caret: number } {
-  const national = nationalDigits(raw);
+  const { prefix, rest } = splitPrefix(raw);
+  const national = rest.slice(0, NATIONAL_LENGTH);
+  if (national === '') {
+    // Цифр номера ещё нет. Начало маски стирается посимвольно; набранное «+375» или «80» становится
+    // началом маски, а не первыми цифрами номера.
+    const value = PHONE_PREFIX.startsWith(raw) ? raw : /[\d+]/.test(raw) ? PHONE_PREFIX : '';
+    return { value, caret: value.length };
+  }
   const value = formatPhone(national);
-  const before = raw.slice(0, caret).replace(/\D/g, '').length - prefixLength(raw);
+  const before = raw.slice(0, caret).replace(/\D/g, '').length - prefix;
   return { value, caret: caretAfterDigit(value, Math.min(before, national.length)) };
 }
 
@@ -75,9 +87,9 @@ export type PhoneResult = { ok: true; e164: string } | { ok: false; problem: Pho
 
 /** Номер в любом написании → E.164 `+375291234567` или причина ошибки. */
 export function parsePhone(value: string): PhoneResult {
-  const digits = value.replace(/\D/g, '');
-  if (digits === '') return { ok: false, problem: 'empty' };
-  const national = digits.slice(prefixLength(value));
+  // Только «+375» или «8 0» – номер не начат.
+  const national = splitPrefix(value).rest;
+  if (national === '') return { ok: false, problem: 'empty' };
   if (national.length !== NATIONAL_LENGTH) return { ok: false, problem: 'incomplete' };
   if (!BY_MOBILE_CODES.some((code) => national.startsWith(code))) {
     return { ok: false, problem: 'unknown_code' };

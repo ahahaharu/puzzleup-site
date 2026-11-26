@@ -269,8 +269,8 @@ export function LeadFormFields({ id, data, state, action, pending, onValid }: Le
         tone="dark"
         autoComplete="name"
         maxLength={NAME_MAX}
-        // Пример – из макета T-6-form.
-        placeholder="Мария"
+        // Подсказка, а не пример имени: пример выглядел бы уже введённым.
+        placeholder="Как к вам обращаться"
         defaultValue={asArray(initial.parentName)[0]}
         error={errors.parentName}
       />

@@ -105,6 +105,24 @@ describe('LeadForm', () => {
     await expect.element(phone).toHaveValue('+375 (29) 000-00-00');
   });
 
+  it('starts the phone with the country code and does not repeat a typed one', async () => {
+    await render(<LeadForm data={data} />);
+    const phone = page.getByLabelText('Телефон');
+    await phone.click();
+    await expect.element(phone).toHaveValue('+375 (');
+    await userEvent.keyboard('+375290000000');
+    await expect.element(phone).toHaveValue('+375 (29) 000-00-00');
+  });
+
+  it('clears the phone start when the parent leaves the field empty', async () => {
+    await render(<LeadForm data={data} />);
+    const phone = page.getByLabelText('Телефон');
+    await phone.click();
+    await page.getByLabelText('Имя родителя').click();
+    await expect.element(phone).toHaveValue('');
+    await expect.element(page.getByText(ERRORS.phoneEmpty)).toBeVisible();
+  });
+
   it('validates a field when it loses focus', async () => {
     await render(<LeadForm data={data} />);
     await page.getByLabelText('Имя родителя').fill('Мария2');
