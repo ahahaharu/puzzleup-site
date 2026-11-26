@@ -45,7 +45,7 @@
 | # | Ветка | Что входит |
 |---|---|---|
 | 4.1 | `feature/seo` | Metadata API и шаблоны title/description, canonical, `sitemap.ts`, `robots.ts`, JSON-LD Person, BreadcrumbList, FAQPage, OG-картинки через `next/og` |
-| 4.2 | `feature/consent-analytics` | Cookie-баннер (две равные кнопки, повторное открытие из подвала), Umami всегда, Яндекс Метрика после «Принять», CSP с nonce |
+| 4.2 | `feature/consent-analytics` | Cookie-баннер (две равные кнопки, повторное открытие из подвала), Umami всегда, Яндекс Метрика после «Принять», CSP без nonce – страницы статические (ADR-056) |
 | 4.3 | `feature/infra` | Dockerfile, `compose.prod.yml` (prod + staging + postgres + umami + caddy), Caddyfile, `deploy.yml`, `/api/health`, инструкция подготовки VPS в `docs/ops.md` |
 | 4.4 | `ci/quality-gates` | Lighthouse CI, axe в E2E, пороги покрытия, CodeQL |
 
