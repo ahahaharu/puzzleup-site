@@ -30,7 +30,11 @@ export function TutorPage({ data, aboutText, form }: TutorPageProps) {
       {data.moreFirst && more}
       <AboutTutor about={data.about}>{aboutText}</AboutTutor>
       <Outside outside={data.outside} />
-      <TutorReviews title={data.reviews.title} reviews={data.reviews.items} />
+      <TutorReviews
+        title={data.reviews.title}
+        label={data.reviews.label}
+        reviews={data.reviews.items}
+      />
       {data.how && <HowToStart how={data.how} />}
       {data.lead && <LeadSection lead={data.lead}>{form}</LeadSection>}
       {!data.moreFirst && more}

@@ -144,7 +144,7 @@ describe('TutorReviews', () => {
     data(FIXTURE_ANNA, count).reviews.items.map((review) => review);
 
   async function renderReviews(count: number) {
-    return render(<TutorReviews title="Отзывы" reviews={reviews(count)} />);
+    return render(<TutorReviews title="Отзывы" label="Скриншоты" reviews={reviews(count)} />);
   }
 
   const visible = (container: HTMLElement) =>
@@ -171,7 +171,7 @@ describe('TutorReviews', () => {
     const few = await renderReviews(5);
     expect(visible(few.container)).toBe(5);
     expect(few.container.querySelector('button')?.checkVisibility()).toBe(false);
-    few.unmount();
+    await few.unmount();
 
     const many = await renderReviews(8);
     expect(visible(many.container)).toBe(6);
@@ -181,5 +181,33 @@ describe('TutorReviews', () => {
   it('renders nothing without reviews', async () => {
     const screen = await renderReviews(0);
     expect(screen.container.innerHTML).toBe('');
+  });
+
+  it('shows screenshots in a strip above the text reviews', async () => {
+    await page.viewport(1280, 900);
+    const [first, second, third] = reviews(3);
+    if (!first || !second || !third) throw new Error('fixture');
+    const items = [
+      { ...first, text: 'Спасибо, ребёнок стал понимать дроби.', screenshot: '/reviews/one.png' },
+      { ...second, screenshot: '/reviews/two.png' },
+      third,
+    ];
+    const screen = await render(
+      <TutorReviews title="Отзывы" label="Скриншоты отзывов об Анне" reviews={items} />,
+    );
+
+    const strip = screen.getByRole('list', { name: 'Скриншоты отзывов об Анне' });
+    await expect.element(strip).toBeInTheDocument();
+    expect(strip.element().querySelectorAll('li')).toHaveLength(2);
+    // Текст переписки – имя снимка, а не текст на экране.
+    await expect
+      .element(
+        screen.getByRole('img', {
+          name: 'Скриншот переписки: Спасибо, ребёнок стал понимать дроби.',
+        }),
+      )
+      .toBeInTheDocument();
+    expect(strip.element().textContent).not.toContain('дроби');
+    expect(screen.container.querySelectorAll('blockquote')).toHaveLength(1);
   });
 });

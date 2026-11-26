@@ -60,3 +60,8 @@ export function leadAnchor(entry: Entry): string {
 export function tutorPhotoUrl(fileName: string): string {
   return `/tutors/${encodeURIComponent(fileName)}`;
 }
+
+/** Исходник скриншота отзыва из `public/reviews/`. */
+export function reviewScreenshotUrl(fileName: string): string {
+  return `/reviews/${encodeURIComponent(fileName)}`;
+}
