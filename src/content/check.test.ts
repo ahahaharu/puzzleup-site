@@ -364,6 +364,9 @@ describe('validateContent', () => {
   it('requires the privacy policy and, only with Metrika, the cookie policy', () => {
     expect(messages(raw({ legal: [] }))).toEqual(['content/legal/privacy.mdx › : file is missing']);
     expect(messages(raw({ legal: [legal('privacy')] }))).toEqual([]);
+    expect(messages(raw({ legal: [legal('privacy'), legal('cookies')] }))).toEqual([
+      'content/legal/cookies.mdx › : the cookie policy needs analytics.metrika in site.json',
+    ]);
 
     const site = raw().site;
     const withMetrika = {

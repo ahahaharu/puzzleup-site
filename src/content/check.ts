@@ -304,10 +304,19 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
     );
   }
 
-  for (const slug of requiredLegal(site)) {
+  const required = requiredLegal(site);
+  for (const slug of required) {
     if (!legal.some((doc) => doc.slug === slug)) {
       report(`content/legal/${slug}.mdx`, '', 'file is missing');
     }
+  }
+  // Политика cookie без cookie обещала бы то, чего на сайте нет (ADR-057).
+  if (!required.includes('cookies') && legal.some((doc) => doc.slug === 'cookies')) {
+    report(
+      'content/legal/cookies.mdx',
+      '',
+      'the cookie policy needs analytics.metrika in site.json',
+    );
   }
   for (const doc of legal) {
     checkLegalHeadings(doc, report);
