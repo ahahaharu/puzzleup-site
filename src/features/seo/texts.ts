@@ -16,3 +16,11 @@ export function homeDescription(subjectsAndGrades: string, names: string): strin
   const who = ['Общий сайт независимых репетиторов', subjectsAndGrades].filter(Boolean).join(' ');
   return `${who}${names ? `: ${names}` : ''}. Занятия онлайн, пробное – 30 минут, бесплатно.`;
 }
+
+/** Строка OG-картинки репетитора из макета P-og: «5–9 классы · онлайн», «7 класс · онлайн». */
+export function tutorOgNote(grades: { from: number; to: number } | null): string {
+  if (!grades) return 'онлайн';
+  const label =
+    grades.from === grades.to ? `${grades.from} класс` : `${grades.from}–${grades.to} классы`;
+  return `${label} · онлайн`;
+}
