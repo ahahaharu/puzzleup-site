@@ -63,6 +63,8 @@ export type CheckOptions = {
   strict?: boolean;
   /** Есть ли файл в `public/tutors/`. Без функции фото не проверяются. */
   photoExists?: (fileName: string) => boolean;
+  /** Есть ли файл в `public/reviews/`. Без функции скриншоты отзывов не проверяются. */
+  screenshotExists?: (fileName: string) => boolean;
 };
 
 /** Страницы политик (ТЗ страницы репетитора, раздел 7) – файлы `content/legal/<slug>.mdx`. */
@@ -268,6 +270,14 @@ function checkLinks(content: Content, options: CheckOptions, report: Report) {
         'content/reviews.json',
         `${index}.subject`,
         `${tutor.id} does not teach «${review.subject}»`,
+      );
+    }
+    const { screenshot } = review;
+    if (screenshot !== undefined && options.screenshotExists?.(screenshot) === false) {
+      report(
+        'content/reviews.json',
+        `${index}.screenshot`,
+        `public/reviews/${screenshot} does not exist`,
       );
     }
   });
