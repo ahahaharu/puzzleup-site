@@ -1,3 +1,5 @@
+import { reveal } from '@/lib/reveal';
+
 import type { HowToStartData } from './page-data';
 import { HOW_TITLE } from './texts';
 
@@ -9,12 +11,12 @@ export function HowToStart({ how }: { how: HowToStartData }) {
   return (
     <section id="how" aria-labelledby="how-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
-        <h2 id="how-title" className="font-display text-h2 text-ink">
+        <h2 id="how-title" {...reveal()} className="font-display text-h2 text-ink">
           {HOW_TITLE}
         </h2>
         <ol className="mt-7 grid gap-7 lg:mt-12 lg:grid-cols-3 lg:gap-12">
           {how.steps.map((step, index) => (
-            <li key={step.title} className="flex flex-col gap-2.5">
+            <li key={step.title} {...reveal()} className="flex flex-col gap-2.5">
               {/* Номер – Spectral Italic 40 px accent-text; порядок для дикторов задаёт список. */}
               <span
                 aria-hidden="true"
@@ -28,7 +30,10 @@ export function HowToStart({ how }: { how: HowToStartData }) {
             </li>
           ))}
         </ol>
-        <div className="mt-8 flex max-w-3xl flex-col gap-2 text-body text-ink-2 lg:mt-12">
+        <div
+          {...reveal()}
+          className="mt-8 flex max-w-3xl flex-col gap-2 text-body text-ink-2 lg:mt-12"
+        >
           <p>{how.terms}</p>
           <p>{how.school}</p>
         </div>

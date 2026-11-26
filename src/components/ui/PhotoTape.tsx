@@ -18,9 +18,18 @@ type PhotoTapeProps = {
   sizes: string;
   /** Фото профиля на первом экране – `preload` (в Next 16 вместо `priority`), остальные грузятся лениво. */
   preload?: boolean;
+  /**
+   * Фото «отклеивается» при наведении на карточку (`group/card`): приподнимается на 4 px, наклон
+   * удваивается, под ним тень полёта. Только transform и opacity тени; на сенсорных экранах наведения нет.
+   */
+  lift?: boolean;
   /** Ширина – классами (`w-[170px]`, `w-full`). */
   className?: string;
 };
+
+// Тень полёта – отдельным слоем: меняется только его прозрачность, не сама тень.
+const LIFT =
+  'transition-[translate,rotate] duration-300 ease-out group-hover/card:-translate-y-1 group-hover/card:rotate-[calc(var(--tilt)*2)] after:pointer-events-none after:absolute after:inset-0 after:opacity-0 after:shadow-flying after:transition-opacity after:duration-300 group-hover/card:after:opacity-100';
 
 const FRAME = { sm: 'p-2', lg: 'p-3' } as const;
 
@@ -40,6 +49,7 @@ export function PhotoTape({
   tilt = -1.5,
   sizes,
   preload = false,
+  lift = false,
   className,
 }: PhotoTapeProps) {
   const style: CSSProperties & Record<'--tilt', string> = { '--tilt': `${tilt}deg` };
@@ -50,6 +60,7 @@ export function PhotoTape({
       className={cn(
         'relative flex-none rotate-(--tilt) bg-white shadow-paper',
         FRAME[frame],
+        lift && LIFT,
         className,
       )}
     >

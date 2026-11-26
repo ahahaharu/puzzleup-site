@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import { subjectColumns, type SubjectCardData } from './cards';
 import { LEAD_LINK_HINT, SUBJECTS_LEAD, SUBJECTS_TITLE, TAUGHT_BY } from './texts';
@@ -110,7 +111,7 @@ export function Subjects({ subjects, id = 'subjects' }: SubjectsProps) {
           )}
         >
           {subjects.map((subject) => (
-            <li key={subject.id} className="@container">
+            <li key={subject.id} {...reveal()} className="@container">
               <SubjectCard subject={subject} />
             </li>
           ))}

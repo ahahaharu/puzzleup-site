@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { reveal } from '@/lib/reveal';
+
 import type { AboutData } from './page-data';
 import { ABOUT_TITLE, HELPS_TITLE } from './texts';
 
@@ -17,7 +19,7 @@ export function AboutTutor({ about, children }: AboutTutorProps) {
   return (
     <section id="about" aria-labelledby="about-title" className="paper-section">
       <div className="page-container page-grid gap-y-6 py-14 lg:py-24">
-        <div className="col-span-full lg:col-span-8">
+        <div {...reveal()} className="col-span-full lg:col-span-8">
           <h2 id="about-title" className="font-display text-h2 text-ink">
             {ABOUT_TITLE}
           </h2>
@@ -27,7 +29,7 @@ export function AboutTutor({ about, children }: AboutTutorProps) {
           </div>
         </div>
 
-        <div className="col-span-full lg:col-span-4">
+        <div {...reveal()} className="col-span-full lg:col-span-4">
           {/* Отступ сверху – под сжатой шапкой 72 px. */}
           <div className="rounded-card border border-ink/12 bg-card p-5 shadow-paper lg:sticky lg:top-28 lg:p-6">
             <h3 className="font-display text-h3 text-ink">{HELPS_TITLE}</h3>

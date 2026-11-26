@@ -56,4 +56,8 @@ test('with reduced motion the accent piece is already in place', async ({ page }
       ),
     )
     .toBe(true);
+  // Деталь не следует за прокруткой – она сразу на месте (ADR-064).
+  expect(
+    await illustration.locator('.hero-piece').evaluate((g) => getComputedStyle(g).transform),
+  ).toBe('none');
 });

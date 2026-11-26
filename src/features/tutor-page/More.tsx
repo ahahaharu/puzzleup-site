@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { TutorCard } from '@/features/tutors/TutorCard';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import type { MoreData } from './page-data';
 import { ALL_TUTORS } from './texts';
@@ -32,6 +33,7 @@ export function More({ more }: { more: MoreData }) {
           {more.tutors.map((tutor, index) => (
             <li
               key={tutor.id}
+              {...reveal()}
               className={cn('min-w-0', !single && 'w-[85%] flex-none snap-start md:w-auto')}
             >
               <TutorCard tutor={tutor} tilt={index % 2 === 0 ? 1.2 : -1.2} entry="tutor_more" />

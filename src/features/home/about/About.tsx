@@ -4,6 +4,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { MessengerIconButton } from '@/components/ui/MessengerIconButton';
 import { leadLabel } from '@/features/tutors/texts';
+import { reveal } from '@/lib/reveal';
 
 import type { AboutTutor } from './cards';
 import { ABOUT_CTA, ABOUT_TITLE } from './texts';
@@ -21,7 +22,10 @@ type AboutProps = {
 
 function TutorCard({ tutor }: { tutor: AboutTutor }) {
   return (
-    <li className="@container flex flex-col gap-3.5 rounded-card bg-card p-4 text-ink">
+    <li
+      {...reveal()}
+      className="@container flex flex-col gap-3.5 rounded-card bg-card p-4 text-ink"
+    >
       <div className="flex items-center gap-3.5">
         <Avatar name={tutor.name} photo={tutor.photo} size={64} />
         <div className="flex min-w-0 flex-col gap-0.5">
@@ -62,7 +66,10 @@ export function About({ text, tutors }: AboutProps) {
   return (
     <section id="about" aria-labelledby="about-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
-        <div className="grid items-center gap-5 rounded-piece bg-ink p-6 text-paper md:p-10 lg:grid-cols-2 lg:gap-14 lg:p-14">
+        <div
+          {...reveal()}
+          className="grid items-center gap-5 rounded-piece bg-ink p-6 text-paper md:p-10 lg:grid-cols-2 lg:gap-14 lg:p-14"
+        >
           <div className="flex flex-col items-start gap-4.5 lg:gap-5">
             {/* 36 px на десктопе – ТЗ, 26 px на телефоне – макет M-9. */}
             <h2

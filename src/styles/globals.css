@@ -113,21 +113,17 @@
 
   /*
    * Движение – docs/design-system.md, раздел 7: один раз, только transform и opacity.
-   * Акцентная деталь первого экрана «встаёт» на место из положения макета D-1-hero
-   * (сдвиг и поворот −6°), тень полёта и пустое место под ней гаснут. При reduced-motion сразу виден конечный кадр.
+   * Деталь первого экрана следует за прокруткой – утилиты hero-piece ниже.
    */
-  --animate-piece-land: piece-land 600ms ease-out both;
-  --animate-piece-fade: piece-fade 600ms ease-out both;
   /* Экран «Спасибо»: акцентная деталь «встаёт» в угол за 400 мс (ТЗ главной, блок 9). */
   --animate-piece-snap: piece-snap 400ms ease-out both;
   /* Смена карточек после выбора вкладки фильтра – появление за 150 мс. */
   --animate-fade-in: fade-in 150ms ease-out both;
+  /* Ответ FAQ при раскрытии проявляется и съезжает на 6 px; высота меняется сразу (ДС, раздел 7). */
+  --animate-answer-in: answer-in 250ms ease-out both;
+  /* Деталь логотипа при наведении кивает – наклон −8° и обратно, отсылка к первому экрану. */
+  --animate-piece-nod: piece-nod 500ms ease-in-out;
 
-  @keyframes piece-land {
-    from {
-      transform: translate(16px, 14px) rotate(-6deg);
-    }
-  }
   @keyframes piece-snap {
     from {
       opacity: 0;
@@ -139,12 +135,57 @@
       opacity: 0;
     }
   }
-  @keyframes piece-fade {
+  @keyframes answer-in {
     from {
-      opacity: 1;
-    }
-    to {
       opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes piece-nod {
+    40% {
+      transform: rotate(-8deg);
+    }
+  }
+}
+
+/*
+ * Акцентная деталь первого экрана следует за прокруткой (ADR-064; ТЗ главной, блок 1): у самого верха
+ * страницы она в положении макета D-1-hero – сдвинута и повёрнута на −6°, с тенью полёта над пустым
+ * местом; за первые 40 % высоты окна прокрутки встаёт на место, при прокрутке назад снова
+ * приподнимается. Только transform и opacity. Где scroll-driven animations нет и при reduced-motion –
+ * деталь сразу на месте, тень и пустое место скрыты (у них opacity-0 в разметке).
+ */
+@keyframes piece-lift {
+  from {
+    transform: translate(16px, 14px) rotate(-6deg);
+  }
+}
+@keyframes piece-lift-trace {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@utility hero-piece {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: piece-lift ease-out both;
+      animation-timeline: scroll(root);
+      animation-range: 0 40vh;
+    }
+  }
+}
+
+/* Тень полёта и пустое место под деталью – видны, пока деталь приподнята. */
+@utility hero-piece-trace {
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      animation: piece-lift-trace ease-out both;
+      animation-timeline: scroll(root);
+      animation-range: 0 40vh;
     }
   }
 }
@@ -207,6 +248,48 @@
     overflow: hidden;
   }
 
+  /*
+   * Появление при прокрутке (ADR-063, src/lib/reveal.ts): блок ниже первого экрана один раз
+   * поднимается и проявляется. Здесь – только начальный кадр вида; прячет и показывает блок скрипт
+   * ScrollReveal (Web Animations API) – без него и при reduced-motion всё видно сразу.
+   */
+  [data-reveal] {
+    --reveal-from: translateY(1.5rem);
+  }
+  [data-reveal='paper'] {
+    --reveal-from: translateY(1rem) rotate(-1.5deg);
+  }
+  /* Пузырь растёт от угла отправителя – верхнего левого, где у него острый угол. */
+  [data-reveal='message'] {
+    --reveal-from: translateY(0.75rem) scale(0.96);
+    transform-origin: 0 0;
+  }
+  /* Выступ формы на десктопе смотрит влево – деталь приходит справа и встаёт в паз. */
+  [data-reveal='piece'] {
+    @variant lg {
+      --reveal-from: translateX(2rem);
+    }
+  }
+
+  /*
+   * View Transitions: фото репетитора перелетает из карточки в профиль (ADR-065, класс `morph` от
+   * React <ViewTransition>), скриншот отзыва вырастает из миниатюры (`screenshot-zoom`). Тот же ease-out,
+   * что у появления блоков. Снимки вписываются целиком: рамки миниатюры и окна разной формы.
+   */
+  ::view-transition-group(.morph) {
+    animation-duration: 450ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-group(screenshot-zoom) {
+    animation-duration: 350ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-old(screenshot-zoom),
+  ::view-transition-new(screenshot-zoom) {
+    height: 100%;
+    object-fit: contain;
+  }
+
   /* Движение выключено целиком; состояния меняются мгновенно, конечный кадр анимации сохраняется. */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -218,6 +301,12 @@
       transition-delay: 0s !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+    /* Псевдоэлементы View Transitions под `*` не попадают. */
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
     }
   }
 }

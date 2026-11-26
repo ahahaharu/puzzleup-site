@@ -8,6 +8,7 @@ import { MarginNote } from '@/components/ui/MarginNote';
 import { MessengerButtons } from '@/components/ui/MessengerButtons';
 import { PhotoTape } from '@/components/ui/PhotoTape';
 import { CURRENCY, LESSON_LENGTH } from '@/features/tutors/texts';
+import { TutorPhotoTransition } from '@/features/tutors/TutorPhotoTransition';
 import { cn } from '@/lib/cn';
 
 import { Breadcrumbs } from './Breadcrumbs';
@@ -66,14 +67,17 @@ export function Profile({ profile }: { profile: ProfileData }) {
               row,
             )}
           >
-            <PhotoTape
-              name={profile.name}
-              photo={profile.photo ? { src: profile.photo, alt: '' } : undefined}
-              frame="lg"
-              sizes="(min-width: 1280px) 461px, (min-width: 1024px) 36vw, 132px"
-              preload
-              className="w-33 max-lg:p-2 lg:w-full"
-            />
+            {/* Фото прилетает сюда из карточки, по которой открыли страницу (ADR-065). */}
+            <TutorPhotoTransition slug={profile.slug}>
+              <PhotoTape
+                name={profile.name}
+                photo={profile.photo ? { src: profile.photo, alt: '' } : undefined}
+                frame="lg"
+                sizes="(min-width: 1280px) 461px, (min-width: 1024px) 36vw, 132px"
+                preload
+                className="w-33 max-lg:p-2 lg:w-full"
+              />
+            </TutorPhotoTransition>
           </div>
 
           <div className="contents lg:col-span-7 lg:flex lg:flex-col lg:items-start lg:gap-5.5">

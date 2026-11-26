@@ -5,6 +5,7 @@ import { SectionHead } from '@/components/ui/SectionHead';
 import type { Site } from '@/content';
 import { formatPrice } from '@/features/tutors/card-data';
 import { CURRENCY } from '@/features/tutors/texts';
+import { reveal } from '@/lib/reveal';
 
 import type { PriceRow } from './rows';
 import { PRICES_CTA, PRICES_LEAD, PRICES_TITLE } from './texts';
@@ -28,7 +29,10 @@ export function Prices({ prices, rows }: PricesProps) {
         <SectionHead id="prices-title" title={PRICES_TITLE} lead={PRICES_LEAD} />
 
         <div className="mt-6 grid max-w-240 gap-4 md:grid-cols-2 md:gap-6 lg:mt-10 xl:gap-8">
-          <div className="flex flex-col gap-3.5 rounded-card bg-ink p-7 text-paper lg:p-10">
+          <div
+            {...reveal()}
+            className="flex flex-col gap-3.5 rounded-card bg-ink p-7 text-paper lg:p-10"
+          >
             <h3 className="font-display text-h3 text-paper">{prices.trial.title}</h3>
             {/* Цифры – Unbounded 700, 64 px (на телефоне 48), валюта – 24 px: ТЗ. */}
             <p className="flex items-baseline gap-2.5 font-display">
@@ -41,7 +45,10 @@ export function Prices({ prices, rows }: PricesProps) {
             <p className="text-[1.0625rem] text-kraft">{prices.trial.caption}</p>
           </div>
 
-          <div className="flex flex-col gap-3.5 rounded-card border border-ink/12 bg-card p-7 shadow-paper lg:p-10">
+          <div
+            {...reveal()}
+            className="flex flex-col gap-3.5 rounded-card border border-ink/12 bg-card p-7 shadow-paper lg:p-10"
+          >
             <h3 className="font-display text-h3 text-ink">{prices.lesson.title}</h3>
             <p className="text-[1.0625rem] text-ink-2">{prices.lesson.caption}</p>
             <ul>
@@ -73,7 +80,7 @@ export function Prices({ prices, rows }: PricesProps) {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-col items-start gap-4 lg:mt-10 lg:gap-5">
+        <div {...reveal()} className="mt-6 flex flex-col items-start gap-4 lg:mt-10 lg:gap-5">
           <p className="max-w-205 text-body text-ink-2">{prices.paymentNote}</p>
           <Button href="#tutors" fullWidth className="md:w-auto">
             {PRICES_CTA}

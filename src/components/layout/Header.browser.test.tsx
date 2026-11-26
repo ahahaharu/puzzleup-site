@@ -87,6 +87,32 @@ describe('Header', () => {
     expect(document.querySelectorAll('[aria-current]')).toHaveLength(0);
   });
 
+  it('slides one line to the current item and fades it out in place', async () => {
+    await page.viewport(1280, 800);
+    const screen = await render(<Page />);
+    const line = () =>
+      document.querySelector<HTMLElement>('header nav > span[aria-hidden="true"]')!;
+    const labelLeft = (name: string) =>
+      screen.getByRole('link', { name }).element().querySelector<HTMLElement>('[data-nav-label]')!
+        .offsetLeft;
+
+    document.getElementById('tutors')!.scrollIntoView({ behavior: 'instant' });
+    await expect.poll(() => getComputedStyle(line()).opacity).toBe('1');
+    const atTutors = line().style.transform;
+    expect(atTutors).toContain(`translate(${labelLeft('Репетиторы')}px`);
+
+    document.getElementById('how')!.scrollIntoView({ behavior: 'instant' });
+    await expect
+      .poll(() => line().style.transform)
+      .toContain(`translate(${labelLeft('Как это работает')}px`);
+    // Переезд от пункта к пункту – анимацией transform.
+    expect(getComputedStyle(line()).transitionProperty).toContain('transform');
+
+    document.getElementById('situations')!.scrollIntoView({ behavior: 'instant' });
+    await expect.poll(() => line().className).toContain('opacity-0');
+    expect(line().style.transform).toContain(`translate(${labelLeft('Как это работает')}px`);
+  });
+
   it('does not highlight items on other pages', async () => {
     await page.viewport(1280, 800);
     const screen = await render(<Page spy={false} />);

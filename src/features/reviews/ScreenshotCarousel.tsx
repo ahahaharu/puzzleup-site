@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { flushSync } from 'react-dom';
 
 import { Icon } from '@/components/ui/Icon';
 
@@ -12,6 +13,27 @@ import { SCREENSHOT_CLOSE, screenshotAlt, SCREENSHOTS_NEXT, SCREENSHOTS_PREV } f
 // странице. Рамки одного размера, снимок вписан целиком. Текст переписки на экране не повторяется:
 // он – имя снимка для дикторов и поиска. Нажатие открывает снимок крупно в `<dialog>`.
 // Без JavaScript лента прокручивается пальцем и колесом, стрелок нет, снимок открывается ссылкой.
+// Снимок вырастает из миниатюры и при закрытии уменьшается обратно в неё – View Transition с общим
+// именем на время перехода (globals.css). Без поддержки и при reduced-motion окно открывается сразу.
+
+/** Имя пары «миниатюра – снимок крупно» на время перехода. */
+const ZOOM = 'screenshot-zoom';
+/** Дольше крупный снимок не ждём: лучше перелёт к пустой рамке, чем задержка нажатия. */
+const DECODE_TIMEOUT_MS = 300;
+
+function canZoom() {
+  return (
+    typeof document.startViewTransition === 'function' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/** Ждёт, пока крупный снимок готов к показу, – иначе перелёт придёт к пустой рамке. */
+async function ready(image: HTMLImageElement | null | undefined) {
+  if (!image) return;
+  const timeout = new Promise((resolve) => setTimeout(resolve, DECODE_TIMEOUT_MS));
+  await Promise.race([image.decode().catch(() => undefined), timeout]);
+}
 
 type Screenshot = ReviewCardData & { screenshot: string };
 
@@ -27,6 +49,9 @@ const ARROW =
 export function ScreenshotCarousel({ reviews, label }: ScreenshotCarouselProps) {
   const list = useRef<HTMLUListElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  const zoomed = useRef<HTMLSpanElement>(null);
+  // Миниатюра открытого снимка – в неё он уменьшается при закрытии.
+  const origin = useRef<HTMLElement>(null);
   const [open, setOpen] = useState<Screenshot>();
   // Без прокрутки (все снимки видны) и до гидратации стрелок нет.
   const [edges, setEdges] = useState({ start: true, end: true });
@@ -63,8 +88,38 @@ export function ScreenshotCarousel({ reviews, label }: ScreenshotCarouselProps) 
 
   function show(event: MouseEvent<HTMLAnchorElement>, review: Screenshot) {
     event.preventDefault();
-    setOpen(review);
-    dialog.current?.showModal();
+    const thumbnail = event.currentTarget.querySelector('span');
+    origin.current = thumbnail;
+    const reveal = () => {
+      flushSync(() => setOpen(review));
+      dialog.current?.showModal();
+    };
+    if (!thumbnail || !canZoom()) {
+      reveal();
+      return;
+    }
+    // Старый кадр – миниатюра, новый – снимок крупно: имя переходит от одной к другому.
+    thumbnail.style.viewTransitionName = ZOOM;
+    document.startViewTransition(async () => {
+      thumbnail.style.viewTransitionName = '';
+      reveal();
+      await ready(zoomed.current?.querySelector('img'));
+    });
+  }
+
+  // Закрытие нажатием – обратный перелёт в миниатюру. Esc закрывает сразу: его отменять нельзя.
+  function hide(event: FormEvent<HTMLFormElement>) {
+    const thumbnail = origin.current;
+    if (!thumbnail?.isConnected || !canZoom()) return;
+    event.preventDefault();
+    const transition = document.startViewTransition(() => {
+      flushSync(() => setOpen(undefined));
+      dialog.current?.close();
+      thumbnail.style.viewTransitionName = ZOOM;
+    });
+    void transition.finished.finally(() => {
+      thumbnail.style.viewTransitionName = '';
+    });
   }
 
   return (
@@ -125,11 +180,15 @@ export function ScreenshotCarousel({ reviews, label }: ScreenshotCarouselProps) 
         onClose={() => setOpen(undefined)}
         className="m-auto size-full max-h-none max-w-none bg-transparent p-0 backdrop:bg-ink/85"
       >
-        <form method="dialog" className="size-full">
+        <form method="dialog" onSubmit={hide} className="size-full">
           <button type="submit" className="relative block size-full cursor-zoom-out p-4">
             <span className="sr-only">{SCREENSHOT_CLOSE}</span>
             {open && (
-              <span className="relative block size-full">
+              <span
+                ref={zoomed}
+                style={{ viewTransitionName: ZOOM }}
+                className="relative block size-full"
+              >
                 <Image
                   src={open.screenshot}
                   alt=""

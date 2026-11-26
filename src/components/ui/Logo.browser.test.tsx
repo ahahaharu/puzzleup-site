@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 
 import { Logo } from './Logo';
 
@@ -32,6 +33,18 @@ describe('Logo', () => {
     const screen = await render(<Logo size={16} />);
 
     expect(getComputedStyle(screen.getByText('PuzzleUp').element()).fontSize).toBe('14px');
+  });
+});
+
+describe('Logo on hover', () => {
+  it('nods the piece once', async () => {
+    const screen = await render(<Logo size={26} />);
+    const piece = screen.container.querySelector('svg')!;
+    expect(getComputedStyle(piece).animationName).toBe('none');
+
+    await userEvent.hover(screen.getByText('PuzzleUp'));
+
+    expect(getComputedStyle(piece).animationName).toBe('piece-nod');
   });
 });
 

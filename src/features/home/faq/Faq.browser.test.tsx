@@ -47,6 +47,18 @@ describe('Faq', () => {
     await expect.poll(() => getComputedStyle(icon).rotate).toBe('45deg');
   });
 
+  it('fades the answer in when it opens', async () => {
+    const screen = await render(<Faq items={ITEMS} />);
+    const summary = screen.getByText('Это одна организация?');
+    const details = summary.element().closest('details')!;
+
+    await userEvent.click(summary);
+
+    expect(details.open).toBe(true);
+    const answer = details.querySelector('summary + *')!;
+    expect(getComputedStyle(answer).animationName).toBe('answer-in');
+  });
+
   it('shows one button: under the heading on desktop, after the questions on phones', async () => {
     await page.viewport(1280, 900);
     const screen = await render(<Faq items={ITEMS} />);

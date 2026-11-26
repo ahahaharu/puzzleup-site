@@ -18,6 +18,7 @@ import {
   REVIEW_FORMS,
   WAITLIST_LABEL,
 } from './texts';
+import { OPEN_PROFILE, TutorPhotoTransition } from './TutorPhotoTransition';
 
 // Карточка репетитора – ТЗ главной, блок 5 «Карточка репетитора»; макеты D-5-tutors, M-5-tutors.
 // Раскладку карточка выбирает по своей ширине (container query), а не по окну: она стоит и в узкой
@@ -34,6 +35,9 @@ type TutorCardProps = {
   entry?: Entry;
 };
 
+/** Ссылки на профиль запускают перелёт фото (ADR-065). */
+const OPEN_PROFILE_TYPES = [OPEN_PROFILE];
+
 // Ссылки под кнопками – строки от 44 px, как в подвале.
 const TEXT_LINK =
   'inline-flex min-h-11 items-center text-small underline underline-offset-4 hover:no-underline';
@@ -44,7 +48,7 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
   const full = tutor.availability === 'full';
 
   return (
-    <article className="@container h-full rounded-card border border-ink/12 bg-card">
+    <article className="group/card @container h-full rounded-card border border-ink/12 bg-card">
       <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-3.5 p-5 @[34rem]:items-start @[34rem]:gap-x-7 @[34rem]:gap-y-2.5 @[34rem]:p-7">
         <Badge
           status={tutor.availability}
@@ -55,17 +59,21 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
             одинаковых ссылок подряд. */}
         <Link
           href={page}
+          transitionTypes={OPEN_PROFILE_TYPES}
           tabIndex={-1}
           aria-hidden="true"
           className="col-start-1 row-start-2 block @[34rem]:row-span-3 @[34rem]:row-start-1"
         >
-          <PhotoTape
-            name={tutor.name}
-            photo={tutor.photo ? { src: tutor.photo, alt: '' } : undefined}
-            tilt={tilt}
-            sizes="170px"
-            className="w-23 @[34rem]:w-42.5"
-          />
+          <TutorPhotoTransition slug={tutor.slug}>
+            <PhotoTape
+              name={tutor.name}
+              photo={tutor.photo ? { src: tutor.photo, alt: '' } : undefined}
+              tilt={tilt}
+              sizes="170px"
+              lift
+              className="w-23 @[34rem]:w-42.5"
+            />
+          </TutorPhotoTransition>
         </Link>
 
         <div className="col-start-2 row-start-2 flex min-w-0 flex-col gap-1.5 @[34rem]:gap-2.5">
@@ -73,6 +81,7 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
             {/* Зона нажатия растянута по высоте до 44 px, строка при этом не выше заголовка. */}
             <Link
               href={page}
+              transitionTypes={OPEN_PROFILE_TYPES}
               className="relative no-underline after:absolute after:inset-x-0 after:-inset-y-3 hover:underline"
             >
               {tutor.name}
@@ -118,7 +127,11 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
 
           {/* Строки по 44 px выше текста – отрицательный отступ возвращает ритм макета. */}
           <div className="-my-2 flex flex-wrap gap-x-5">
-            <Link href={page} className={`${TEXT_LINK} font-semibold text-ink`}>
+            <Link
+              href={page}
+              transitionTypes={OPEN_PROFILE_TYPES}
+              className={`${TEXT_LINK} font-semibold text-ink`}
+            >
               {MORE_LABEL}
               <span className="sr-only"> {about}</span>
             </Link>

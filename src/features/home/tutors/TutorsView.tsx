@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { CHOICE_CHIP_SHAPE } from '@/components/ui/ChoiceChip';
 import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/cn';
+import { reveal } from '@/lib/reveal';
 
 import { collapsedCount, tutorsLayout, type FilterTab, type TutorsLayout } from './filter';
 import { ALL_TAB, LIST_LABEL, SHOW_ALL, TABS_LABEL } from './texts';
@@ -134,6 +135,7 @@ export function TutorsView({
           {visible.map((item, index) => (
             <li
               key={item.id}
+              {...reveal()}
               className={cn(
                 ITEM[layout],
                 animate && 'motion-safe:animate-fade-in',

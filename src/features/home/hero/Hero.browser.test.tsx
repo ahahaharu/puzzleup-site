@@ -102,21 +102,37 @@ describe('Hero', () => {
     expect(notes.every((note) => getComputedStyle(note).display !== 'none')).toBe(true);
   });
 
-  it('lands the accent piece once, animating only transform and opacity', async () => {
-    const screen = await renderHero();
-    const animations = screen.container
-      .querySelector('svg[role="img"]')
-      ?.getAnimations({ subtree: true });
+  it('lifts the accent piece at the top of the page and sets it in place as the page scrolls', async () => {
+    const screen = await render(
+      <>
+        <Hero badge={BADGE} slogan="Всё сложится." />
+        <div style={{ height: 3000 }} />
+      </>,
+    );
+    const svg = screen.container.querySelector('svg[role="img"]');
+    const piece = svg?.querySelector<SVGGElement>('.hero-piece');
+    const transformAt = async (top: number) => {
+      window.scrollTo({ top, behavior: 'instant' });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return getComputedStyle(piece ?? document.body).transform;
+    };
 
-    expect(animations?.length).toBeGreaterThan(0);
-    for (const animation of animations ?? []) {
-      expect(animation.effect?.getTiming().iterations).toBe(1);
-      expect(animation.effect?.getTiming().duration).toBe(600);
+    // Положение макета D-1-hero: сдвиг 16 × 14 и поворот −6°.
+    expect(await transformAt(0)).toMatch(/^matrix\(0\.99\d+, -0\.10\d+, .*, 16, 14\)$/);
+    expect(await transformAt(window.innerHeight)).toBe('matrix(1, 0, 0, 1, 0, 0)');
+    // Прокрутка назад снова приподнимает деталь.
+    expect(await transformAt(0)).toMatch(/, 16, 14\)$/);
+
+    const animations = svg?.getAnimations({ subtree: true }) ?? [];
+    expect(animations.length).toBeGreaterThan(0);
+    for (const animation of animations) {
+      expect(animation.timeline).toBeInstanceOf(ScrollTimeline);
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- у AnimationEffect нет getKeyframes, он есть у KeyframeEffect
       const keyframes = (animation.effect as KeyframeEffect).getKeyframes();
       for (const key of keyframes.flatMap((frame) => Object.keys(frame))) {
         expect(ALLOWED_KEYFRAME_KEYS).toContain(key);
       }
     }
+    window.scrollTo({ top: 0, behavior: 'instant' });
   });
 });
