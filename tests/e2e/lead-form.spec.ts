@@ -14,6 +14,13 @@ test.skip(
 
 const SUBMIT = 'Записаться на пробное занятие';
 
+// Выбор в cookie-баннере уже сделан: на телефоне баннер внизу экрана закрывал бы кнопки формы.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('puzzleup:cookie-consent', 'necessary');
+  });
+});
+
 /**
  * Свой IP для каждого теста: rate limit считает заявки по `X-Forwarded-For`, а тесты идут
  * параллельно с одного адреса.
