@@ -100,7 +100,7 @@ export function Subjects({ subjects, id = 'subjects' }: SubjectsProps) {
   if (subjects.length === 0) return null;
 
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="paper-page">
+    <section id={id} aria-labelledby={`${id}-title`} className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <SectionHead id={`${id}-title`} title={SUBJECTS_TITLE} lead={SUBJECTS_LEAD} />
         <ul

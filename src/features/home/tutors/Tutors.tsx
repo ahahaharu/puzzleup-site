@@ -34,7 +34,7 @@ export function Tutors({ tutors, subjects, id = 'tutors' }: TutorsProps) {
   }));
 
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="paper-page-alt">
+    <section id={id} aria-labelledby={`${id}-title`} className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <SectionHead id={`${id}-title`} title={TUTORS_TITLE} lead={TUTORS_LEAD} />
         <Suspense

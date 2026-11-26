@@ -15,7 +15,7 @@ type AboutTutorProps = {
 
 export function AboutTutor({ about, children }: AboutTutorProps) {
   return (
-    <section id="about" aria-labelledby="about-title" className="paper-page">
+    <section id="about" aria-labelledby="about-title" className="paper-section">
       <div className="page-container page-grid gap-y-6 py-14 lg:py-24">
         <div className="col-span-full lg:col-span-8">
           <h2 id="about-title" className="font-display text-h2 text-ink">

@@ -7,7 +7,7 @@ import { HOW_TITLE } from './texts';
 
 export function HowToStart({ how }: { how: HowToStartData }) {
   return (
-    <section id="how" aria-labelledby="how-title" className="paper-page">
+    <section id="how" aria-labelledby="how-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <h2 id="how-title" className="font-display text-h2 text-ink">
           {HOW_TITLE}

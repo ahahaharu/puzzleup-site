@@ -13,7 +13,7 @@ export function TutorReviews({ title, reviews }: TutorReviewsProps) {
   if (reviews.length === 0) return null;
 
   return (
-    <section id="reviews" aria-labelledby="reviews-title" className="paper-page-alt">
+    <section id="reviews" aria-labelledby="reviews-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <h2 id="reviews-title" className="font-display text-h2 text-ink">
           {title}

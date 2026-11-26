@@ -23,7 +23,7 @@ type LeadSectionProps = {
 
 export function LeadSection({ lead, children }: LeadSectionProps) {
   return (
-    <section id={LEAD_ID} aria-labelledby="lead-title" className="paper-page-alt">
+    <section id={LEAD_ID} aria-labelledby="lead-title" className="paper-section">
       <div className="page-container page-grid items-center gap-y-10 py-14 lg:gap-y-6 lg:py-24">
         <div className="col-span-full flex flex-col gap-6 lg:col-span-5 lg:gap-8">
           <h2 id="lead-title" className="font-display text-h2 text-ink">

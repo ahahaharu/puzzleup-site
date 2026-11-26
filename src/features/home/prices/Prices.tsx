@@ -23,11 +23,11 @@ export function Prices({ prices, rows }: PricesProps) {
   if (rows.length === 0) return null;
 
   return (
-    <section id="prices" aria-labelledby="prices-title" className="paper-page">
+    <section id="prices" aria-labelledby="prices-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <SectionHead id="prices-title" title={PRICES_TITLE} lead={PRICES_LEAD} />
 
-        <div className="mt-6 grid max-w-240 items-start gap-4 md:grid-cols-2 md:gap-6 lg:mt-10 xl:gap-8">
+        <div className="mt-6 grid max-w-240 gap-4 md:grid-cols-2 md:gap-6 lg:mt-10 xl:gap-8">
           <div className="flex flex-col gap-3.5 rounded-card bg-ink p-7 text-paper lg:p-10">
             <h3 className="font-display text-h3 text-paper">{prices.trial.title}</h3>
             {/* Цифры – Unbounded 700, 64 px (на телефоне 48), валюта – 24 px: ТЗ. */}

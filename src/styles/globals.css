@@ -281,6 +281,18 @@
   background-color: var(--color-paper-alt);
 }
 
+/*
+ * Секция страницы: тон бумаги чередуется по порядку секций, а не задан в блоке – блок без данных не
+ * выводится, и соседние секции одного тона слились бы (ADR-059). Первая секция – paper.
+ */
+@utility paper-section {
+  @apply paper-page;
+
+  &:nth-child(even of .paper-section) {
+    background-color: var(--color-paper-alt);
+  }
+}
+
 /* Клетка – математика, алгебра. */
 @utility paper-cell {
   --paper-line: color-mix(in srgb, var(--color-focus) 22%, transparent);

@@ -77,7 +77,7 @@ function Example({ example }: { example: TrialExample }) {
 
 export function How({ steps, example }: HowProps) {
   return (
-    <section id="how" aria-labelledby="how-title" className="isolate paper-page-alt">
+    <section id="how" aria-labelledby="how-title" className="isolate paper-section">
       <div className="relative page-container py-14 lg:py-24">
         <Doodle
           shape="lever"

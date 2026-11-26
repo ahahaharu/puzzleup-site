@@ -77,7 +77,7 @@ export function Situations({ cards }: SituationsProps) {
     'relative flex w-[75vw] max-w-80 flex-none snap-start flex-col md:w-auto md:max-w-none';
 
   return (
-    <section id="situations" aria-labelledby="situations-title" className="isolate paper-page">
+    <section id="situations" aria-labelledby="situations-title" className="isolate paper-section">
       <div className="relative page-container py-14 lg:py-24">
         <Doodle
           shape="triangle"

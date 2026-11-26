@@ -16,7 +16,7 @@ export function More({ more }: { more: MoreData }) {
   const single = more.tutors.length === 1;
 
   return (
-    <section id="more" aria-labelledby="more-title" className="paper-page">
+    <section id="more" aria-labelledby="more-title" className="paper-section">
       <div className="page-container py-14 lg:py-24">
         <SectionHead id="more-title" title={more.title} lead={more.lead} />
         <ul

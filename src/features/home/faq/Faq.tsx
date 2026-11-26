@@ -24,7 +24,7 @@ export function Faq({ items }: FaqProps) {
   if (items.length === 0) return null;
 
   return (
-    <section id="faq" aria-labelledby="faq-title" className="paper-page">
+    <section id="faq" aria-labelledby="faq-title" className="paper-section">
       <div className="page-container page-grid gap-y-6 py-14 lg:py-24">
         <div className="col-span-full flex flex-col items-start gap-4 lg:col-span-4 lg:gap-5">
           <h2 id="faq-title" className="font-display text-h2 text-ink">
