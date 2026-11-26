@@ -45,5 +45,6 @@ export const getSituations = () => content.situations;
 export const getFaq = () => content.faq;
 export const getLegal = (slug: string) => legal.find((doc) => doc.slug === slug);
 
+export { REQUIRED_LEGAL } from './check';
 export type { Content, LegalDoc, Tutor } from './check';
 export type { FaqItem, Review, Site, Situation, Subject } from './schemas';
