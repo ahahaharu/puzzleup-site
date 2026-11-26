@@ -332,6 +332,39 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('checks that the review screenshot file exists', () => {
+    const content = raw({
+      reviews: {
+        file: 'content/reviews.json',
+        data: [
+          {
+            id: 'r-1',
+            tutorId: 't-maria',
+            author: 'Ольга',
+            relation: 'мама',
+            subject: 'math',
+            text: 'Отзыв.',
+            screenshot: 'r-1.png',
+            date: '2026-01-01',
+            featured: false,
+            consent: true,
+            source: 'Telegram',
+          },
+        ],
+      },
+    });
+    expect(validateContent(content, { screenshotExists: () => false }).issues).toEqual([
+      {
+        file: 'content/reviews.json',
+        path: '0.screenshot',
+        message: 'public/reviews/r-1.png does not exist',
+      },
+    ]);
+    expect(validateContent(content, { screenshotExists: (name) => name === 'r-1.png' }).ok).toBe(
+      true,
+    );
+  });
+
   it('rejects situations that name an unknown tutor or one without the goal', () => {
     const situations = [
       { id: 'a', title: 'А', text: 'Текст.', goal: 'grades', tutors: ['t-anna'] },

@@ -123,7 +123,13 @@ export const reviewSchema = z.strictObject({
   author: text,
   relation: text,
   subject: slug,
+  /** Текст отзыва; у скриншота – расшифровка переписки: на экране её нет, её читают дикторы. */
   text,
+  /** Скриншот отзыва из мессенджера – файл в `public/reviews/`; без него отзыв – карточка с текстом. */
+  screenshot: z
+    .string()
+    .regex(/^[\w-]+\.(?:jpe?g|png|webp)$/i, 'JPEG, PNG or WebP file name in public/reviews/')
+    .optional(),
   date: isoDate,
   featured: z.boolean(),
   consent: z.boolean(),

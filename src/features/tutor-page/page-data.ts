@@ -1,5 +1,6 @@
 import type { Review, Site, Subject, Tutor } from '@/content';
 import { toReviewCard, type ReviewCardData } from '@/features/reviews/card-data';
+import { screenshotsLabel } from '@/features/reviews/texts';
 import {
   countReviews,
   experienceLabel,
@@ -363,7 +364,8 @@ export type TutorPageData = {
   about: AboutData;
   /** «Вне занятий»: хобби и личная деталь; пусто – блока нет. */
   outside: OutsideData;
-  reviews: { title: string; items: ReviewCardData[] };
+  /** `label` – имя ленты скриншотов для дикторов. */
+  reviews: { title: string; label: string; items: ReviewCardData[] };
   /** «Как начать» и форма – только у того, кто принимает учеников. */
   how?: HowToStartData | undefined;
   lead?: LeadData | undefined;
@@ -396,7 +398,11 @@ export function tutorPageData(tutor: Tutor, context: PageContext): TutorPageData
     profile: profileData(tutor, { subjects, others, reviewCount: own.length, year }),
     about: aboutData(tutor, site),
     outside: { paragraphs: [tutor.hobby, tutor.personalNote].filter((text) => text !== undefined) },
-    reviews: { title: reviewsTitle(tutor.namePrepositional, own.length), items: own },
+    reviews: {
+      title: reviewsTitle(tutor.namePrepositional, own.length),
+      label: screenshotsLabel(tutor.namePrepositional),
+      items: own,
+    },
     how: status === 'archived' ? undefined : howToStartData(tutor, site),
     lead: status === 'archived' ? undefined : leadData(tutor, site),
     more:

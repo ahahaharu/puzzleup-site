@@ -1,7 +1,8 @@
 // Проверка `content/` (docs/data-model.md, «Перекрёстные проверки»): `pnpm content:check`.
 // `--strict` – перед релизом: заглушки `[…]` и черновой объём «О себе» тоже ошибки.
 // В отличие от загрузчика ловит то, что Content Collections молча пропускает: битый YAML
-// и синтаксис MDX, – и проверяет, что указанные фото лежат в public/tutors/.
+// и синтаксис MDX, – и проверяет, что указанные фото лежат в public/tutors/, а скриншоты отзывов –
+// в public/reviews/.
 import { EventEmitter } from 'node:events';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -39,6 +40,7 @@ const { formatIssues, validateContent } = await import('../src/content/check');
 const result = validateContent(readContent().raw, {
   strict,
   photoExists: (fileName) => existsSync(resolve('public/tutors', fileName)),
+  screenshotExists: (fileName) => existsSync(resolve('public/reviews', fileName)),
 });
 
 const problems = [...buildErrors, ...(result.ok ? [] : [formatIssues(result.issues)])];

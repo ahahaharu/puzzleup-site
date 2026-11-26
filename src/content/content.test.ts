@@ -10,13 +10,14 @@ import { readContent } from './raw';
 describe('content/', () => {
   const { raw } = readContent();
   const photoExists = (fileName: string) => existsSync(resolve('public/tutors', fileName));
+  const screenshotExists = (fileName: string) => existsSync(resolve('public/reviews', fileName));
 
   it('passes the regular check', () => {
-    expect(validateContent(raw, { photoExists }).issues).toEqual([]);
+    expect(validateContent(raw, { photoExists, screenshotExists }).issues).toEqual([]);
   });
 
   it('fails the strict check only on placeholders left for the release', () => {
-    const { issues } = validateContent(raw, { strict: true, photoExists });
+    const { issues } = validateContent(raw, { strict: true, photoExists, screenshotExists });
     expect(issues.length).toBeGreaterThan(0);
     expect(issues.filter((issue) => !issue.message.startsWith('placeholder '))).toEqual([]);
   });

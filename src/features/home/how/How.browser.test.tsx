@@ -49,7 +49,7 @@ describe('How', () => {
     expect(getComputedStyle(card.parentElement!.parentElement!.parentElement!).position).toBe(
       'sticky',
     );
-    desktop.unmount();
+    await desktop.unmount();
 
     await page.viewport(390, 800);
     const phone = await render(<How steps={STEPS} example={EXAMPLE} />);

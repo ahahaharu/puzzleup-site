@@ -4,13 +4,14 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
+import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
 import { cn } from '@/lib/cn';
 
 import type { ReviewColumn } from './columns';
 import { REVIEWS_LEAD, REVIEWS_TITLE } from './texts';
 
 // Блок «Отзывы» – ТЗ главной, блок 6; макеты D-6-reviews, M-6-reviews. Колонка на репетитора:
-// шапка, один отзыв и ссылка на все. Строки колонок – общая сетка (subgrid), поэтому карточки
+// шапка, один отзыв (есть скриншоты – их лента, ADR-062) и ссылка на все. Строки колонок – общая сетка (subgrid), поэтому карточки
 // в одном ряду одной высоты. Телефон – колонки одна под другой, без ленты.
 
 type ReviewsProps = {
@@ -54,7 +55,11 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
                   <p className="text-small text-ink-muted">{column.meta}</p>
                 </div>
               </div>
-              <ReviewCard review={column.review} />
+              {column.screenshots.length > 0 ? (
+                <ScreenshotCarousel reviews={column.screenshots} label={column.screenshotsLabel} />
+              ) : (
+                <ReviewCard review={column.review} />
+              )}
               <Link
                 href={column.allHref}
                 className="inline-flex min-h-11 items-center gap-2 self-start text-field font-semibold text-ink no-underline hover:underline"
