@@ -12,6 +12,11 @@ const NBSP = ' ';
 export const BREADCRUMBS_LABEL = 'Хлебные крошки';
 export const BREADCRUMB_HOME = 'Главная';
 export const BREADCRUMB_TUTORS = 'Репетиторы';
+/** Крошки до имени репетитора: «Репетиторы» ведёт в блок на главной. Их же повторяет JSON-LD. */
+export const BREADCRUMB_PARENTS = [
+  { label: BREADCRUMB_HOME, href: '/' },
+  { label: BREADCRUMB_TUTORS, href: '/#tutors' },
+] as const;
 
 // --- 1. Профиль ---
 
