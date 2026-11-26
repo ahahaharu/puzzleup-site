@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Golos_Text, Spectral, Unbounded } from 'next/font/google';
 import type { ReactNode } from 'react';
 
+import { getSite } from '@/content';
+
 import '@/styles/globals.css';
 
 // Шрифты – docs/design-system.md, разделы 2 и 8. Preload – только у Unbounded и Golos Text.
@@ -28,8 +30,12 @@ const spectral = Spectral({
   preload: false,
 });
 
+// Полные адреса canonical, `og:url` и `og:image` – от боевого адреса из `site.json` (ADR-055).
+// Остальное – у страниц (`pageMetadata`).
 export const metadata: Metadata = {
-  title: 'PuzzleUp',
+  metadataBase: new URL(getSite().url),
+  title: getSite().name,
+  twitter: { card: 'summary_large_image' },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

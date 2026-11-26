@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { SiteShell } from '@/components/layout/SiteShell';
-import { getLegal, type LegalSlug } from '@/content';
+import { getLegal, getSite, type LegalSlug } from '@/content';
+import { pageMetadata } from '@/features/seo/metadata';
 
 import { LEGAL_TITLE_ID, LegalPage } from './LegalPage';
 import { legalPageData } from './page-data';
@@ -14,7 +15,9 @@ import { legalComponents } from './prose';
 
 export function legalMetadata(slug: LegalSlug): Metadata {
   const doc = getLegal(slug);
-  return doc ? { title: `${doc.title} | PuzzleUp` } : {};
+  return doc
+    ? pageMetadata({ siteName: getSite().name, path: `/${slug}`, title: `${doc.title} | PuzzleUp` })
+    : {};
 }
 
 export function LegalRoute({ slug }: { slug: LegalSlug }) {

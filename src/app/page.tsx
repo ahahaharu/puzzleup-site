@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { SiteShell } from '@/components/layout/SiteShell';
 import { listedTutors } from '@/components/layout/texts';
 import {
@@ -27,6 +29,10 @@ import { Situations } from '@/features/home/situations/Situations';
 import { subjectCards } from '@/features/home/subjects/cards';
 import { Subjects } from '@/features/home/subjects/Subjects';
 import { Tutors } from '@/features/home/tutors/Tutors';
+import { homeMetadata } from '@/features/seo/home-metadata';
+import { faqPageJsonLd } from '@/features/seo/json-ld';
+import { JsonLd } from '@/features/seo/JsonLd';
+import { pageMetadata } from '@/features/seo/metadata';
 import { countReviews, toTutorCardData } from '@/features/tutors/card-data';
 import { currentYear } from '@/features/tutors/current-year';
 import { sortByAvailability } from '@/features/tutors/sort';
@@ -39,6 +45,13 @@ function trialExample(example: Site['trialExample'], tutors: readonly Tutor[]) {
   return example && tutor ? { ...example, name: tutor.name } : undefined;
 }
 
+// Метатеги не зависят от статуса занятости – только от состава репетиторов в контенте.
+export const metadata: Metadata = pageMetadata({
+  siteName: getSite().name,
+  path: '/',
+  ...homeMetadata(getSubjects(), listedTutors(getTutors())),
+});
+
 export default async function HomePage() {
   const site = getSite();
   const subjects = getSubjects();
@@ -46,6 +59,7 @@ export default async function HomePage() {
   const published = getPublishedReviews();
   const reviews = countReviews(published);
   const year = await currentYear();
+  const faq = faqItems(getFaq(), tutors, subjects);
 
   const cards = sortByAvailability(tutors).map((tutor) =>
     toTutorCardData(tutor, {
@@ -68,7 +82,8 @@ export default async function HomePage() {
       <Subjects subjects={subjectCards(subjects, tutors)} />
       <Reviews columns={reviewColumns(published, tutors, subjects)} />
       <Prices prices={site.prices} rows={priceRows(tutors, subjects)} />
-      <Faq items={faqItems(getFaq(), tutors, subjects)} />
+      <Faq items={faq} />
+      <JsonLd data={faqPageJsonLd(faq)} />
       <About text={site.about} tutors={aboutTutors(tutors, subjects)} />
     </SiteShell>
   );
