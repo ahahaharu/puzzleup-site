@@ -51,7 +51,8 @@
 │  ├─ tutors/andrei.mdx, maxim.mdx
 │  ├─ reviews.json, subjects.json, situations.json, faq.json, site.json
 │  └─ legal/privacy.mdx, cookies.mdx
-├─ public/tutors/              исходники фото (оптимизирует next/image)
+├─ public/tutors/              исходники фото, JPEG или PNG (оптимизирует next/image)
+├─ assets/fonts/               TTF с лицензиями OFL для OG-картинок: `next/og` не читает woff2 и `next/font`
 ├─ src/
 │  ├─ app/
 │  │  ├─ layout.tsx            шрифты, globals.css, аналитика, cookie-баннер
@@ -71,7 +72,8 @@
 │  │  ├─ home/                 блоки главной: Hero, Tutors (+ фильтр), Situations, How, Subjects, Reviews, Prices, Faq, About
 │  │  ├─ tutor-page/           Profile, About, Outside, Reviews, HowToStart, More, статусы
 │  │  ├─ lead-form/            LeadForm (клиент), schema.ts (Zod), action.ts (Server Action), Thanks
-│  │  └─ tutors/               TutorCard, сортировка, availability
+│  │  ├─ tutors/               TutorCard, сортировка, availability
+│  │  └─ seo/                  метатеги (pageMetadata, главная), JSON-LD, sitemap, даты из git, шаблоны OG-картинок (og/)
 │  ├─ content/                 загрузчик (index.ts, server-only), схемы, перекрёстные проверки и правила текстов
 │  ├─ server/                  только серверный код, каждый index.ts начинается с import 'server-only'
 │  │  ├─ db/                   client.ts, schema/*.ts, migrations/, migrate.ts (миграции + начальные статусы)
@@ -211,7 +213,7 @@ YANDEX_METRIKA_ID=
 
 ## 9. Сборка, деплой, инфраструктура
 
-- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `dist/worker.js` – один ESM-файл со всеми зависимостями, `tsup.config.ts`). Один образ, две команды запуска: `node server.js` и `node worker.js`.
+- **Dockerfile** многоступенчатый: `deps` → `build` (`pnpm build` – он сначала запускает `content:check`, ADR-033, – и сборка воркера через `tsup`) → `runner` (`node:26-slim`, непривилегированный пользователь, standalone-вывод + `dist/worker.js` – один ESM-файл со всеми зависимостями, `tsup.config.ts`). Один образ, две команды запуска: `node server.js` и `node worker.js`. Сборке нужна история git (`fetch-depth: 0` и `.git` в контексте Docker): из неё `sitemap.xml` берёт `lastmod` (ADR-055); без git `lastmod` не выводится, а в неполном клоне у всех страниц была бы дата последнего коммита.
 - **CI** (`ci.yml`, на каждый PR в `develop`/`main` и push в них): install → format:check → lint → typecheck → `content:check` → unit → integration (Testcontainers) → build → e2e (Playwright против собранного приложения + Postgres service) → Lighthouse CI для `/` и `/tutors/andrei`. Параллельно – gitleaks по всей истории и `pnpm audit` (не блокирует). Шаги добавляются в фичах, где появляется то, что они проверяют; job `checks` и `build-e2e` обязательны для слияния в `develop` и `main`. Actions закреплены по SHA (ADR-022), сборка – отдельный шаг перед Playwright (ADR-024).
 - **Deploy** (`deploy.yml`):
   - push в `develop` – образ `ghcr.io/<owner>/puzzleup:develop-<sha>` → staging;
