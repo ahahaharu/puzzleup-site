@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { Logo } from '@/components/ui/Logo';
 import { MessengerIconButton } from '@/components/ui/MessengerIconButton';
+import { cn } from '@/lib/cn';
 
 import { invoker } from './invoker';
 import type { NavLink } from './nav';
@@ -29,6 +30,19 @@ type MobileMenuProps = {
 // контурной кнопки ДС.
 const SQUARE =
   'inline-flex size-11 flex-none items-center justify-center rounded-button border-[1.5px] border-ink text-ink hover:bg-ink/6';
+
+// Открытие – только CSS (@starting-style), поэтому работает и без JavaScript: лист меню проявляется,
+// пункты поднимаются на 8 px один за другим через 40 мс, ✕ доворачивается на место. Закрытие –
+// лист гаснет целиком. Всё вместе укладывается в 600 мс (docs/design-system.md, раздел 7).
+const ITEM =
+  'transition-[opacity,translate] duration-300 ease-out delay-(--delay) starting:translate-y-2 starting:opacity-0';
+const STAGGER_MS = 40;
+const FIRST_DELAY_MS = 60;
+
+/** Задержка пункта по его порядку в меню. */
+function delay(index: number): CSSProperties & Record<'--delay', string> {
+  return { '--delay': `${FIRST_DELAY_MS + index * STAGGER_MS}ms` };
+}
 
 /**
  * Бургер и меню на весь экран в модальном `<dialog>`: фокус остаётся внутри, Esc закрывает, фокус
@@ -84,7 +98,7 @@ export function MobileMenu({ links, cta, tutors, hoursLine }: MobileMenuProps) {
         ref={dialogRef}
         id={MENU_ID}
         aria-label="Меню"
-        className="m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto border-0 paper-page p-0 text-ink backdrop:bg-transparent"
+        className="m-0 h-dvh max-h-none w-full max-w-none overflow-y-auto border-0 paper-page p-0 text-ink opacity-0 transition-[opacity,display,overlay] transition-discrete duration-150 ease-out backdrop:bg-transparent open:opacity-100 open:duration-200 starting:open:opacity-0"
       >
         <div className="page-container flex flex-col gap-5 pb-7">
           <div className="flex h-16 items-center justify-between">
@@ -101,15 +115,20 @@ export function MobileMenu({ links, cta, tutors, hoursLine }: MobileMenuProps) {
               }}
               className={SQUARE}
             >
-              <Icon name="close" size={22} strokeWidth={2} />
+              <Icon
+                name="close"
+                size={22}
+                strokeWidth={2}
+                className="transition-transform duration-300 ease-out starting:-rotate-90"
+              />
               <span className="sr-only">Закрыть меню</span>
             </button>
           </div>
 
           <nav aria-label="Основная">
             <ul>
-              {links.map((link) => (
-                <li key={link.id}>
+              {links.map((link, index) => (
+                <li key={link.id} style={delay(index)} className={ITEM}>
                   <NavAnchor
                     href={link.href}
                     // Unbounded 500, 26 px, строка от 56 px – из ТЗ.
@@ -122,7 +141,7 @@ export function MobileMenu({ links, cta, tutors, hoursLine }: MobileMenuProps) {
             </ul>
           </nav>
 
-          <div className="flex flex-col gap-2.5">
+          <div style={delay(links.length)} className={cn('flex flex-col gap-2.5', ITEM)}>
             <Button href={cta.href} fullWidth>
               {cta.label}
             </Button>
@@ -150,7 +169,12 @@ export function MobileMenu({ links, cta, tutors, hoursLine }: MobileMenuProps) {
           </div>
 
           {tutors.length > 0 && (
-            <p className="text-center text-small text-balance text-ink-muted">{hoursLine}</p>
+            <p
+              style={delay(links.length + 1)}
+              className={cn('text-center text-small text-balance text-ink-muted', ITEM)}
+            >
+              {hoursLine}
+            </p>
           )}
         </div>
       </dialog>

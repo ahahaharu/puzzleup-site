@@ -50,6 +50,22 @@ describe('MobileMenu', () => {
     await expect.element(screen.getByText(HOURS_LINE)).toBeVisible();
   });
 
+  it('lets the items rise one after another, moving only opacity and transforms', async () => {
+    const { dialog, burger } = await renderMenu();
+    await burger.click();
+
+    const transitions = dialog()
+      .getAnimations({ subtree: true })
+      .filter((animation) => animation instanceof CSSTransition);
+    expect(new Set(transitions.map(({ transitionProperty }) => transitionProperty))).toEqual(
+      new Set(['opacity', 'translate', 'rotate']),
+    );
+    const delays = [...dialog().querySelectorAll('nav li')].map(
+      (item) => getComputedStyle(item).transitionDelay,
+    );
+    expect(delays).toEqual(LINKS.map((_, index) => `${0.06 + index * 0.04}s`));
+  });
+
   it('closes with Escape and returns focus to the burger', async () => {
     const { dialog, burger } = await renderMenu();
     await burger.click();
