@@ -2,6 +2,9 @@
 // классы и имена – те же, что в бейдже H1 (ТЗ главной, блок 1, п. 1).
 
 const SUFFIX = ' | PuzzleUp';
+// Между числом и словом в картинке – неразрывный пробел. В метатегах – обычный: их читают
+// поисковики, как и в `tutorMetadata`.
+const NBSP = '\u00a0';
 
 /** «Онлайн-репетиторы по математике для 5–11 классов | PuzzleUp». */
 export function homeTitle(badgeTitle: string): string {
@@ -21,6 +24,8 @@ export function homeDescription(subjectsAndGrades: string, names: string): strin
 export function tutorOgNote(grades: { from: number; to: number } | null): string {
   if (!grades) return 'онлайн';
   const label =
-    grades.from === grades.to ? `${grades.from} класс` : `${grades.from}–${grades.to} классы`;
+    grades.from === grades.to
+      ? `${grades.from}${NBSP}класс`
+      : `${grades.from}–${grades.to}${NBSP}классы`;
   return `${label} · онлайн`;
 }
