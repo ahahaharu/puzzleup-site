@@ -36,9 +36,11 @@ test('robots.txt allows the site and points to the sitemap', async ({ request })
 
 test('sitemap lists the home page, tutors and policies', async ({ request }) => {
   const xml = await (await request.get('/sitemap.xml')).text();
-  for (const path of ['/', '/tutors/andrei', '/tutors/maxim', '/privacy', '/cookies']) {
+  for (const path of ['/', '/tutors/andrei', '/tutors/maxim', '/privacy']) {
     expect(xml).toContain(`<loc>${SITE}${path}</loc>`);
   }
+  // Без Метрики политики cookie нет (ADR-057).
+  expect(xml).not.toContain('/cookies');
 });
 
 test('the home page has canonical, Open Graph and FAQPage markup', async ({ page }) => {

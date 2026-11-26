@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-// Служебные страницы – ТЗ страницы репетитора, раздел 7: 404, `/privacy` и `/cookies`.
+// Служебные страницы – ТЗ страницы репетитора, раздел 7: 404 и `/privacy`. Политики cookie без
+// Метрики нет (ADR-057) – это проверяет consent-analytics.spec.ts.
 
 test.describe('404', () => {
   test('an unknown address answers 404, is hidden from search and leads back', async ({ page }) => {
@@ -65,13 +66,5 @@ test.describe('policies', () => {
         name: '4. Права субъекта',
       }),
     ).toHaveAttribute('aria-current', 'location');
-  });
-
-  test('the cookie policy uses the same template', async ({ page }) => {
-    const response = await page.goto('/cookies');
-
-    expect(response?.status()).toBe(200);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Политика cookie');
-    await expect(page.getByText(/^Действует с /)).toBeVisible();
   });
 });

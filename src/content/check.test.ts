@@ -41,6 +41,13 @@ function tutor(slug: string, overrides: Record<string, unknown> = {}): SourceFil
   return { file: `content/tutors/${slug}.mdx`, data: tutorData(slug, overrides) };
 }
 
+function legal(slug: string): SourceFile {
+  return {
+    file: `content/legal/${slug}.mdx`,
+    data: { title: 'Политика', effectiveDate: '2026-01-01', content: 'Текст.' },
+  };
+}
+
 function raw(overrides: Partial<RawContent> = {}): RawContent {
   const file = (name: string, data: unknown): SourceFile => ({
     file: `content/${name}.json`,
@@ -75,13 +82,9 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
     cookieBanner: { text: 'Сайт использует cookie.', policyLinkLabel: 'Политике cookie' },
     siteOperatorTutorId: 't-maria',
   };
-  const legal = (slug: string): SourceFile => ({
-    file: `content/legal/${slug}.mdx`,
-    data: { title: 'Политика', effectiveDate: '2026-01-01', content: 'Текст.' },
-  });
   return {
     tutors: [tutor('maria')],
-    legal: [legal('privacy'), legal('cookies')],
+    legal: [legal('privacy')],
     subjects: file('subjects', [
       {
         id: 'math',
@@ -229,7 +232,9 @@ describe('validateContent', () => {
 
   it('accepts analytics placeholders until release and rejects a non-https Umami script', () => {
     const site = raw().site;
+    // С Метрикой нужна и политика cookie.
     const withAnalytics = (umami: object) => ({
+      legal: [legal('privacy'), legal('cookies')],
       site: {
         ...site,
         data: { ...Object(site.data), analytics: { umami, metrika: { counterId: '[номер]' } } },
@@ -356,11 +361,21 @@ describe('validateContent', () => {
     ]);
   });
 
-  it('requires both policy files', () => {
-    expect(messages(raw({ legal: [] }))).toEqual([
-      'content/legal/privacy.mdx › : file is missing',
+  it('requires the privacy policy and, only with Metrika, the cookie policy', () => {
+    expect(messages(raw({ legal: [] }))).toEqual(['content/legal/privacy.mdx › : file is missing']);
+    expect(messages(raw({ legal: [legal('privacy')] }))).toEqual([]);
+
+    const site = raw().site;
+    const withMetrika = {
+      ...site,
+      data: { ...Object(site.data), analytics: { metrika: { counterId: 12345678 } } },
+    };
+    expect(messages(raw({ site: withMetrika, legal: [legal('privacy')] }))).toEqual([
       'content/legal/cookies.mdx › : file is missing',
     ]);
+    expect(
+      messages(raw({ site: withMetrika, legal: [legal('privacy'), legal('cookies')] })),
+    ).toEqual([]);
   });
 
   it('requires plain, distinct policy headings for the table of contents', () => {

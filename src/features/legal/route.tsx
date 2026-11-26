@@ -13,7 +13,8 @@ import { legalPageData } from './page-data';
 import { legalComponents } from './prose';
 
 // Маршруты `/privacy` и `/cookies` – один шаблон (ТЗ страницы репетитора, раздел 7). Страницы
-// статические и индексируются; файлы политик обязательны (`content:check`).
+// статические и индексируются. Политика cookie есть, только когда сайт ставит cookie (ADR-057):
+// без файла `/cookies` отвечает 404, а подвал и sitemap её не показывают.
 
 export function legalMetadata(slug: LegalSlug): Metadata {
   const doc = getLegal(slug);

@@ -221,7 +221,10 @@ export const siteSchema = z.strictObject({
       metrika: z.strictObject({ counterId: orPlaceholder(z.int().positive()) }).optional(),
     })
     .optional(),
-  /** Cookie-баннер: «{text} Подробнее – в {policyLinkLabel}.», ссылка – на `/cookies`. */
+  /**
+   * Cookie-баннер: «{text} Подробнее – в {policyLinkLabel}.», ссылка – на `/cookies`. Показывается
+   * только с `analytics.metrika`; тогда обязателен и `legal/cookies.mdx`.
+   */
   cookieBanner: z.strictObject({ text, policyLinkLabel: text }),
   /** Кто технически ведёт сайт – строка «Сайт ведёт» в подвале. */
   siteOperatorTutorId: z.string(),

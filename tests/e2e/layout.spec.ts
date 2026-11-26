@@ -25,10 +25,9 @@ test('footer shows navigation, documents and the site disclosure with requisites
   await page.goto('/');
   const footer = page.getByRole('contentinfo');
 
-  await expect(footer.getByRole('link', { name: 'Политика cookie' })).toHaveAttribute(
-    'href',
-    '/cookies',
-  );
+  await expect(
+    footer.getByRole('link', { name: 'Политика обработки персональных данных' }),
+  ).toHaveAttribute('href', '/privacy');
   await expect(footer.getByRole('link', { name: 'Андрей' })).toHaveAttribute(
     'href',
     '/tutors/andrei',
