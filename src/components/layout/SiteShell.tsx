@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { getLegal, getPublishedReviews, getSite, getSubjects, getTutors } from '@/content';
+import { hasCookieBanner } from '@/lib/analytics';
 
 import { BottomBar } from './BottomBar';
 import { Footer } from './Footer';
@@ -76,7 +77,7 @@ export function SiteShell({ children, home = false, cta, bottomBar }: SiteShellP
         links={links}
         tutors={contacts}
         documents={documents}
-        cookieSettings={site.analytics?.metrika !== undefined}
+        cookieSettings={hasCookieBanner(site.analytics)}
         {...footerTexts(site, tutors)}
       />
       <BottomBar

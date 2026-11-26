@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveAnalytics } from './analytics';
+import { hasCookieBanner, resolveAnalytics } from './analytics';
 import { contentSecurityPolicy } from './csp';
 
 const UMAMI = {
@@ -33,7 +33,17 @@ describe('resolveAnalytics', () => {
       }),
     ).toEqual({});
     expect(resolveAnalytics({ umami: { ...UMAMI, websiteId: '[id]' } })).toEqual({});
+    expect(resolveAnalytics({ umami: { ...UMAMI, scriptUrl: 'https://' } })).toEqual({});
     expect(resolveAnalytics(undefined)).toEqual({});
+  });
+});
+
+describe('hasCookieBanner', () => {
+  it('asks for consent whenever Metrika is set up, even with a placeholder number', () => {
+    expect(hasCookieBanner({ metrika: { counterId: 12345678 } })).toBe(true);
+    expect(hasCookieBanner({ metrika: { counterId: '[номер]' } })).toBe(true);
+    expect(hasCookieBanner({ umami: UMAMI })).toBe(false);
+    expect(hasCookieBanner(undefined)).toBe(false);
   });
 });
 
