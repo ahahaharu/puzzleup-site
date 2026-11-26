@@ -57,7 +57,7 @@ export function Faq({ items }: FaqProps) {
               <Markdown
                 source={item.answer}
                 // Ответ – 16 px, ink-2 (ТЗ), межстрочный 1,55 – макет D-8.
-                className="-mt-2 max-w-160 pb-5 text-field leading-[1.55] text-ink-2"
+                className="-mt-2 max-w-160 pb-5 text-field leading-[1.55] text-ink-2 motion-safe:group-open:animate-answer-in"
               />
             </details>
           ))}

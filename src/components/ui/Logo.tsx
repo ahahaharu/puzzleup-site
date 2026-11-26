@@ -36,12 +36,16 @@ export function Logo({ size = 26, wordSize, tone = 'ink', className, wordClassNa
     <span
       style={style}
       className={cn(
-        'inline-flex items-center gap-(--logo-gap)',
+        'group/logo inline-flex items-center gap-(--logo-gap)',
         tone === 'ink' ? 'text-ink' : 'text-paper',
         className,
       )}
     >
-      <PuzzlePiece size={size} className="text-accent" />
+      {/* Наведение – только там, где оно есть (hover: hover), и без reduced-motion. */}
+      <PuzzlePiece
+        size={size}
+        className="origin-center text-accent motion-safe:group-hover/logo:animate-piece-nod"
+      />
       <span
         className={cn(
           'font-display text-[max(0.875rem,var(--logo-word))] leading-none font-bold tracking-[-0.01em] whitespace-nowrap',

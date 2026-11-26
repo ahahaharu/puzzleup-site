@@ -48,7 +48,7 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
   const full = tutor.availability === 'full';
 
   return (
-    <article className="@container h-full rounded-card border border-ink/12 bg-card">
+    <article className="group/card @container h-full rounded-card border border-ink/12 bg-card">
       <div className="grid h-full grid-cols-[auto_minmax(0,1fr)] grid-rows-[auto_auto_1fr] items-center gap-x-4 gap-y-3.5 p-5 @[34rem]:items-start @[34rem]:gap-x-7 @[34rem]:gap-y-2.5 @[34rem]:p-7">
         <Badge
           status={tutor.availability}
@@ -70,6 +70,7 @@ export function TutorCard({ tutor, tilt = -1.5, entry = 'tutors' }: TutorCardPro
               photo={tutor.photo ? { src: tutor.photo, alt: '' } : undefined}
               tilt={tilt}
               sizes="170px"
+              lift
               className="w-23 @[34rem]:w-42.5"
             />
           </TutorPhotoTransition>

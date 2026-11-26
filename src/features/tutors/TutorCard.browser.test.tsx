@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 
 import { FIXTURE_TUTORS } from './fixtures';
 import { TutorCard } from './TutorCard';
@@ -44,6 +45,17 @@ describe('TutorCard', () => {
     const photoLink = screen.container.querySelector('a[aria-hidden="true"]');
     expect(photoLink?.getAttribute('href')).toBe('/tutors/example-1');
     expect(photoLink?.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('lifts the photo off the page on hover, doubling its tilt', async () => {
+    const screen = await render(<TutorCard tutor={ANNA} tilt={-1.5} />);
+    await rendered(screen);
+    const photo = screen.container.querySelector<HTMLElement>('[style*="--tilt"]')!;
+    expect(getComputedStyle(photo).rotate).toBe('-1.5deg');
+
+    await userEvent.hover(screen.getByRole('heading', { level: 3, name: 'Анна' }));
+
+    await expect.poll(() => getComputedStyle(photo).rotate).toBe('-3deg');
   });
 
   it('leads to the form with entry=tutors and to both messengers', async () => {

@@ -119,6 +119,10 @@
   --animate-piece-snap: piece-snap 400ms ease-out both;
   /* Смена карточек после выбора вкладки фильтра – появление за 150 мс. */
   --animate-fade-in: fade-in 150ms ease-out both;
+  /* Ответ FAQ при раскрытии проявляется и съезжает на 6 px; высота меняется сразу (ДС, раздел 7). */
+  --animate-answer-in: answer-in 250ms ease-out both;
+  /* Деталь логотипа при наведении кивает – наклон −8° и обратно, отсылка к первому экрану. */
+  --animate-piece-nod: piece-nod 500ms ease-in-out;
 
   @keyframes piece-snap {
     from {
@@ -129,6 +133,17 @@
   @keyframes fade-in {
     from {
       opacity: 0;
+    }
+  }
+  @keyframes answer-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  @keyframes piece-nod {
+    40% {
+      transform: rotate(-8deg);
     }
   }
 }
