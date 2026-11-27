@@ -37,7 +37,7 @@ const WORDING: readonly Rule[] = [
   },
   { pattern: forms('команд', NOUN), message: NOT_ORGANIZATION },
   { pattern: forms('центр', NOUN), message: NOT_ORGANIZATION },
-  // Только сама «школа»: «учится в школе», «справка из школы» – обязательные тексты ТЗ.
+  // Только сама «школа»: «учится в школе», «справка из школы» – обычные фразы.
   { pattern: word('школа'), message: NOT_ORGANIZATION },
   {
     pattern: forms('компани', ['я', 'и', 'ю', 'ей', 'ям', 'ями', 'ях', 'й']),

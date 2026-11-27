@@ -30,13 +30,11 @@ export function HowToStart({ how }: { how: HowToStartData }) {
             </li>
           ))}
         </ol>
-        <div
-          {...reveal()}
-          className="mt-8 flex max-w-3xl flex-col gap-2 text-body text-ink-2 lg:mt-12"
-        >
-          <p>{how.terms}</p>
-          <p>{how.school}</p>
-        </div>
+        {how.terms !== undefined && (
+          <p {...reveal()} className="mt-8 max-w-3xl text-body text-ink-2 lg:mt-12">
+            {how.terms}
+          </p>
+        )}
       </div>
     </section>
   );

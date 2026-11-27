@@ -32,7 +32,6 @@ import {
   platformsLine,
   providerLine,
   reviewsTitle,
-  schoolLine,
   startSteps,
   termsLine,
   tutorSubtitle,
@@ -239,11 +238,12 @@ export function tutorReviews(
 
 // --- 5. Как начать ---
 
-export type HowToStartData = { steps: StartStep[]; terms: string; school: string };
+/** `terms` – только у репетитора со своим полем `terms`: общих условий нет (ADR-067). */
+export type HowToStartData = { steps: StartStep[]; terms?: string | undefined };
 
 export function howToStartData(
   tutor: Tutor,
-  site: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'>,
+  site: Pick<Site, 'responseHours' | 'defaultPlatforms'>,
 ): HowToStartData {
   const { from, to } = site.responseHours;
   return {
@@ -255,9 +255,7 @@ export function howToStartData(
       price: formatPrice(tutor.price),
       platforms: tutor.platforms ?? site.defaultPlatforms,
     }),
-    // Условия по умолчанию показываются как условия этого репетитора (раздел 2, `terms`).
-    terms: termsLine(tutor.nameGenitive, tutor.terms ?? site.defaultTerms),
-    school: schoolLine(tutor.name),
+    terms: tutor.terms === undefined ? undefined : termsLine(tutor.nameGenitive, tutor.terms),
   };
 }
 
@@ -376,7 +374,7 @@ export type TutorPageData = {
 };
 
 type PageContext = {
-  site: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'> & {
+  site: Pick<Site, 'responseHours' | 'defaultPlatforms'> & {
     prices: { trial: Pick<Site['prices']['trial'], 'price'> };
   };
   subjects: readonly Subject[];

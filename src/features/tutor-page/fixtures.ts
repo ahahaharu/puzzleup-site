@@ -101,11 +101,10 @@ export const FIXTURE_VERA = fixtureTutor('vera', {
   viber: '+375 29 000-00-03',
 });
 
-export const FIXTURE_SITE: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'> & {
+export const FIXTURE_SITE: Pick<Site, 'responseHours' | 'defaultPlatforms'> & {
   prices: { trial: Pick<Site['prices']['trial'], 'price'> };
 } = {
   responseHours: { from: '09:00', to: '22:00', tz: 'Europe/Minsk' },
-  defaultTerms: 'перенос без списания – если предупредить не позже чем за 6 часов',
   defaultPlatforms: ['Google Meet', 'Miro'],
   prices: { trial: { price: 0 } },
 };

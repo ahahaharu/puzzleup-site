@@ -195,8 +195,6 @@ export const siteSchema = z.strictObject({
   responseHours: z
     .strictObject({ from: time, to: time, tz: z.literal('Europe/Minsk') })
     .refine((hours) => hours.from < hours.to, '`from` must be earlier than `to`'),
-  /** Условия оплаты и переноса для репетитора без своего поля `terms`. */
-  defaultTerms: text,
   /** Платформы занятий для репетитора без своего поля `platforms`. */
   defaultPlatforms: z.array(text).min(1),
   prices: z.strictObject({

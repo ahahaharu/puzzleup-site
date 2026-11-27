@@ -65,7 +65,6 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
       copyright: '© 2026 {tutorsFullNames}',
     },
     responseHours: { from: '09:00', to: '22:00', tz: 'Europe/Minsk' },
-    defaultTerms: 'условия',
     defaultPlatforms: ['Google Meet'],
     prices: {
       trial: { title: 'Пробное занятие', price: 0, caption: '30 минут' },
