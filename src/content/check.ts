@@ -163,7 +163,9 @@ function checkStrings(raw: RawContent, options: CheckOptions, report: Report) {
 
   for (const [source, allowedKeys] of sources) {
     walkStrings(source.data, '', (path, value) => {
-      for (const violation of checkText(value)) {
+      // Текст отзыва – слова родителя, а не сайта.
+      const quote = source === raw.reviews && /^\d+\.text$/.test(path);
+      for (const violation of checkText(value, { quote })) {
         report(source.file, path, `${violation.message}: «${violation.match}»`);
       }
       // В MDX фигурные скобки – выражения JSX, а не шаблон.

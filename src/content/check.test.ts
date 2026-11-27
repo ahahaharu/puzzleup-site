@@ -461,6 +461,24 @@ describe('validateContent', () => {
     ]);
   });
 
+  it('lets the review text speak as «мы», but not the other review fields', () => {
+    const review = {
+      id: 'r-1',
+      tutorId: 't-maria',
+      relation: 'мы, родители',
+      subject: 'math',
+      text: 'Мы довольны, ребенок тоже.',
+      date: '2026-01-01',
+      featured: false,
+      consent: true,
+      source: 'Telegram',
+    };
+    expect(messages(raw({ reviews: { file: 'content/reviews.json', data: [review] } }))).toEqual([
+      'content/reviews.json › 0.relation: the site never speaks as «мы»: «мы»',
+      'content/reviews.json › 0.text: use «ё»: «ребенок»',
+    ]);
+  });
+
   it('allows placeholders by default and rejects them in strict mode', () => {
     const stub = raw({
       tutors: [tutor('maria', { fullName: '[Фамилия Имя Отчество]', teachingSince: '[год]' })],

@@ -19,34 +19,42 @@ function forms(stem: string, endings: readonly string[]): RegExp {
 
 const NOUN = ['', 'а', 'е', 'у', 'ом', 'ой', 'ы', 'и', 'ов', 'ам', 'ами', 'ах'];
 
-type Rule = { pattern: RegExp; message: string };
+/**
+ * `voice` – правило о голосе самого сайта («мы», «команда», «подберём»). В словах родителя
+ * («Мы с ребёнком довольны») оно не действует; гарантии и типографика – действуют (ADR-070).
+ */
+type Rule = { pattern: RegExp; message: string; voice?: true };
 
 const NOT_ORGANIZATION = 'PuzzleUp is not an organization';
 const NO_GUARANTEES = 'no guarantees of results';
 
 const WORDING: readonly Rule[] = [
-  { pattern: word('мы'), message: 'the site never speaks as «мы»' },
-  { pattern: word('(?:нас|нам|нами)'), message: 'the site never speaks as «мы»' },
+  { pattern: word('мы'), message: 'the site never speaks as «мы»', voice: true },
+  { pattern: word('(?:нас|нам|нами)'), message: 'the site never speaks as «мы»', voice: true },
   {
     pattern: forms('наш', ['', 'а', 'е', 'и', 'его', 'ей', 'ему', 'им', 'ими', 'ем', 'у', 'их']),
     message: 'the site never speaks as «наш»',
+    voice: true,
   },
   {
     pattern: word('(?:находим|разбираем|решаем)'),
     message: 'use an impersonal form or the tutor’s first person',
+    voice: true,
   },
-  { pattern: forms('команд', NOUN), message: NOT_ORGANIZATION },
-  { pattern: forms('центр', NOUN), message: NOT_ORGANIZATION },
+  { pattern: forms('команд', NOUN), message: NOT_ORGANIZATION, voice: true },
+  { pattern: forms('центр', NOUN), message: NOT_ORGANIZATION, voice: true },
   // Только сама «школа»: «учится в школе», «справка из школы» – обычные фразы.
-  { pattern: word('школа'), message: NOT_ORGANIZATION },
+  { pattern: word('школа'), message: NOT_ORGANIZATION, voice: true },
   {
     pattern: forms('компани', ['я', 'и', 'ю', 'ей', 'ям', 'ями', 'ях', 'й']),
     message: NOT_ORGANIZATION,
+    voice: true,
   },
-  { pattern: /©\s*PuzzleUp/giu, message: NOT_ORGANIZATION },
+  { pattern: /©\s*PuzzleUp/giu, message: NOT_ORGANIZATION, voice: true },
   {
     pattern: forms('подбер', ['ём', 'ем', 'ёт', 'ет']),
     message: 'parents choose a tutor themselves',
+    voice: true,
   },
   { pattern: word('гарантир\\p{L}*'), message: NO_GUARANTEES },
   { pattern: word('с\\s+первого\\s+раза'), message: NO_GUARANTEES },
@@ -81,6 +89,8 @@ function apply(
   );
 }
 
-export function checkText(value: string): TextViolation[] {
-  return [...apply('wording', WORDING, value), ...apply('typography', TYPOGRAPHY, value)];
+/** `quote` – чужие слова (текст отзыва): правила о голосе сайта пропускаются. */
+export function checkText(value: string, { quote = false } = {}): TextViolation[] {
+  const wording = quote ? WORDING.filter((rule) => !rule.voice) : WORDING;
+  return [...apply('wording', wording, value), ...apply('typography', TYPOGRAPHY, value)];
 }
