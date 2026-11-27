@@ -34,6 +34,17 @@ describe('MessengerButtons', () => {
       .toHaveAttribute('href', 'viber://chat?number=%2B375290000000');
   });
 
+  it('opens Telegram in a new tab and Viber in place', async () => {
+    const screen = await render(<MessengerButtons {...TUTOR} />);
+
+    const telegram = screen.getByRole('link', { name: 'Написать Андрею в Telegram' });
+    await expect.element(telegram).toHaveAttribute('target', '_blank');
+    await expect.element(telegram).toHaveAttribute('rel', 'noopener');
+    await expect
+      .element(screen.getByRole('link', { name: 'Написать Андрею в Viber' }))
+      .not.toHaveAttribute('target');
+  });
+
   it('shows only messenger names in a narrow card, the name stays personal', async () => {
     const screen = await render(
       <div style={{ width: 328 }}>

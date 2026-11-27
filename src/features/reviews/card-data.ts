@@ -1,4 +1,5 @@
-import type { Review, Subject } from '@/content';
+import type { PublishedReview, Subject } from '@/content';
+import type { ImageSize } from '@/lib/image-size';
 import { capitalize } from '@/lib/text';
 import { formatLongDate } from '@/lib/time';
 import { reviewScreenshotUrl } from '@/lib/urls';
@@ -8,7 +9,7 @@ import { reviewScreenshotUrl } from '@/lib/urls';
 
 export type ReviewCardData = {
   id: string;
-  /** «Ольга, мама ученика 7 класса». */
+  /** «Ольга, мама ученика 7 класса», без имени – «Мама ученика 7 класса». */
   signature: string;
   /** «Математика». */
   subject: string;
@@ -16,6 +17,8 @@ export type ReviewCardData = {
   text: string;
   /** Адрес скриншота переписки; есть – отзыв стоит в ленте скриншотов, а не карточкой. */
   screenshot?: string | undefined;
+  /** Размер файла скриншота; неизвестен – рамка 3:4. */
+  screenshotSize?: ImageSize | undefined;
   /** «12 октября 2026» и дата для `<time>`. */
   date: string;
   dateTime: string;
@@ -31,17 +34,21 @@ export function splitScreenshots(reviews: readonly ReviewCardData[]) {
 }
 
 export function toReviewCard(
-  review: Review,
+  review: PublishedReview,
   subjects: readonly Pick<Subject, 'id' | 'name'>[],
 ): ReviewCardData {
   const subject = subjects.find((candidate) => candidate.id === review.subject);
   return {
     id: review.id,
-    signature: `${review.author}, ${review.relation}`,
+    signature:
+      review.author === undefined
+        ? capitalize(review.relation)
+        : `${review.author}, ${review.relation}`,
     subject: capitalize(subject?.name ?? review.subject),
     text: review.text,
     screenshot:
       review.screenshot === undefined ? undefined : reviewScreenshotUrl(review.screenshot),
+    screenshotSize: review.screenshotSize,
     date: formatLongDate(review.date),
     dateTime: review.date,
   };

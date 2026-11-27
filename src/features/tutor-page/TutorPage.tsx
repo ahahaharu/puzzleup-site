@@ -34,6 +34,7 @@ export function TutorPage({ data, aboutText, form }: TutorPageProps) {
         title={data.reviews.title}
         label={data.reviews.label}
         reviews={data.reviews.items}
+        note={data.reviews.note}
       />
       {data.how && <HowToStart how={data.how} />}
       {data.lead && <LeadSection lead={data.lead}>{form}</LeadSection>}

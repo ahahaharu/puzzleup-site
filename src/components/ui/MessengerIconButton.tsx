@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn';
-import { telegramUrl, viberUrl } from '@/lib/urls';
+import { TELEGRAM_LINK_PROPS, telegramUrl, viberUrl } from '@/lib/urls';
 
 import { Icon } from './Icon';
 
@@ -34,6 +34,7 @@ export function MessengerIconButton({
   return (
     <a
       href={url(value)}
+      {...(messenger === 'telegram' && TELEGRAM_LINK_PROPS)}
       // Рамка 1,5 px – как у контурной кнопки (ДС, раздел 6).
       className={cn(
         'inline-flex size-12 flex-none items-center justify-center rounded-button border-[1.5px] border-ink text-ink no-underline transition-transform duration-150 select-none hover:bg-ink/6 active:scale-[.98]',

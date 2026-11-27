@@ -36,6 +36,13 @@ describe('checkText: wording', () => {
   ])('allows «%s»', (text) => {
     expect(checkText(text).filter((violation) => violation.kind === 'wording')).toEqual([]);
   });
+
+  it('lets a quote speak as «мы» but keeps guarantees and typography', () => {
+    const quote = (text: string) =>
+      checkText(text, { quote: true }).map((violation) => violation.match);
+    expect(quote('Мы с сыном довольны, наша школа далеко')).toEqual([]);
+    expect(quote('Гарантирую, ребенок поймёт')).toEqual(['Гарантирую', 'ребенок']);
+  });
 });
 
 describe('checkText: typography', () => {

@@ -7,15 +7,15 @@ export const READ_MORE = 'Читать полностью';
 
 export const READ_LESS = 'Свернуть';
 
-// Лента скриншотов отзывов (ADR-062). Подписи – только для дикторов: на экране стрелки и снимки.
+// Скриншоты отзывов (ADR-062, ADR-071).
 
 /** Имя снимка – расшифровка переписки: текст на картинке иначе недоступен дикторам и поиску. */
 export const screenshotAlt = (text: string) => `Скриншот переписки: ${text}`;
 
-/** «Скриншоты отзывов об Андрее» – имя ленты. */
+/** «Скриншоты отзывов об Андрее» – имя списка снимков для дикторов. */
 export const screenshotsLabel = (namePrepositional: string) =>
   `Скриншоты отзывов ${aboutName(namePrepositional)}`;
 
-export const SCREENSHOTS_PREV = 'Предыдущие отзывы';
-export const SCREENSHOTS_NEXT = 'Следующие отзывы';
+/** Кладка на странице репетитора – как у текстовых отзывов. */
+export const SCREENSHOTS_MORE = 'Показать ещё';
 export const SCREENSHOT_CLOSE = 'Закрыть';

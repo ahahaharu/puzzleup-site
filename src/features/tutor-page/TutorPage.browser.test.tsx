@@ -183,7 +183,7 @@ describe('TutorReviews', () => {
     expect(screen.container.innerHTML).toBe('');
   });
 
-  it('shows screenshots in a strip above the text reviews', async () => {
+  it('shows screenshots in a wall above the text reviews', async () => {
     await page.viewport(1280, 900);
     const [first, second, third] = reviews(3);
     if (!first || !second || !third) throw new Error('fixture');
@@ -196,9 +196,9 @@ describe('TutorReviews', () => {
       <TutorReviews title="Отзывы" label="Скриншоты отзывов об Анне" reviews={items} />,
     );
 
-    const strip = screen.getByRole('list', { name: 'Скриншоты отзывов об Анне' });
-    await expect.element(strip).toBeInTheDocument();
-    expect(strip.element().querySelectorAll('li')).toHaveLength(2);
+    const wall = screen.getByRole('list', { name: 'Скриншоты отзывов об Анне' });
+    await expect.element(wall).toBeInTheDocument();
+    expect(wall.element().querySelectorAll('[role="listitem"]')).toHaveLength(2);
     // Текст переписки – имя снимка, а не текст на экране.
     await expect
       .element(
@@ -207,7 +207,7 @@ describe('TutorReviews', () => {
         }),
       )
       .toBeInTheDocument();
-    expect(strip.element().textContent).not.toContain('дроби');
+    expect(wall.element().textContent).not.toContain('дроби');
     expect(screen.container.querySelectorAll('blockquote')).toHaveLength(1);
   });
 });

@@ -22,8 +22,8 @@ export type ConsentData = {
   /** «политика» – ссылка в скобках после подписи, открывается в новой вкладке. */
   policyLabel: string;
   policyHref: string;
-  /** Мелкий текст под подписью: операторы, хранение, передача. */
-  details: string;
+  /** Мелкий текст под подписью: операторы, хранение, передача; нет в `site.json` – нет и его. */
+  details?: string | undefined;
 };
 
 export type LeadFormData = {
@@ -65,15 +65,19 @@ export function consentData(
     label: site.consent.label,
     policyLabel: site.consent.policyLinkLabel,
     policyHref: '/privacy',
-    details: fillTemplate(site.consent.details, {
-      operators: consentOperators(listedTutors(tutors)),
-    }),
+    details:
+      site.consent.details === undefined
+        ? undefined
+        : fillTemplate(site.consent.details, {
+            operators: consentOperators(listedTutors(tutors)),
+          }),
   };
 }
 
 /** Текст согласия целиком – так, как его видит родитель; от него считается хеш в `consents`. */
 export function consentText(consent: ConsentData): string {
-  return `${consent.label} (${consent.policyLabel}). ${consent.details}`;
+  const text = `${consent.label} (${consent.policyLabel}).`;
+  return consent.details === undefined ? text : `${text} ${consent.details}`;
 }
 
 type Context = {

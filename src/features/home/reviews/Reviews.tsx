@@ -1,10 +1,11 @@
 import Link from 'next/link';
 
 import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
-import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
+import { Screenshots } from '@/features/reviews/Screenshots';
 import { cn } from '@/lib/cn';
 import { reveal } from '@/lib/reveal';
 
@@ -58,17 +59,33 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
                 </div>
               </div>
               {column.screenshots.length > 0 ? (
-                <ScreenshotCarousel reviews={column.screenshots} label={column.screenshotsLabel} />
+                <Screenshots
+                  reviews={column.screenshots}
+                  label={column.screenshotsLabel}
+                  layout="preview"
+                />
               ) : (
                 <ReviewCard review={column.review} />
               )}
-              <Link
-                href={column.allHref}
-                className="inline-flex min-h-11 items-center gap-2 self-start text-field font-semibold text-ink no-underline hover:underline"
-              >
-                {column.allLabel}
-                <Icon name="arrow-right" size={18} />
-              </Link>
+              {column.screenshots.length > 0 ? (
+                // Под растворённым низом мини-кладки – кнопка: «все снимки – здесь».
+                <Button
+                  href={column.allHref}
+                  variant="secondary"
+                  size="md"
+                  className="justify-self-start"
+                >
+                  {column.allLabel}
+                </Button>
+              ) : (
+                <Link
+                  href={column.allHref}
+                  className="inline-flex min-h-11 items-center gap-2 self-start text-field font-semibold text-ink no-underline hover:underline"
+                >
+                  {column.allLabel}
+                  <Icon name="arrow-right" size={18} />
+                </Link>
+              )}
             </li>
           ))}
         </ul>

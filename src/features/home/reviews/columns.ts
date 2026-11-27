@@ -55,9 +55,11 @@ export function reviewColumns(
     const own = reviews.filter((review) => review.tutorId === tutor.id);
     const review = pickReview(own);
     if (!review) return [];
+    // Сверху стопки – тот же отзыв, что выбран для колонки, если он скриншотом; дальше – новые.
     const { screenshots } = splitScreenshots(
       own
         .toSorted((a, b) => b.date.localeCompare(a.date))
+        .toSorted((a, b) => Number(b.id === review.id) - Number(a.id === review.id))
         .map((item) => toReviewCard(item, subjects)),
     );
 

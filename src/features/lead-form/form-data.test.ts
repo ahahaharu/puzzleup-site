@@ -82,6 +82,16 @@ describe('leadFormData', () => {
       `Согласен на обработку персональных данных (политика). ${consent.details}`,
     );
   });
+
+  it('keeps only the label when the site has no consent details', () => {
+    const { details: _, ...bare } = site.consent;
+    const { consent } = leadFormData(FIXTURE_ANNA, {
+      ...context,
+      site: { ...site, consent: bare },
+    });
+    expect(consent.details).toBeUndefined();
+    expect(consentText(consent)).toBe('Согласен на обработку персональных данных (политика).');
+  });
 });
 
 describe('consentOperators', () => {

@@ -1,6 +1,6 @@
 import { splitScreenshots, type ReviewCardData } from '@/features/reviews/card-data';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
-import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
+import { Screenshots, type WallNote } from '@/features/reviews/Screenshots';
 import { reveal } from '@/lib/reveal';
 
 import { ReviewsList } from './ReviewsList';
@@ -14,9 +14,11 @@ type TutorReviewsProps = {
   /** Имя ленты скриншотов для дикторов. */
   label: string;
   reviews: readonly ReviewCardData[];
+  /** Записка о пробном занятии в пустом месте кладки скриншотов. */
+  note?: WallNote | undefined;
 };
 
-export function TutorReviews({ title, label, reviews }: TutorReviewsProps) {
+export function TutorReviews({ title, label, reviews, note }: TutorReviewsProps) {
   // Пока опубликованных отзывов нет, блока нет (раздел 3).
   if (reviews.length === 0) return null;
   const { screenshots, cards } = splitScreenshots(reviews);
@@ -29,7 +31,7 @@ export function TutorReviews({ title, label, reviews }: TutorReviewsProps) {
         </h2>
         {screenshots.length > 0 && (
           <div {...reveal()} className="mt-7 lg:mt-10">
-            <ScreenshotCarousel reviews={screenshots} label={label} />
+            <Screenshots reviews={screenshots} label={label} layout="wall" note={note} />
           </div>
         )}
         {cards.length > 0 && (

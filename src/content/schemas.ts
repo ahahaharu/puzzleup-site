@@ -56,10 +56,11 @@ export const tutorSchema = z.strictObject({
   /** «он ответит», «посмотрите его страницу» – «Как начать», плашка ушедшего, подсказка о классе. */
   pronoun: z.enum(['он', 'она']),
   fullName: orPlaceholder(text),
-  // Без кавычек YAML прочитает УНП числом – просим строку, а не молча приводим.
+  // УНП физлица – две латинские буквы и 7 цифр, организации и ИП – 9 цифр (ADR-066). Без кавычек
+  // YAML прочитает цифровой УНП числом – просим строку, а не молча приводим.
   unp: orPlaceholder(
-    z.string().regex(/^\d{9}$/),
-    "UNP must be a quoted string of 9 digits: '123456789'",
+    z.string().regex(/^(?:\d{9}|[A-Z]{2}\d{7})$/),
+    "UNP must be a quoted string: 2 Latin capital letters and 7 digits ('AB1234567') or 9 digits",
   ),
   photo: z
     .string()
@@ -120,7 +121,8 @@ export type Subject = z.infer<typeof subjectSchema>;
 export const reviewSchema = z.strictObject({
   id: slug,
   tutorId: z.string(),
-  author: text,
+  /** Имя без фамилии; без него подпись – только `relation`: «Мама ученика 7 класса» (ADR-069). */
+  author: text.optional(),
   relation: text,
   subject: slug,
   /** Текст отзыва; у скриншота – расшифровка переписки: на экране её нет, её читают дикторы. */
@@ -180,8 +182,6 @@ export const siteSchema = z.strictObject({
    */
   url: z.url({ protocol: /^https$/ }).regex(/[^/]$/, 'Without a trailing slash'),
   slogan: text,
-  /** Раскрытие статуса сайта – на каждой странице (ТЗ главной, раздел 1). */
-  disclosure: text,
   /** Текст блока «О сайте» (ТЗ главной, блок 9). */
   about: text,
   footer: z.strictObject({
@@ -194,8 +194,6 @@ export const siteSchema = z.strictObject({
   responseHours: z
     .strictObject({ from: time, to: time, tz: z.literal('Europe/Minsk') })
     .refine((hours) => hours.from < hours.to, '`from` must be earlier than `to`'),
-  /** Условия оплаты и переноса для репетитора без своего поля `terms`. */
-  defaultTerms: text,
   /** Платформы занятий для репетитора без своего поля `platforms`. */
   defaultPlatforms: z.array(text).min(1),
   prices: z.strictObject({
@@ -209,7 +207,8 @@ export const siteSchema = z.strictObject({
     version: isoDate,
     label: text,
     policyLinkLabel: text,
-    details: text,
+    /** Мелкий текст под подписью; без него – только подпись со ссылкой на политику (ADR-068). */
+    details: text.optional(),
   }),
   /**
    * Счётчики (ТЗ главной, «Глобальные элементы»): Umami без cookie считает всегда, Яндекс Метрика –

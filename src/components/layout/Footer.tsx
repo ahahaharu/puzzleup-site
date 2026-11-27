@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import { Logo } from '@/components/ui/Logo';
 import { CookieSettingsButton } from '@/features/analytics/CookieSettingsButton';
-import { telegramUrl, viberUrl } from '@/lib/urls';
+import { TELEGRAM_LINK_PROPS, telegramUrl, viberUrl } from '@/lib/urls';
 
 import type { NavLink } from './nav';
 import { NavAnchor } from './NavAnchor';
@@ -107,7 +107,11 @@ export function Footer({
                       {tutor.name}
                     </Link>
                     <div className="flex gap-3 text-paper/85">
-                      <a href={telegramUrl(tutor.telegram)} className={LINK}>
+                      <a
+                        href={telegramUrl(tutor.telegram)}
+                        {...TELEGRAM_LINK_PROPS}
+                        className={LINK}
+                      >
                         <span className="sr-only">{`Написать ${tutor.nameDative} в `}</span>
                         Telegram
                       </a>

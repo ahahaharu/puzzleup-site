@@ -1,5 +1,6 @@
 import type { Review, Site, Subject, Tutor } from '@/content';
 import { toReviewCard, type ReviewCardData } from '@/features/reviews/card-data';
+import type { WallNote } from '@/features/reviews/Screenshots';
 import { screenshotsLabel } from '@/features/reviews/texts';
 import {
   countReviews,
@@ -31,8 +32,9 @@ import {
   moreTitle,
   platformsLine,
   providerLine,
+  REVIEWS_NOTE_TITLE,
+  reviewsNoteText,
   reviewsTitle,
-  schoolLine,
   startSteps,
   termsLine,
   tutorSubtitle,
@@ -239,11 +241,12 @@ export function tutorReviews(
 
 // --- 5. Как начать ---
 
-export type HowToStartData = { steps: StartStep[]; terms: string; school: string };
+/** `terms` – только у репетитора со своим полем `terms`: общих условий нет (ADR-067). */
+export type HowToStartData = { steps: StartStep[]; terms?: string | undefined };
 
 export function howToStartData(
   tutor: Tutor,
-  site: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'>,
+  site: Pick<Site, 'responseHours' | 'defaultPlatforms'>,
 ): HowToStartData {
   const { from, to } = site.responseHours;
   return {
@@ -255,9 +258,7 @@ export function howToStartData(
       price: formatPrice(tutor.price),
       platforms: tutor.platforms ?? site.defaultPlatforms,
     }),
-    // Условия по умолчанию показываются как условия этого репетитора (раздел 2, `terms`).
-    terms: termsLine(tutor.nameGenitive, tutor.terms ?? site.defaultTerms),
-    school: schoolLine(tutor.name),
+    terms: tutor.terms === undefined ? undefined : termsLine(tutor.nameGenitive, tutor.terms),
   };
 }
 
@@ -365,7 +366,8 @@ export type TutorPageData = {
   /** «Вне занятий»: хобби и личная деталь; пусто – блока нет. */
   outside: OutsideData;
   /** `label` – имя ленты скриншотов для дикторов. */
-  reviews: { title: string; label: string; items: ReviewCardData[] };
+  /** `note` – записка о пробном занятии в кладке скриншотов, только у того, у кого есть места. */
+  reviews: { title: string; label: string; items: ReviewCardData[]; note?: WallNote | undefined };
   /** «Как начать» и форма – только у того, кто принимает учеников. */
   how?: HowToStartData | undefined;
   lead?: LeadData | undefined;
@@ -376,7 +378,7 @@ export type TutorPageData = {
 };
 
 type PageContext = {
-  site: Pick<Site, 'responseHours' | 'defaultTerms' | 'defaultPlatforms'> & {
+  site: Pick<Site, 'responseHours' | 'defaultPlatforms'> & {
     prices: { trial: Pick<Site['prices']['trial'], 'price'> };
   };
   subjects: readonly Subject[];
@@ -394,14 +396,20 @@ export function tutorPageData(tutor: Tutor, context: PageContext): TutorPageData
   const counts = countReviews(reviews);
   const own = tutorReviews(tutor, reviews, subjects);
 
+  const profile = profileData(tutor, { subjects, others, reviewCount: own.length, year });
+
   return {
-    profile: profileData(tutor, { subjects, others, reviewCount: own.length, year }),
+    profile,
     about: aboutData(tutor, site),
     outside: { paragraphs: [tutor.hobby, tutor.personalNote].filter((text) => text !== undefined) },
     reviews: {
       title: reviewsTitle(tutor.namePrepositional, own.length),
       label: screenshotsLabel(tutor.namePrepositional),
       items: own,
+      note:
+        status === 'full' || status === 'archived'
+          ? undefined
+          : { title: REVIEWS_NOTE_TITLE, text: reviewsNoteText(tutor.name), cta: profile.cta },
     },
     how: status === 'archived' ? undefined : howToStartData(tutor, site),
     lead: status === 'archived' ? undefined : leadData(tutor, site),

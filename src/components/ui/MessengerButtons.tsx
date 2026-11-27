@@ -1,5 +1,5 @@
 import { cn } from '@/lib/cn';
-import { telegramUrl, viberUrl } from '@/lib/urls';
+import { TELEGRAM_LINK_PROPS, telegramUrl, viberUrl } from '@/lib/urls';
 
 import { Button, type ButtonSize } from './Button';
 import type { IconName } from './Icon';
@@ -76,8 +76,13 @@ export function MessengerButtons({
   viber,
   nameDative,
 }: MessengerButtonsProps) {
-  const messengers: Array<{ icon: IconName; title: string; href: string }> = [
-    { icon: 'telegram', title: 'Telegram', href: telegramUrl(telegram) },
+  const messengers: Array<{
+    icon: IconName;
+    title: string;
+    href: string;
+    link?: typeof TELEGRAM_LINK_PROPS;
+  }> = [
+    { icon: 'telegram', title: 'Telegram', href: telegramUrl(telegram), link: TELEGRAM_LINK_PROPS },
     { icon: 'viber', title: 'Viber', href: viberUrl(viber) },
   ];
 
@@ -92,10 +97,11 @@ export function MessengerButtons({
           label === 'personal' ? 'grid-cols-1 @2xl:grid-cols-2' : 'grid-cols-2',
         )}
       >
-        {messengers.map(({ icon, title, href }) => (
+        {messengers.map(({ icon, title, href, link }) => (
           <Button
             key={title}
             href={href}
+            {...link}
             variant={tone === 'dark' ? 'secondaryOnDark' : 'secondary'}
             size={size}
             icon={icon}

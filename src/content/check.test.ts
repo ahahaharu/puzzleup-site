@@ -57,7 +57,6 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
     name: 'PuzzleUp',
     url: 'https://puzzle-up.by',
     slogan: 'Всё сложится.',
-    disclosure: 'PuzzleUp – общий сайт независимых репетиторов.',
     about: 'Текст о сайте.',
     footer: {
       tagline: 'Общий сайт независимых репетиторов',
@@ -65,7 +64,6 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
       copyright: '© 2026 {tutorsFullNames}',
     },
     responseHours: { from: '09:00', to: '22:00', tz: 'Europe/Minsk' },
-    defaultTerms: 'условия',
     defaultPlatforms: ['Google Meet'],
     prices: {
       trial: { title: 'Пробное занятие', price: 0, caption: '30 минут' },
@@ -217,8 +215,16 @@ describe('validateContent', () => {
 
   it('asks to quote the UNP so that YAML keeps it a string', () => {
     expect(messages(raw({ tutors: [tutor('maria', { unp: 123456789 })] }))).toEqual([
-      "content/tutors/maria.mdx › unp: UNP must be a quoted string of 9 digits: '123456789'",
+      "content/tutors/maria.mdx › unp: UNP must be a quoted string: 2 Latin capital letters and 7 digits ('AB1234567') or 9 digits",
     ]);
+  });
+
+  it('accepts the UNP of an individual: two Latin letters and 7 digits', () => {
+    expect(validateContent(raw({ tutors: [tutor('maria', { unp: 'AB1234567' })] })).ok).toBe(true);
+    // Кириллические «АВ» выглядят так же, но в УНП их нет.
+    for (const unp of ['АВ1234567', 'ab1234567', 'AB123456', '12345678']) {
+      expect(messages(raw({ tutors: [tutor('maria', { unp })] }))).toHaveLength(1);
+    }
   });
 
   it('accepts a Telegram nick only without @', () => {
@@ -451,6 +457,24 @@ describe('validateContent', () => {
     expect(issues).toEqual([
       'content/tutors/maria.mdx › tagline: the site never speaks as «мы»: «Мы»',
       'content/tutors/maria.mdx › content: hyphen used as a dash, use «–» (en dash): « - »',
+    ]);
+  });
+
+  it('lets the review text speak as «мы», but not the other review fields', () => {
+    const review = {
+      id: 'r-1',
+      tutorId: 't-maria',
+      relation: 'мы, родители',
+      subject: 'math',
+      text: 'Мы довольны, ребенок тоже.',
+      date: '2026-01-01',
+      featured: false,
+      consent: true,
+      source: 'Telegram',
+    };
+    expect(messages(raw({ reviews: { file: 'content/reviews.json', data: [review] } }))).toEqual([
+      'content/reviews.json › 0.relation: the site never speaks as «мы»: «мы»',
+      'content/reviews.json › 0.text: use «ё»: «ребенок»',
     ]);
   });
 
