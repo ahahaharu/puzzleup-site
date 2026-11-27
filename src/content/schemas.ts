@@ -121,7 +121,8 @@ export type Subject = z.infer<typeof subjectSchema>;
 export const reviewSchema = z.strictObject({
   id: slug,
   tutorId: z.string(),
-  author: text,
+  /** Имя без фамилии; без него подпись – только `relation`: «Мама ученика 7 класса» (ADR-069). */
+  author: text.optional(),
   relation: text,
   subject: slug,
   /** Текст отзыва; у скриншота – расшифровка переписки: на экране её нет, её читают дикторы. */

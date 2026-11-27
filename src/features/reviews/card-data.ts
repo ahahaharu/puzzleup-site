@@ -8,7 +8,7 @@ import { reviewScreenshotUrl } from '@/lib/urls';
 
 export type ReviewCardData = {
   id: string;
-  /** «Ольга, мама ученика 7 класса». */
+  /** «Ольга, мама ученика 7 класса», без имени – «Мама ученика 7 класса». */
   signature: string;
   /** «Математика». */
   subject: string;
@@ -37,7 +37,10 @@ export function toReviewCard(
   const subject = subjects.find((candidate) => candidate.id === review.subject);
   return {
     id: review.id,
-    signature: `${review.author}, ${review.relation}`,
+    signature:
+      review.author === undefined
+        ? capitalize(review.relation)
+        : `${review.author}, ${review.relation}`,
     subject: capitalize(subject?.name ?? review.subject),
     text: review.text,
     screenshot:

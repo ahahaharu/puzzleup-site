@@ -82,6 +82,12 @@ describe('reviewColumns', () => {
     expect(columns[1]?.allLabel).toBe('Все отзывы о Максиме');
   });
 
+  it('signs a review without the author name by the relation alone', () => {
+    const { author: _, ...anonymous } = review('a1', 't-andrei', '2026-10-05', true);
+    const [column] = reviewColumns([anonymous], TUTORS, SUBJECTS);
+    expect(column?.review?.signature).toBe('Мама ученика 7 класса');
+  });
+
   it('puts the tutor screenshots, newest first, into the column', () => {
     const [column] = reviewColumns(
       [
