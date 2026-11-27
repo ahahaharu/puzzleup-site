@@ -16,6 +16,12 @@ export function telegramUrl(value: string): string {
   return `https://t.me/${encodeURIComponent(nick)}`;
 }
 
+/**
+ * Атрибуты ссылки на Telegram: внешняя страница `t.me` – в новой вкладке, чтобы сайт остался
+ * открытым (ТЗ главной, раздел 3). У Viber их нет: `viber://` сразу открывает приложение.
+ */
+export const TELEGRAM_LINK_PROPS = { target: '_blank', rel: 'noopener' } as const;
+
 /** Номер в любом написании (`+375 29 000-00-00`) → `viber://chat?number=%2B375290000000`. */
 export function viberUrl(phone: string): string {
   const digits = phone.replace(/\D/g, '');
