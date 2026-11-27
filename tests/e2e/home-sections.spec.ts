@@ -90,12 +90,13 @@ test('the grades answer is built from the tutors', async ({ page }) => {
   await expect(item.locator('p')).toHaveText(/^[А-ЯЁ][а-яё]+ – с [\d–\u2060]+\sклассом/);
 });
 
-test('the about block says the site is not an organisation', async ({ page }) => {
+// Раскрытие «не организация» – в реквизитах подвала (ADR-072, проверяют layout и smoke).
+test('the about block describes the site', async ({ page }) => {
   await page.goto('/');
   const block = page.locator('#about');
 
   await expect(block.getByRole('heading', { level: 2, name: 'О сайте' })).toBeVisible();
-  await expect(block.getByText(/не организация, не юрлицо и не ИП/)).toBeVisible();
+  await expect(block.getByText(/^PuzzleUp – общий сайт/)).toBeVisible();
 });
 
 test('on a 360 px phone the new blocks fit and no text is smaller than 14 px', async ({ page }) => {
