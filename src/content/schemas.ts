@@ -182,8 +182,6 @@ export const siteSchema = z.strictObject({
    */
   url: z.url({ protocol: /^https$/ }).regex(/[^/]$/, 'Without a trailing slash'),
   slogan: text,
-  /** Раскрытие статуса сайта – на каждой странице (ТЗ главной, раздел 1). */
-  disclosure: text,
   /** Текст блока «О сайте» (ТЗ главной, блок 9). */
   about: text,
   footer: z.strictObject({

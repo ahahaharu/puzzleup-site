@@ -91,7 +91,6 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 |---|---|
 | `name`, `slogan` | «PuzzleUp», «Всё сложится.» |
 | `url` | боевой адрес `https://puzzle-up.by` без `/` в конце: canonical, sitemap, `og:image`, JSON-LD (ADR-055) |
-| `disclosure` | раскрытие статуса сайта отдельной фразой – для мест вне подвала; в подвале раскрытие входит в `footer.requisites` (ADR-041) |
 | `about` | текст блока «О сайте» как есть (решение владельца, ADR-035) |
 | `footer.tagline`, `footer.requisites`, `footer.copyright` | подвал; реквизиты – шаблон с `{tutorsRequisites}` и `{siteOperatorFullName}`, копирайт – с `{tutorsFullNames}` |
 | `responseHours` | `{ from: '09:00', to: '22:00', tz: 'Europe/Minsk' }`, `from` раньше `to` |

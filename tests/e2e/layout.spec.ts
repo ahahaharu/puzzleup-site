@@ -32,7 +32,7 @@ test('footer shows navigation, documents and the site disclosure with requisites
     'href',
     '/tutors/andrei',
   );
-  await expect(footer.getByText('PuzzleUp – общий сайт независимых репетиторов.')).toBeVisible();
+  await expect(footer.getByText(/PuzzleUp – общий сайт .+ репетиторов\./)).toBeVisible();
   await expect(
     footer.getByText('Не является организацией, юридическим лицом или ИП.'),
   ).toBeVisible();

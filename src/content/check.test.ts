@@ -57,7 +57,6 @@ function raw(overrides: Partial<RawContent> = {}): RawContent {
     name: 'PuzzleUp',
     url: 'https://puzzle-up.by',
     slogan: 'Всё сложится.',
-    disclosure: 'PuzzleUp – общий сайт независимых репетиторов.',
     about: 'Текст о сайте.',
     footer: {
       tagline: 'Общий сайт независимых репетиторов',
