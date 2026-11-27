@@ -1,4 +1,5 @@
-import type { Review, Subject } from '@/content';
+import type { PublishedReview, Subject } from '@/content';
+import type { ImageSize } from '@/lib/image-size';
 import { capitalize } from '@/lib/text';
 import { formatLongDate } from '@/lib/time';
 import { reviewScreenshotUrl } from '@/lib/urls';
@@ -16,6 +17,8 @@ export type ReviewCardData = {
   text: string;
   /** Адрес скриншота переписки; есть – отзыв стоит в ленте скриншотов, а не карточкой. */
   screenshot?: string | undefined;
+  /** Размер файла скриншота; неизвестен – рамка 3:4. */
+  screenshotSize?: ImageSize | undefined;
   /** «12 октября 2026» и дата для `<time>`. */
   date: string;
   dateTime: string;
@@ -31,7 +34,7 @@ export function splitScreenshots(reviews: readonly ReviewCardData[]) {
 }
 
 export function toReviewCard(
-  review: Review,
+  review: PublishedReview,
   subjects: readonly Pick<Subject, 'id' | 'name'>[],
 ): ReviewCardData {
   const subject = subjects.find((candidate) => candidate.id === review.subject);
@@ -45,6 +48,7 @@ export function toReviewCard(
     text: review.text,
     screenshot:
       review.screenshot === undefined ? undefined : reviewScreenshotUrl(review.screenshot),
+    screenshotSize: review.screenshotSize,
     date: formatLongDate(review.date),
     dateTime: review.date,
   };
