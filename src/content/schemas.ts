@@ -208,7 +208,8 @@ export const siteSchema = z.strictObject({
     version: isoDate,
     label: text,
     policyLinkLabel: text,
-    details: text,
+    /** Мелкий текст под подписью; без него – только подпись со ссылкой на политику (ADR-068). */
+    details: text.optional(),
   }),
   /**
    * Счётчики (ТЗ главной, «Глобальные элементы»): Umami без cookie считает всегда, Яндекс Метрика –

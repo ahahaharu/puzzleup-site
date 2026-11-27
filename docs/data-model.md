@@ -97,7 +97,7 @@ Frontmatter + тело «О себе» (600–1200 символов, 2–4 аб�
 | `responseHours` | `{ from: '09:00', to: '22:00', tz: 'Europe/Minsk' }`, `from` раньше `to` |
 | `defaultPlatforms` | `['Google Meet', 'Miro']` для репетитора без `platforms` |
 | `prices` | заголовки и подписи карточек «Пробное занятие» и «Занятие», строка об оплате, сноска об оферте |
-| `consent` | `version` (дата редакции, `YYYY-MM-DD`), `label`, `policyLinkLabel`, `details` – шаблон с `{operators}` |
+| `consent` | `version` (дата редакции, `YYYY-MM-DD`), `label`, `policyLinkLabel`, `details` – необязательный шаблон с `{operators}`, без него под подписью ничего нет (ADR-068) |
 | `analytics` | необязательные счётчики: `umami { scriptUrl, websiteId }` (адрес `https://`, UUID сайта в Umami) и `metrika { counterId }`; до релиза – заглушки `[…]`. Работают только на боевом адресе `url`; cookie-баннер есть, когда есть поле `metrika`, в том числе с заглушкой (ADR-056). На запуске `metrika` нет (ADR-057) |
 | `cookieBanner` | `text` и `policyLinkLabel` cookie-баннера: «{text} Подробнее – в {policyLinkLabel}.», ссылка – на `/cookies` |
 | `siteOperatorTutorId` | кто ведёт сайт: `t-andrei` |
