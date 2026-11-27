@@ -217,8 +217,16 @@ describe('validateContent', () => {
 
   it('asks to quote the UNP so that YAML keeps it a string', () => {
     expect(messages(raw({ tutors: [tutor('maria', { unp: 123456789 })] }))).toEqual([
-      "content/tutors/maria.mdx › unp: UNP must be a quoted string of 9 digits: '123456789'",
+      "content/tutors/maria.mdx › unp: UNP must be a quoted string: 2 Latin capital letters and 7 digits ('AB1234567') or 9 digits",
     ]);
+  });
+
+  it('accepts the UNP of an individual: two Latin letters and 7 digits', () => {
+    expect(validateContent(raw({ tutors: [tutor('maria', { unp: 'AB1234567' })] })).ok).toBe(true);
+    // Кириллические «АВ» выглядят так же, но в УНП их нет.
+    for (const unp of ['АВ1234567', 'ab1234567', 'AB123456', '12345678']) {
+      expect(messages(raw({ tutors: [tutor('maria', { unp })] }))).toHaveLength(1);
+    }
   });
 
   it('accepts a Telegram nick only without @', () => {

@@ -56,10 +56,11 @@ export const tutorSchema = z.strictObject({
   /** «он ответит», «посмотрите его страницу» – «Как начать», плашка ушедшего, подсказка о классе. */
   pronoun: z.enum(['он', 'она']),
   fullName: orPlaceholder(text),
-  // Без кавычек YAML прочитает УНП числом – просим строку, а не молча приводим.
+  // УНП физлица – две латинские буквы и 7 цифр, организации и ИП – 9 цифр (ADR-066). Без кавычек
+  // YAML прочитает цифровой УНП числом – просим строку, а не молча приводим.
   unp: orPlaceholder(
-    z.string().regex(/^\d{9}$/),
-    "UNP must be a quoted string of 9 digits: '123456789'",
+    z.string().regex(/^(?:\d{9}|[A-Z]{2}\d{7})$/),
+    "UNP must be a quoted string: 2 Latin capital letters and 7 digits ('AB1234567') or 9 digits",
   ),
   photo: z
     .string()
