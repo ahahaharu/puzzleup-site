@@ -4,7 +4,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Icon } from '@/components/ui/Icon';
 import { SectionHead } from '@/components/ui/SectionHead';
 import { ReviewCard } from '@/features/reviews/ReviewCard';
-import { ScreenshotCarousel } from '@/features/reviews/ScreenshotCarousel';
+import { Screenshots } from '@/features/reviews/Screenshots';
 import { cn } from '@/lib/cn';
 import { reveal } from '@/lib/reveal';
 
@@ -58,7 +58,11 @@ export function Reviews({ columns, id = 'reviews' }: ReviewsProps) {
                 </div>
               </div>
               {column.screenshots.length > 0 ? (
-                <ScreenshotCarousel reviews={column.screenshots} label={column.screenshotsLabel} />
+                <Screenshots
+                  reviews={column.screenshots}
+                  label={column.screenshotsLabel}
+                  layout="stack"
+                />
               ) : (
                 <ReviewCard review={column.review} />
               )}

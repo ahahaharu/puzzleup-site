@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 
-import { ScreenshotCarousel } from './ScreenshotCarousel';
+import { Screenshots } from './Screenshots';
 
 const screenshots = (count: number) =>
   Array.from({ length: count }, (_, index) => ({
@@ -13,30 +13,64 @@ const screenshots = (count: number) =>
     screenshot: `/reviews/r-${index}.png`,
     date: '12 октября 2026',
     dateTime: '2026-10-12',
+    screenshotSize: { width: 900, height: index % 2 === 0 ? 410 : 900 },
   }));
 
-describe('ScreenshotCarousel', () => {
-  it('has no arrows when every screenshot fits', async () => {
-    await page.viewport(1280, 900);
-    const screen = await render(<ScreenshotCarousel reviews={screenshots(2)} label="Скриншоты" />);
-    await expect.element(screen.getByRole('list', { name: 'Скриншоты' })).toBeInTheDocument();
-    expect(screen.container.querySelectorAll('button:not(dialog button)')).toHaveLength(0);
+const NOTE = {
+  title: 'Пробное занятие – бесплатно',
+  text: '30 минут онлайн.',
+  cta: { label: 'Записаться к Андрею', href: '#lead' },
+};
+
+describe('Screenshots', () => {
+  it('stacks the first screenshot over the edges of the next two', async () => {
+    const screen = await render(
+      <Screenshots reviews={screenshots(4)} label="Скриншоты" layout="stack" />,
+    );
+    const list = screen.getByRole('list', { name: 'Скриншоты' });
+    await expect.element(list).toBeInTheDocument();
+    // Под верхним – только оформление: одна ссылка и один пункт списка.
+    expect(screen.getByRole('listitem').all()).toHaveLength(1);
+    expect(screen.getByRole('link').all()).toHaveLength(1);
+    expect(list.element().querySelectorAll('[aria-hidden="true"] img')).toHaveLength(2);
   });
 
-  it('scrolls by one screenshot with the arrows and disables them at the ends', async () => {
+  it('lays out every screenshot in columns and puts the note into the room left', async () => {
+    await page.viewport(1280, 900);
+    const screen = await render(
+      <Screenshots reviews={screenshots(5)} label="Скриншоты" layout="wall" note={NOTE} />,
+    );
+    expect(screen.getByRole('listitem').all()).toHaveLength(5);
+    await expect.element(screen.getByRole('link', { name: 'Записаться к Андрею' })).toBeVisible();
+    // Скрытая кнопка не попадает в дерево доступности – ищем по тексту в разметке.
+    const more = [...screen.container.querySelectorAll('button')].find(
+      (button) => button.textContent === 'Показать ещё',
+    );
+    expect(more?.checkVisibility()).toBe(false);
+  });
+
+  it('shows three screenshots on a phone until «Показать ещё»', async () => {
     await page.viewport(390, 844);
-    const screen = await render(<ScreenshotCarousel reviews={screenshots(4)} label="Скриншоты" />);
-    const prev = screen.getByRole('button', { name: 'Предыдущие отзывы' });
-    const next = screen.getByRole('button', { name: 'Следующие отзывы' });
-    await expect.element(prev).toBeDisabled();
+    const screen = await render(
+      <Screenshots reviews={screenshots(5)} label="Скриншоты" layout="wall" note={NOTE} />,
+    );
+    const visible = () =>
+      screen
+        .getByRole('listitem')
+        .elements()
+        .filter((item) => item.checkVisibility());
+    expect(visible()).toHaveLength(3);
+    // Записка – только от 1024 px; скрытую ссылку ищем по тексту в разметке.
+    const cta = [...screen.container.querySelectorAll('a')].find(
+      (link) => link.textContent === 'Записаться к Андрею',
+    );
+    expect(cta?.checkVisibility()).toBe(false);
 
-    await userEvent.click(next);
-    const list = screen.getByRole('list').element();
-    await expect.poll(() => list.scrollLeft).toBeGreaterThan(0);
-    await expect.element(prev).toBeEnabled();
-
-    list.scrollLeft = list.scrollWidth;
-    await expect.element(next).toBeDisabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Показать ещё' }));
+    expect(visible()).toHaveLength(5);
+    await expect
+      .element(screen.getByRole('link', { name: 'Скриншот переписки: Спасибо за занятия 3' }))
+      .toHaveFocus();
   });
 
   it('grows the screenshot out of its thumbnail and shrinks it back on close', async () => {
@@ -46,9 +80,11 @@ describe('ScreenshotCarousel', () => {
       .mockImplementation((update) =>
         Document.prototype.startViewTransition.call(document, update),
       );
-    const screen = await render(<ScreenshotCarousel reviews={screenshots(2)} label="Скриншоты" />);
+    const screen = await render(
+      <Screenshots reviews={screenshots(2)} label="Скриншоты" layout="wall" />,
+    );
     const link = screen.getByRole('link', { name: 'Скриншот переписки: Спасибо за занятия 1' });
-    const thumbnail = link.element().querySelector('span')!;
+    const thumbnail = link.element().querySelector<HTMLElement>('[data-thumbnail]')!;
 
     await userEvent.click(link);
 
@@ -78,7 +114,9 @@ describe('ScreenshotCarousel', () => {
           : matchMedia(query),
       );
     const startViewTransition = vi.spyOn(document, 'startViewTransition');
-    const screen = await render(<ScreenshotCarousel reviews={screenshots(2)} label="Скриншоты" />);
+    const screen = await render(
+      <Screenshots reviews={screenshots(2)} label="Скриншоты" layout="wall" />,
+    );
 
     await userEvent.click(
       screen.getByRole('link', { name: 'Скриншот переписки: Спасибо за занятия 0' }),
@@ -91,7 +129,9 @@ describe('ScreenshotCarousel', () => {
   });
 
   it('opens the screenshot in a dialog and closes it', async () => {
-    const screen = await render(<ScreenshotCarousel reviews={screenshots(2)} label="Скриншоты" />);
+    const screen = await render(
+      <Screenshots reviews={screenshots(2)} label="Скриншоты" layout="wall" />,
+    );
     await userEvent.click(
       screen.getByRole('link', { name: 'Скриншот переписки: Спасибо за занятия 1' }),
     );

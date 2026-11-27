@@ -79,6 +79,12 @@ export const reviewsTitle = (namePrepositional: string, count: number) =>
   `Отзывы ${aboutName(namePrepositional)}\u00a0·\u00a0${count}`;
 export const SHOW_MORE = 'Показать ещё';
 
+// Записка о пробном занятии в пустом месте кладки скриншотов (ADR-071) – тот же смысл, что у шага
+// «Пробное занятие» в «Как начать».
+export const REVIEWS_NOTE_TITLE = 'Пробное занятие – бесплатно';
+export const reviewsNoteText = (name: string) =>
+  `30 минут онлайн. ${name} познакомится с ребёнком и найдёт пробелы.`;
+
 // --- 5. Как начать ---
 
 export const HOW_TITLE = 'Как начать';
