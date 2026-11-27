@@ -16,6 +16,8 @@ export type WallLayout = {
   columns: number[][];
   /** Колонка, в которую встаёт записка; нет – нигде нет пустого места под неё. */
   noteColumn?: number | undefined;
+  /** Высоты колонок в долях их ширины – по ним видно, выйдет ли кладка за предел высоты. */
+  heights: number[];
 };
 
 /**
@@ -48,5 +50,9 @@ export function wallLayout(
   const noteColumn = shown > 1 && room >= NOTE ? heights.indexOf(Math.min(...heights)) : undefined;
   indices.slice(shown).forEach(place);
 
-  return { columns: columns.map((column) => column.toSorted((a, b) => a - b)), noteColumn };
+  return {
+    columns: columns.map((column) => column.toSorted((a, b) => a - b)),
+    noteColumn,
+    heights,
+  };
 }

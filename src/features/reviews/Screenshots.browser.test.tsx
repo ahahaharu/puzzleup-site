@@ -23,16 +23,32 @@ const NOTE = {
 };
 
 describe('Screenshots', () => {
-  it('stacks the first screenshot over the edges of the next two', async () => {
+  it('previews the first four screenshots in two columns and fades the bottom', async () => {
+    await page.viewport(1280, 900);
     const screen = await render(
-      <Screenshots reviews={screenshots(4)} label="Скриншоты" layout="stack" />,
+      <Screenshots reviews={screenshots(6)} label="Скриншоты" layout="preview" />,
     );
     const list = screen.getByRole('list', { name: 'Скриншоты' });
-    await expect.element(list).toBeInTheDocument();
-    // Под верхним – только оформление: одна ссылка и один пункт списка.
-    expect(screen.getByRole('listitem').all()).toHaveLength(1);
-    expect(screen.getByRole('link').all()).toHaveLength(1);
-    expect(list.element().querySelectorAll('[aria-hidden="true"] img')).toHaveLength(2);
+    expect(screen.getByRole('listitem').all()).toHaveLength(4);
+    // Широкий, квадратный, широкий, квадратный: колонки выше предела – низ растворяется.
+    expect(getComputedStyle(list.element()).maskImage).toContain('linear-gradient');
+  });
+
+  it('previews two screenshots on a phone', async () => {
+    await page.viewport(390, 844);
+    const screen = await render(
+      <Screenshots reviews={screenshots(6)} label="Скриншоты" layout="preview" />,
+    );
+    expect(screen.getByRole('listitem').all()).toHaveLength(2);
+  });
+
+  it('does not fade a preview that fits', async () => {
+    await page.viewport(1280, 900);
+    const screen = await render(
+      <Screenshots reviews={screenshots(1)} label="Скриншоты" layout="preview" />,
+    );
+    const list = screen.getByRole('list', { name: 'Скриншоты' }).element();
+    expect(getComputedStyle(list).maskImage).toBe('none');
   });
 
   it('lays out every screenshot in columns and puts the note into the room left', async () => {

@@ -15,8 +15,9 @@ import { wallLayout } from './wall-layout';
 
 // Скриншоты отзывов из мессенджеров (ADR-062, ADR-071), «вклеенные» скотчем с лёгким наклоном, как
 // фото в профиле. Два вида:
-// - `stack` – стопка на главной в колонке репетитора: сверху первый снимок, из-под него под углом
-//   выглядывают края ещё двух – видно, что отзывов больше; все – по ссылке под колонкой;
+// - `preview` – мини-кладка на главной в колонке репетитора: первые 4 снимка в две колонки (на
+//   телефоне – 2 в одну), не выше 28rem; если кладка выше, низ растворяется – «дальше ещё», все
+//   снимки – по ссылке «Все отзывы» под ней;
 // - `wall` – кладка на странице репетитора: все снимки сразу, колонки одной ширины (текст на снимках
 //   одного размера), снимок – в самую короткую колонку (`wallLayout`). В пустое место под короткой
 //   колонкой встаёт записка о пробном занятии. После 3 (телефон), 4 (от 768 px) или 6 (от 1024 px)
@@ -41,12 +42,22 @@ const VISIBLE = { phone: 3, tablet: 4, desktop: 6 };
 const WALL_COLUMNS = 3;
 /** Наклоны вклеек по кругу, ±1,5° – как у фото репетитора (PhotoTape). */
 const TILTS = [-1.2, 0.9, -0.6, 1.3, -0.9, 0.5];
-/** Края снимков под верхним в стопке: наклон и сдвиг – чтобы выглядывали с разных сторон. */
-const UNDER = ['translate-x-3 rotate-[4deg]', '-translate-x-2 -rotate-[5deg]'];
+/** Мини-кладка на главной: сколько снимков и колонок, сколько снимков на телефоне. */
+const PREVIEW = { count: 4, columns: 2, phone: 2 };
+/**
+ * Предел высоты мини-кладки в долях ширины колонки: 28rem при колонке ~16rem от 768 px, 26rem при
+ * ~20rem на телефоне. Выше – низ растворяется.
+ */
+const PREVIEW_LIMIT = { desktop: 1.7, phone: 1.25 };
+// Растворение низа – целыми строками: Tailwind не видит классы, собранные из частей.
+const FADE = {
+  phone: 'max-md:max-h-[26rem] max-md:mask-[linear-gradient(to_bottom,#000_65%,transparent)]',
+  desktop: 'md:max-h-[28rem] md:mask-[linear-gradient(to_bottom,#000_65%,transparent)]',
+};
 
 const WALL_SIZES =
   '(min-width: 80rem) 368px, (min-width: 64rem) 30vw, (min-width: 48rem) 45vw, 92vw';
-const STACK_SIZES = '(min-width: 48rem) 384px, 92vw';
+const PREVIEW_SIZES = '(min-width: 64rem) 272px, (min-width: 48rem) 45vw, 92vw';
 
 function canZoom() {
   return (
@@ -71,7 +82,7 @@ type ScreenshotsProps = {
   reviews: readonly Screenshot[];
   /** Имя списка для дикторов: «Скриншоты отзывов об Андрее». */
   label: string;
-  layout: 'stack' | 'wall';
+  layout: 'preview' | 'wall';
   /** Только у кладки; нет – пустое место остаётся пустым. */
   note?: WallNote | undefined;
 };
@@ -136,36 +147,15 @@ export function Screenshots({ reviews, label, layout, note }: ScreenshotsProps) 
     });
   }
 
-  /** Вклеенный снимок со скотчем; `under` – края следующих снимков стопки под ним. */
-  function shot(review: Screenshot, index: number, sizes: string, under: Screenshot[] = []) {
+  /** Вклеенный снимок со скотчем. */
+  function shot(review: Screenshot, index: number, sizes: string) {
     const { width, height } = review.screenshotSize ?? FALLBACK_SIZE;
     const tilt: CSSProperties & Record<'--tilt', string> = {
       '--tilt': `${TILTS[index % TILTS.length] ?? 0}deg`,
     };
     return (
-      // Под стопкой подпись ниже: края нижних снимков выглядывают и снизу.
-      <figure className={cn('flex flex-col', under.length > 0 ? 'gap-6' : 'gap-3')}>
+      <figure className="flex flex-col gap-3">
         <div className="relative">
-          {under.map((item, position) => (
-            // Только оформление: эти снимки – по ссылке «Все отзывы».
-            <span
-              key={item.id}
-              aria-hidden="true"
-              // Чуть меньше верхнего и приглушены: видны края, а не текст.
-              className={cn(
-                'rounded-xl absolute inset-x-1 inset-y-1.5 overflow-hidden bg-ink shadow-paper brightness-50',
-                UNDER[position],
-              )}
-            >
-              <Image
-                src={item.screenshot}
-                alt=""
-                fill
-                sizes={sizes}
-                className="object-cover object-top"
-              />
-            </span>
-          ))}
           <a
             href={review.screenshot}
             onClick={(event) => show(event, review)}
@@ -202,23 +192,58 @@ export function Screenshots({ reviews, label, layout, note }: ScreenshotsProps) 
     );
   }
 
-  const [top, ...rest] = reviews;
-  const { columns, noteColumn } =
+  const sizeOf = (review: Screenshot) => review.screenshotSize ?? FALLBACK_SIZE;
+  const shown = layout === 'preview' ? reviews.slice(0, PREVIEW.count) : reviews;
+  const { columns, noteColumn, heights } =
     layout === 'wall'
-      ? wallLayout(
-          reviews.map((review) => review.screenshotSize ?? FALLBACK_SIZE),
-          { columns: WALL_COLUMNS, visible: expanded ? reviews.length : VISIBLE.desktop },
-        )
-      : { columns: [], noteColumn: undefined };
+      ? wallLayout(shown.map(sizeOf), {
+          columns: WALL_COLUMNS,
+          visible: expanded ? reviews.length : VISIBLE.desktop,
+        })
+      : wallLayout(shown.map(sizeOf), { columns: PREVIEW.columns });
+  // На телефоне мини-кладка – одна колонка из первых снимков.
+  const phoneHeight = shown
+    .slice(0, PREVIEW.phone)
+    .reduce((sum, review) => sum + sizeOf(review).height / sizeOf(review).width + 0.25, 0);
+  const fade = {
+    desktop: Math.max(...heights) > PREVIEW_LIMIT.desktop,
+    phone: phoneHeight > PREVIEW_LIMIT.phone,
+  };
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      {layout === 'stack' ? (
-        // Отступы – место скотчу сверху и краям снимков под верхним по бокам.
-        <div role="list" aria-label={label} className="w-full max-w-sm px-3 pt-3">
-          {top && (
-            <div role="listitem">{shot(top, 0, STACK_SIZES, rest.slice(0, UNDER.length))}</div>
+      {layout === 'preview' ? (
+        // Колонки `wallLayout`; на телефоне обёртки растворяются и снимки встают в одну колонку.
+        // Поля по бокам – место наклону и скотчу: край обрезан пределом высоты.
+        <div
+          role="list"
+          aria-label={label}
+          className={cn(
+            'flex flex-col gap-8 overflow-hidden px-2 md:flex-row md:gap-6',
+            fade.phone && FADE.phone,
+            fade.desktop && FADE.desktop,
           )}
+        >
+          {columns.map((column, columnIndex) => (
+            <div
+              key={columnIndex}
+              className="contents md:flex md:min-w-0 md:flex-1 md:flex-col md:gap-8"
+            >
+              {column.map((index) => {
+                const review = shown[index];
+                if (!review) return null;
+                return (
+                  <div
+                    key={review.id}
+                    role="listitem"
+                    className={cn('min-w-0 pt-3', index >= PREVIEW.phone && 'max-md:hidden')}
+                  >
+                    {shot(review, index, PREVIEW_SIZES)}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       ) : (
         // От 1024 px – колонки `wallLayout`; уже обёртки колонок растворяются (`contents`), и снимки
